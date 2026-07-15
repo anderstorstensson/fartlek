@@ -79,23 +79,63 @@ Timestamps are naive; use `start_time_local` for day/week grouping.
 - **Progress signals**: pace at fixed HR over months, PR trajectory from `best_efforts`,
   weekly distance trend from `/api/trends/weekly`.
 
+## The athlete profile (required before any plan)
+
+A tailored plan requires knowing the athlete, not just their data. The profile lives at
+`data/athlete-profile.md` (gitignored — personal data).
+
+- **Before creating or revising a plan, read this file.** If it doesn't exist, conduct
+  the interview below and write it. If it exists, confirm it's current ("still true that
+  you can train 6 days/week and the long run is Sunday?") and update what changed.
+- **Never ask what the database already answers** (weekly volume, fitness trend, PRs,
+  pace-at-HR, workout frequency — derive those). Interview only for what data can't show:
+  1. Goal: race, distance, date, target time — and a secondary goal if any.
+  2. Training availability: days/week, time per day, which day fits the long run,
+     access to track/hills/treadmill.
+  3. Injury history and current niggles; what has broken them before.
+  4. Training history: years of consistent running, highest sustained weekly volume,
+     what type of training they've responded well/poorly to.
+  5. Life load: sleep quality, work/family stress, other sports.
+  6. Age and anything affecting recovery (illness, medication).
+  7. Preferences that affect adherence (loves/hates intervals, group runs, doubles).
+- Keep the file short and factual; date-stamp updates. Record plan-relevant conclusions
+  from check-ins there too ("responds badly to back-to-back quality days").
+
 ## Suggesting a training plan
 
-Always ask (or confirm) first: goal race + distance + date, target time (or "finish"),
-sessions available per week, injury history/constraints.
+Plans are built from the athlete's data + profile, never from generic templates.
 
-Then build from the data, not from templates:
-1. Current state: CTL, recent weekly km (last 4–6 weeks median), longest recent run,
-   current threshold pace estimate (use recent 5K/10K best efforts; Riegel exponent 1.06
-   for race predictions).
-2. Training paces from threshold pace: easy ≈ threshold +25–35%, marathon pace ≈ +8–12%,
-   threshold intervals at ≈100%, VO2max reps ≈ −8–10%.
-3. Structure: phases (base → build → peak → taper 2–3 weeks); weekly volume growth ≤10%
-   with a down week every 4th; 80/20 easy/hard distribution; long run ≤30–35% of weekly km.
-4. Express the plan week by week (target km, key sessions with paces, target CTL), and
-   sanity-check the implied CTL ramp rate stays ≤5/week.
-5. Present as a markdown table; note explicitly that it should be adjusted for how the
-   body responds — re-analyze after 2–3 weeks of execution.
+1. **Baseline from data**: current CTL and 4–6-week median volume, longest recent run,
+   threshold pace estimate (recent best efforts + Riegel exponent 1.06), pace-at-HR
+   trend. State these numbers to the user as the plan's foundation.
+2. **Demand analysis — what does the goal require?** Compare the race's demand profile
+   against the athlete's current state and name the gaps. Race demands, roughly:
+   5K ≈ VO2max + speed; 10K ≈ VO2max + threshold; half ≈ threshold + endurance;
+   marathon ≈ endurance + threshold + fueling. The plan's emphasis must follow the gap
+   analysis (e.g. threshold pace already sufficient for the 10K goal but CTL low →
+   endurance-heavy plan), and the plan must say so explicitly.
+3. **Every session names its target system.** No session goes in the plan without a
+   stated physiological purpose: `endurance` (Z1–Z2 aerobic base), `threshold` (LT2,
+   ~10K–HM effort), `vo2max` (3–5 min reps at ~3K–5K effort, 1:1 recovery — Billat),
+   `speed` (short reps/strides, full recovery, neuromuscular), `race-specific`
+   (goal pace work), `recovery`. Weekly structure follows polarized/pyramidal
+   distribution (~80% easy / 20% hard by time — Seiler); typically max 2 quality
+   sessions + 1 long run per week, never hard days back-to-back.
+4. **Training paces from the athlete's numbers** (not tables): easy ≈ threshold pace
+   +25–35%, marathon pace ≈ +8–12%, threshold ≈ 100%, VO2max reps ≈ −8–10%, all
+   cross-checked against actual recent performances and the athlete's zones.
+5. **Progression and safety rails**: volume growth ≤10%/week, down week every 4th
+   (~70%), long run ≤30–35% of weekly volume, CTL ramp ≤5/week, intensity volume grows
+   before intensity density. Periodize base → build (race-specific emphasis grows) →
+   peak → taper (2–3 weeks, volume −40–60%, keep intensity frequency — maintain fitness,
+   shed fatigue).
+6. **Present before publishing**: week-by-week table (target km, key sessions with
+   paces and their target system, weekly intent), the reasoning ("weeks 1–4 build
+   aerobic base because X; threshold block starts week 5 because Y"), stated
+   assumptions, and what would trigger a revision. Publish to the calendar only after
+   the user approves.
+7. Re-analyze against execution after 2–3 weeks (see adjustment section) and update
+   both the plan and the athlete profile with what was learned.
 
 ## Publishing a training plan into the app
 
@@ -110,10 +150,11 @@ curl -s -X POST http://127.0.0.1:8077/api/plan \
     "replace_plan": true,
     "workouts": [
       {"day": "2026-07-20", "title": "Easy 8K", "workout_type": "easy",
-       "target_distance_m": 8000, "description": "Conversational pace, 5:30-5:50 /km",
+       "target_distance_m": 8000,
+       "description": "[endurance] Conversational pace, 5:30-5:50 /km, HR Z2",
        "plan_name": "sub-40 10K — Oct 18"},
       {"day": "2026-07-22", "title": "6 × 800m @ 3:55/km", "workout_type": "intervals",
-       "description": "2K warmup, 6x800 w/ 90s jog rest, 2K cooldown",
+       "description": "[vo2max] 2K warmup, 6x800 w/ 90s jog rest, 2K cooldown",
        "plan_name": "sub-40 10K — Oct 18"},
       {"day": "2026-07-24", "title": "Rest", "workout_type": "rest",
        "plan_name": "sub-40 10K — Oct 18"}
@@ -123,6 +164,11 @@ curl -s -X POST http://127.0.0.1:8077/api/plan \
 
 Rules:
 - `workout_type` ∈ easy | long | intervals | tempo | race | rest | cross.
+- `description` starts with the session's target system in brackets —
+  `[endurance]`, `[threshold]`, `[vo2max]`, `[speed]`, `[race-specific]`, `[recovery]` —
+  followed by the concrete prescription (paces/HR, structure). This is mandatory:
+  it shows in the calendar tooltip and is how planned intent is audited against
+  execution later.
 - Use one consistent `plan_name` (include the goal + race date) for the whole plan;
   `replace_plan: true` replaces any previous version of that plan atomically.
 - Put paces and structure in `description` — it shows in the calendar tooltip.
@@ -165,6 +211,9 @@ unusual fatigue, or a schedule conflict:
 4. As with new plans: present the proposed changes and get the user's approval
    BEFORE writing, and summarize what changed afterwards (e.g. "moved Thursday's
    intervals to Friday, dropped Sunday's long run to 14 km").
+5. Record durable lessons in `data/athlete-profile.md` (e.g. "third cold this
+   winter during high-volume block — cap ramp rate lower"), so the next plan
+   starts smarter.
 
 ## Housekeeping commands
 
