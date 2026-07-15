@@ -211,6 +211,34 @@ def test_plan_update_workout(client):
     client.delete("/api/plan?plan_name=adjust-test")
 
 
+def test_plan_ics_export(client):
+    payload = {
+        "workouts": [
+            {"day": "2026-08-03", "title": "6 × 1000m @ 3:26-3:32", "workout_type": "intervals",
+             "description": "[vo2max] 2K warmup, 6x1000 w/ 2min jog, 2K cooldown",
+             "target_distance_m": 12000, "plan_name": "ics-test"},
+            {"day": "2026-08-05", "title": "Long run, easy", "workout_type": "long",
+             "target_distance_m": 26000, "plan_name": "ics-test"},
+        ],
+    }
+    client.post("/api/plan", json=payload)
+
+    response = client.get("/api/plan/export.ics?plan_name=ics-test")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/calendar")
+    body = response.text
+    assert body.startswith("BEGIN:VCALENDAR")
+    assert body.count("BEGIN:VEVENT") == 2
+    assert "DTSTART;VALUE=DATE:20260803" in body
+    assert "SUMMARY:6 × 1000m @ 3:26-3:32" in body
+    assert "2K warmup\\, 6x1000 w/ 2min jog\\, 2K cooldown" in body  # commas escaped
+    # RFC 5545: no unfolded line may exceed 75 octets
+    assert all(len(line.encode()) <= 75 for line in body.split("\r\n"))
+
+    assert client.get("/api/plan/export.ics?plan_name=nonexistent").status_code == 404
+    client.delete("/api/plan?plan_name=ics-test")
+
+
 def test_plan_validates_workout_type(client):
     bad = {"workouts": [{"day": "2026-07-13", "title": "X", "workout_type": "fartlek"}]}
     assert client.post("/api/plan", json=bad).status_code == 422

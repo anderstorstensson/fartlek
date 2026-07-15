@@ -1,10 +1,12 @@
 from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import Response
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from backend.db import get_session
+from backend.ics import plan_to_ics
 from backend.models import Activity, PlannedWorkout
 from backend.schemas import PlanImport, PlanInfo, PlannedWorkoutIn, PlannedWorkoutOut
 
@@ -72,6 +74,25 @@ def import_plan(payload: PlanImport, session: Session = Depends(get_session)) ->
         session.add(PlannedWorkout(**workout.model_dump()))
     session.commit()
     return {"imported": len(payload.workouts)}
+
+
+@router.get("/export.ics")
+def export_ics(
+    plan_name: str | None = None, session: Session = Depends(get_session)
+) -> Response:
+    query = select(PlannedWorkout).order_by(PlannedWorkout.day)
+    if plan_name:
+        query = query.where(PlannedWorkout.plan_name == plan_name)
+    workouts = session.scalars(query).all()
+    if not workouts:
+        raise HTTPException(status_code=404, detail="No planned workouts to export")
+    calendar_name = plan_name or "Fartlek training plan"
+    filename = (plan_name or "fartlek-plan").replace(" ", "-").replace("/", "-")
+    return Response(
+        content=plan_to_ics(workouts, calendar_name=calendar_name),
+        media_type="text/calendar; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}.ics"'},
+    )
 
 
 @router.get("/plans", response_model=list[PlanInfo])

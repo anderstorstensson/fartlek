@@ -328,8 +328,19 @@ export default function Calendar() {
                     <td className="muted">
                       {plan.first_day} → {plan.last_day}
                     </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button className="ghost" onClick={() => deletePlan(plan.plan_name)}>
+                    <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <a
+                        className="btn-ghost"
+                        href={`/api/plan/export.ics?plan_name=${encodeURIComponent(plan.plan_name)}`}
+                        download
+                      >
+                        Export .ics
+                      </a>
+                      <button
+                        className="ghost"
+                        style={{ marginLeft: 8 }}
+                        onClick={() => deletePlan(plan.plan_name)}
+                      >
                         Delete
                       </button>
                     </td>
