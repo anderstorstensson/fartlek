@@ -5,7 +5,7 @@
 ![React 18](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?logo=sqlite&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-pytest-0A9EDC?logo=pytest&logoColor=white)
+[![CI](https://github.com/anderstorstensson/fartlek/actions/workflows/ci.yml/badge.svg)](https://github.com/anderstorstensson/fartlek/actions/workflows/ci.yml)
 ![Data: 100% local](https://img.shields.io/badge/data-100%25%20local-e8590c)
 ![License: MIT](https://img.shields.io/badge/license-MIT-97ca00)
 
