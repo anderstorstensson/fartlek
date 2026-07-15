@@ -255,6 +255,21 @@ button.ghost {
   border: 1px solid var(--border);
 }
 
+a.btn-ghost {
+  display: inline-block;
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+a.btn-ghost:hover {
+  filter: brightness(1.1);
+}
+
 .segmented {
   display: inline-flex;
   background: var(--surface);
