@@ -3,6 +3,7 @@ import { NavLink, Route, Routes } from 'react-router-dom'
 import { fetchJson, SyncStatus } from './api'
 import Activities from './pages/Activities'
 import ActivityDetailPage from './pages/ActivityDetail'
+import Analysis from './pages/Analysis'
 import Calendar from './pages/Calendar'
 import Dashboard from './pages/Dashboard'
 import Logbook from './pages/Logbook'
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
   { to: '/logbook', label: 'Logbook', icon: '📒' },
   { to: '/calendar', label: 'Calendar', icon: '📅' },
   { to: '/trends', label: 'Trends', icon: '📈' },
+  { to: '/analysis', label: 'Analysis', icon: '🧠' },
   { to: '/records', label: 'Records', icon: '🏆' },
   { to: '/settings', label: 'Settings', icon: '⚙️' }
 ]
@@ -76,6 +78,7 @@ export default function App() {
           <Route path="/activities/:id" element={<ActivityDetailPage />} />
           <Route path="/logbook" element={<Logbook />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/analysis" element={<Analysis />} />
           <Route path="/trends" element={<Trends />} />
           <Route path="/records" element={<Records />} />
           <Route path="/settings" element={<SettingsPage />} />

@@ -216,6 +216,40 @@ def test_plan_validates_workout_type(client):
     assert client.post("/api/plan", json=bad).status_code == 422
 
 
+def test_notes_crud(client):
+    created = client.post(
+        "/api/notes",
+        json={"activity_id": 1, "kind": "session", "title": "Morning Run analysis",
+              "content": "## Solid aerobic run\n- decoupling 2.1%"},
+    ).json()
+    assert created["id"] > 0
+
+    by_activity = client.get("/api/notes?activity_id=1").json()
+    assert len(by_activity) == 1
+    assert by_activity[0]["title"] == "Morning Run analysis"
+    assert client.get("/api/notes?activity_id=999").json() == []
+
+    updated = client.put(
+        f"/api/notes/{created['id']}",
+        json={"activity_id": 1, "kind": "session", "title": "Morning Run analysis v2",
+              "content": "revised"},
+    ).json()
+    assert updated["title"] == "Morning Run analysis v2"
+
+    weekly = client.post(
+        "/api/notes",
+        json={"kind": "weekly", "title": "W28 check-in", "content": "on plan",
+              "period_start": "2026-07-06", "period_end": "2026-07-12"},
+    ).json()
+    assert client.get("/api/notes?kind=weekly").json()[0]["id"] == weekly["id"]
+
+    assert client.post("/api/notes", json={"kind": "bogus", "title": "x", "content": "y"}).status_code == 422
+
+    for note_id in (created["id"], weekly["id"]):
+        assert client.delete(f"/api/notes/{note_id}").json() == {"deleted": note_id}
+    assert client.delete("/api/notes/99999").status_code == 404
+
+
 def test_sync_status(client):
     body = client.get("/api/sync/status").json()
     assert body["total_activities"] == 1

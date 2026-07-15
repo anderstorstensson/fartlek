@@ -68,6 +68,31 @@ Timestamps are naive; use `start_time_local` for day/week grouping.
 6. Place it in context: TSB on the day (was the athlete fresh or fatigued?), contribution
    to the week's load.
 
+## Saving analyses into the app
+
+Substantive analyses should be saved so the user can revisit them in the app (they
+appear on the Analysis page, and session analyses also on the activity's own page).
+After completing an analysis, save it — mention that you did; skip only for trivial
+one-line answers or when the user says not to.
+
+```bash
+curl -s -X POST http://127.0.0.1:8077/api/notes -H 'Content-Type: application/json' -d '{
+  "activity_id": 23604865594,
+  "kind": "session",
+  "title": "Odsherred intervals — rep consistency and HR response",
+  "content": "## Summary\n..."
+}'
+```
+
+- `kind` ∈ `session` (one activity — set `activity_id`) | `weekly` | `trend` |
+  `plan-checkin` (set `period_start`/`period_end` for these) | `other`.
+- `content` is markdown. Write it for future reading: findings first, numbers included,
+  no conversational filler. Keep the title specific ("W29 check-in — volume back on
+  plan, decoupling improving"), not generic ("Analysis").
+- Update rather than duplicate: if re-analyzing the same activity/period, list existing
+  notes (`GET /api/notes?activity_id=…` or `?kind=…`) and `PUT /api/notes/{id}`.
+- The DB is also directly writable at `analysis_notes` if the app is down.
+
 ## Analyzing long-term trends
 
 - **Ramp rate**: CTL increase per week. Sustainable ≈ 3–5 points/week; >8 is injury risk.

@@ -591,6 +591,71 @@ tr.lap-active td {
   border: 1px dashed var(--series-planned);
 }
 
+/* ---------- Analysis notes ---------- */
+.note-card {
+  margin-bottom: 16px;
+}
+
+.note-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.markdown {
+  color: var(--text-secondary);
+  line-height: 1.55;
+  font-size: 14px;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  color: var(--text-primary);
+  font-size: 15px;
+  margin: 14px 0 6px;
+}
+
+.markdown p {
+  margin: 6px 0;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 6px 0;
+  padding-left: 22px;
+}
+
+.markdown li {
+  margin: 3px 0;
+}
+
+.markdown strong {
+  color: var(--text-primary);
+}
+
+.markdown code {
+  background: var(--surface-2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 13px;
+}
+
+.markdown table {
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.markdown blockquote {
+  border-left: 3px solid var(--baseline);
+  margin: 8px 0;
+  padding-left: 12px;
+  color: var(--text-muted);
+}
+
 /* ---------- Misc ---------- */
 .badge {
   display: inline-block;

@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from backend.api import activities, plan, settings, sync, trends
+from backend.api import activities, notes, plan, settings, sync, trends
 from backend.config import BASE_DIR, config
 from backend.db import init_db
 from backend.sync.scheduler import start_scheduler, stop_scheduler
@@ -28,6 +28,7 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title="Fartlek", lifespan=lifespan)
 
 app.include_router(activities.router)
+app.include_router(notes.router)
 app.include_router(plan.router)
 app.include_router(trends.router)
 app.include_router(settings.router)
