@@ -239,6 +239,23 @@ def test_plan_ics_export(client):
     client.delete("/api/plan?plan_name=ics-test")
 
 
+def test_plan_ics_export_non_ascii_plan_name(client):
+    # Em-dash and colon in the plan name must not break the download headers.
+    name = "sub-2:45 Valencia — Dec 6"
+    client.post("/api/plan", json={"workouts": [
+        {"day": "2026-08-10", "title": "Easy 10K", "workout_type": "easy",
+         "target_distance_m": 10000, "plan_name": name},
+    ]})
+    from urllib.parse import quote
+    response = client.get(f"/api/plan/export.ics?plan_name={quote(name)}")
+    assert response.status_code == 200
+    disposition = response.headers["content-disposition"]
+    assert disposition.encode("latin-1")  # header must be encodable
+    assert 'filename="sub-2-45-Valencia-Dec-6.ics"' in disposition
+    assert "X-WR-CALNAME:sub-2:45 Valencia — Dec 6" in response.text
+    client.delete(f"/api/plan?plan_name={quote(name)}")
+
+
 def test_plan_validates_workout_type(client):
     bad = {"workouts": [{"day": "2026-07-13", "title": "X", "workout_type": "fartlek"}]}
     assert client.post("/api/plan", json=bad).status_code == 422
