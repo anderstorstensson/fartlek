@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
-import { ActivityDetail, Streams, useApi } from '../api'
+import { ActivityDetail, AnalysisNote, Streams, useApi } from '../api'
 import ActivityMap from '../components/ActivityMap'
+import NoteCard from '../components/NoteCard'
 import StreamCharts from '../components/StreamCharts'
 import ZoneChart from '../components/ZoneChart'
 import {
@@ -28,6 +29,7 @@ export default function ActivityDetailPage() {
   const { id } = useParams()
   const detail = useApi<ActivityDetail>(id ? `/api/activities/${id}` : null)
   const streams = useApi<Streams>(id ? `/api/activities/${id}/streams` : null)
+  const notes = useApi<AnalysisNote[]>(id ? `/api/notes?activity_id=${id}` : null)
 
   if (detail.error) return <div className="error-box">Failed to load: {detail.error}</div>
   if (!detail.data) return <p className="muted">Loading…</p>
@@ -77,6 +79,15 @@ export default function ActivityDetailPage() {
             </span>
           ))}
         </p>
+      )}
+
+      {notes.data && notes.data.length > 0 && (
+        <>
+          <h2>Analysis</h2>
+          {notes.data.map((note) => (
+            <NoteCard key={note.id} note={note} />
+          ))}
+        </>
       )}
 
       {streams.data && <ActivityMap streams={streams.data} />}

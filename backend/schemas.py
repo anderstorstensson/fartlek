@@ -148,6 +148,25 @@ class PlanInfo(BaseModel):
     last_day: date
 
 
+class NoteIn(BaseModel):
+    activity_id: int | None = None
+    kind: str = Field(
+        default="session", pattern="^(session|weekly|trend|plan-checkin|other)$"
+    )
+    title: str = Field(min_length=1, max_length=200)
+    content: str = Field(min_length=1, max_length=50000)
+    period_start: date | None = None
+    period_end: date | None = None
+
+
+class NoteOut(NoteIn):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+
 class RecordEntry(BaseModel):
     label: str
     distance_m: float

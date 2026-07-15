@@ -131,6 +131,18 @@ export interface Settings {
   zones: Zone[]
 }
 
+export interface AnalysisNote {
+  id: number
+  activity_id: number | null
+  kind: 'session' | 'weekly' | 'trend' | 'plan-checkin' | 'other'
+  title: string
+  content: string
+  period_start: string | null
+  period_end: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface SyncStatus {
   status: string
   message: string

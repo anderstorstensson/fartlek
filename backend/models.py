@@ -137,6 +137,26 @@ class PlannedWorkout(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
 
+class AnalysisNote(Base):
+    """A saved analysis written by the Claude skill (session, weekly, trend…).
+
+    activity_id is intentionally NOT a foreign key: re-imports delete and recreate
+    activity rows, and notes must survive that.
+    """
+
+    __tablename__ = "analysis_notes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    activity_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True, index=True)
+    kind: Mapped[str] = mapped_column(String, default="session", index=True)
+    title: Mapped[str] = mapped_column(String)
+    content: Mapped[str] = mapped_column(String)  # markdown
+    period_start: Mapped[date | None] = mapped_column(Date, nullable=True)
+    period_end: Mapped[date | None] = mapped_column(Date, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+
 class AthleteSettings(Base):
     __tablename__ = "athlete_settings"
 
