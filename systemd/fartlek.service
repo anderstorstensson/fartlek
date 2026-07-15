@@ -1,0 +1,15 @@
+# Template unit — install via scripts/install-service.sh, which fills in the paths.
+[Unit]
+Description=Fartlek — local training log with Garmin sync
+After=network-online.target
+Wants=network-online.target
+RequiresMountsFor=@WORKDIR@
+
+[Service]
+WorkingDirectory=@WORKDIR@
+ExecStart=@VENV@/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8077
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
