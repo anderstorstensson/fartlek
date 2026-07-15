@@ -129,12 +129,20 @@ Plans are built from the athlete's data + profile, never from generic templates.
    before intensity density. Periodize base → build (race-specific emphasis grows) →
    peak → taper (2–3 weeks, volume −40–60%, keep intensity frequency — maintain fitness,
    shed fatigue).
-6. **Present before publishing**: week-by-week table (target km, key sessions with
+6. **Independent review before the athlete sees it**: spawn the `coach-advisor` agent
+   (defined in `.claude/agents/coach-advisor.md`) with the draft plan, the baseline
+   numbers, and the goal. It verifies the numbers against the database itself and
+   returns a verdict with severity-ranked findings. Fix CRITICAL and HIGH findings and
+   re-submit to the advisor until it approves (max 2 iterations — then present with the
+   remaining disagreements stated openly). Mention in the presentation that the plan
+   passed independent review and what it flagged. Do the same for major revisions
+   (regenerated remainder, changed race date) — not for 1–2 workout tweaks.
+7. **Present before publishing**: week-by-week table (target km, key sessions with
    paces and their target system, weekly intent), the reasoning ("weeks 1–4 build
    aerobic base because X; threshold block starts week 5 because Y"), stated
    assumptions, and what would trigger a revision. Publish to the calendar only after
    the user approves.
-7. Re-analyze against execution after 2–3 weeks (see adjustment section) and update
+8. Re-analyze against execution after 2–3 weeks (see adjustment section) and update
    both the plan and the athlete profile with what was learned.
 
 ## Publishing a training plan into the app
