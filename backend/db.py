@@ -44,6 +44,10 @@ def _migrate() -> None:
     new_columns = {
         "activities": [("is_workout", "BOOLEAN NOT NULL DEFAULT 0")],
         "laps": [("intensity", "VARCHAR")],
+        "athlete_settings": [
+            ("zone_mode", "VARCHAR NOT NULL DEFAULT 'max_hr'"),
+            ("manual_zone_bounds", "JSON"),
+        ],
     }
     with engine.connect() as conn:
         for table, columns in new_columns.items():

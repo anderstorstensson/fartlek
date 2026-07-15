@@ -126,6 +126,8 @@ export interface Settings {
   lthr: number
   threshold_pace_s_per_km: number
   sex: string
+  zone_mode: 'max_hr' | 'lthr' | 'manual'
+  manual_zone_bounds: number[] | null
   zones: Zone[]
 }
 

@@ -146,6 +146,8 @@ class AthleteSettings(Base):
     lthr: Mapped[int] = mapped_column(Integer, default=170)
     threshold_pace_s_per_km: Mapped[float] = mapped_column(Float, default=270.0)
     sex: Mapped[str] = mapped_column(String, default="male")
+    zone_mode: Mapped[str] = mapped_column(String, default="max_hr")  # max_hr | lthr | manual
+    manual_zone_bounds: Mapped[list | None] = mapped_column(JSON, nullable=True)  # 5 lower bounds (bpm)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
 
 

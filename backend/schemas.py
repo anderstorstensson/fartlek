@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class ActivitySummary(BaseModel):
@@ -187,6 +187,8 @@ class SettingsOut(BaseModel):
     lthr: int
     threshold_pace_s_per_km: float
     sex: str
+    zone_mode: str
+    manual_zone_bounds: list[int] | None
 
 
 class SettingsIn(BaseModel):
@@ -195,6 +197,20 @@ class SettingsIn(BaseModel):
     lthr: int = Field(ge=100, le=220)
     threshold_pace_s_per_km: float = Field(ge=120, le=720)
     sex: str = Field(pattern="^(male|female)$")
+    zone_mode: str = Field(default="max_hr", pattern="^(max_hr|lthr|manual)$")
+    manual_zone_bounds: list[int] | None = None
+
+    @model_validator(mode="after")
+    def _check_manual_bounds(self) -> "SettingsIn":
+        if self.zone_mode == "manual":
+            bounds = self.manual_zone_bounds
+            if bounds is None or len(bounds) != 5:
+                raise ValueError("manual zone mode requires 5 lower bounds (bpm)")
+            if any(b2 <= b1 for b1, b2 in zip(bounds, bounds[1:])):
+                raise ValueError("manual zone bounds must be strictly increasing")
+            if bounds[0] < 40 or bounds[-1] > 230:
+                raise ValueError("manual zone bounds must be plausible bpm values")
+        return self
 
 
 class SettingsResponse(SettingsOut):

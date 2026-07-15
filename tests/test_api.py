@@ -96,6 +96,35 @@ def test_settings_roundtrip(client):
     assert client.get("/api/settings").json()["resting_hr"] == 48
 
 
+def test_settings_zone_modes(client):
+    base = {"resting_hr": 48, "max_hr": 188, "lthr": 168,
+            "threshold_pace_s_per_km": 255, "sex": "male"}
+
+    lthr_zones = client.put(
+        "/api/settings", json={**base, "zone_mode": "lthr"}
+    ).json()["zones"]
+    assert lthr_zones[4]["low_bpm"] == 168  # Z5 starts at LTHR
+
+    manual = client.put(
+        "/api/settings",
+        json={**base, "zone_mode": "manual",
+              "manual_zone_bounds": [100, 130, 145, 160, 172]},
+    ).json()
+    assert [z["low_bpm"] for z in manual["zones"]] == [100, 130, 145, 160, 172]
+    assert manual["zones"][4]["high_bpm"] is None
+
+    # Manual mode requires 5 strictly increasing bounds.
+    bad = client.put(
+        "/api/settings",
+        json={**base, "zone_mode": "manual", "manual_zone_bounds": [100, 90, 145, 160, 172]},
+    )
+    assert bad.status_code == 422
+    assert client.put("/api/settings", json={**base, "zone_mode": "manual"}).status_code == 422
+
+    # Restore default mode for other tests.
+    client.put("/api/settings", json={**base, "zone_mode": "max_hr"})
+
+
 def test_settings_validation(client):
     bad = {"resting_hr": 5, "max_hr": 188, "lthr": 168,
            "threshold_pace_s_per_km": 255, "sex": "male"}
