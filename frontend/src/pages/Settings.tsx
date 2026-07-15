@@ -35,7 +35,9 @@ export default function SettingsPage() {
         max_hr: settings.max_hr,
         lthr: settings.lthr,
         threshold_pace_s_per_km: settings.threshold_pace_s_per_km,
-        sex: settings.sex
+        sex: settings.sex,
+        zone_mode: settings.zone_mode,
+        manual_zone_bounds: settings.manual_zone_bounds
       })
     })
       .then((updated) => {
@@ -124,15 +126,15 @@ export default function SettingsPage() {
               />
             </label>
             <label>
-              <div className="muted">
-                Threshold pace (s/km) = {formatPaceFromSeconds(settings.threshold_pace_s_per_km)}{' '}
-                /km
-              </div>
+              <div className="muted">Threshold pace (s/km)</div>
               <input
                 type="number"
                 value={settings.threshold_pace_s_per_km}
                 onChange={(e) => update({ threshold_pace_s_per_km: Number(e.target.value) })}
               />
+              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                = {formatPaceFromSeconds(settings.threshold_pace_s_per_km)}/km
+              </div>
             </label>
             <label>
               <div className="muted">Sex (TRIMP coefficients)</div>
@@ -148,23 +150,65 @@ export default function SettingsPage() {
 
       {settings && (
         <>
-          <h2>Heart-rate zones (% of max HR)</h2>
-          <div className="card table-wrap" style={{ padding: 0 }}>
-            <table>
-              <tbody>
-                {settings.zones.map((zone) => (
-                  <tr key={zone.name}>
-                    <td className="strong" style={{ width: 60 }}>
-                      {zone.name}
-                    </td>
-                    <td>
-                      {zone.low_bpm}
-                      {zone.high_bpm ? ` – ${zone.high_bpm}` : '+'} bpm
-                    </td>
-                  </tr>
+          <h2>Heart-rate zones</h2>
+          <div className="card">
+            <label>
+              <div className="muted">Zones based on</div>
+              <select
+                value={settings.zone_mode}
+                onChange={(e) => {
+                  const mode = e.target.value as Settings['zone_mode']
+                  const patch: Partial<Settings> = { zone_mode: mode }
+                  if (mode === 'manual' && !settings.manual_zone_bounds) {
+                    patch.manual_zone_bounds = settings.zones.map((z) => z.low_bpm)
+                  }
+                  update(patch)
+                }}
+              >
+                <option value="max_hr">% of max HR</option>
+                <option value="lthr">% of lactate threshold HR</option>
+                <option value="manual">Manual (bpm)</option>
+              </select>
+            </label>
+            {settings.zone_mode === 'manual' && settings.manual_zone_bounds && (
+              <div className="stat-grid" style={{ marginTop: 12 }}>
+                {settings.manual_zone_bounds.map((bound, i) => (
+                  <label key={i}>
+                    <div className="muted">Z{i + 1} from (bpm)</div>
+                    <input
+                      type="number"
+                      value={bound}
+                      onChange={(e) => {
+                        const bounds = settings.manual_zone_bounds!.map((b, j) =>
+                          j === i ? Number(e.target.value) : b
+                        )
+                        update({ manual_zone_bounds: bounds })
+                      }}
+                    />
+                  </label>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
+            <p className="muted" style={{ fontSize: 12 }}>
+              Save settings to recalculate the zone table below.
+            </p>
+            <div className="table-wrap">
+              <table>
+                <tbody>
+                  {settings.zones.map((zone) => (
+                    <tr key={zone.name}>
+                      <td className="strong" style={{ width: 60 }}>
+                        {zone.name}
+                      </td>
+                      <td>
+                        {zone.low_bpm}
+                        {zone.high_bpm ? ` – ${zone.high_bpm}` : '+'} bpm
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}

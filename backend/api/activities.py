@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
-from backend.analysis.zones import hr_zones, time_in_zones
+from backend.analysis.zones import time_in_zones, zones_for_settings
 from backend.db import get_session
 from backend.models import Activity, Stream
 from backend.schemas import ActivityDetail, ActivityList, StreamsOut, ZoneOut
@@ -79,9 +79,9 @@ def get_streams(activity_id: int, session: Session = Depends(get_session)) -> St
     if stream is None:
         raise HTTPException(status_code=404, detail="No streams for this activity")
     settings = get_or_create_settings(session)
-    zones = hr_zones(settings.max_hr)
+    zones = zones_for_settings(settings)
     tiz = time_in_zones(
-        [t for t in stream.time_s if t is not None], stream.hr, settings.max_hr
+        [t for t in stream.time_s if t is not None], stream.hr, zones
     )
     return StreamsOut(
         time_s=stream.time_s,
