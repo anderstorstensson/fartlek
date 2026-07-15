@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -87,7 +88,9 @@ def export_ics(
     if not workouts:
         raise HTTPException(status_code=404, detail="No planned workouts to export")
     calendar_name = plan_name or "Fartlek training plan"
-    filename = (plan_name or "fartlek-plan").replace(" ", "-").replace("/", "-")
+    # HTTP headers are latin-1 only — reduce the filename to safe ASCII.
+    safe = re.sub(r"[^A-Za-z0-9._-]+", "-", plan_name or "fartlek-plan").strip("-")
+    filename = safe or "fartlek-plan"
     return Response(
         content=plan_to_ics(workouts, calendar_name=calendar_name),
         media_type="text/calendar; charset=utf-8",
