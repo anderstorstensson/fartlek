@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ActivityList, FitnessPoint, StatsSummary, useApi, WeeklyStat } from '../api'
+import {
+  ActivityList,
+  FitnessPoint,
+  PlannedWorkout,
+  StatsSummary,
+  useApi,
+  WeeklyStat
+} from '../api'
 import FitnessChart from '../components/FitnessChart'
 import StatCard from '../components/StatCard'
 import WeeklyChart, { WeeklyMetric } from '../components/WeeklyChart'
@@ -13,12 +20,45 @@ import {
   sportEmoji
 } from '../format'
 
+const KEY_TYPES = ['intervals', 'tempo', 'long', 'race']
+
+function isoToday(offsetDays = 0): string {
+  const d = new Date()
+  d.setDate(d.getDate() + offsetDays)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function NextWorkoutTile({ workout }: { workout: PlannedWorkout }) {
+  const [y, m, d] = workout.day.split('-').map(Number)
+  const dayLabel = new Date(y, m - 1, d).toLocaleDateString(undefined, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short'
+  })
+  return (
+    <Link to="/calendar" className="card stat-tile next-workout">
+      <div className="label">Next key workout · {dayLabel}</div>
+      <div className="value" style={{ fontSize: 17, lineHeight: 1.3 }}>
+        {workout.title}
+      </div>
+      <div className="delta">
+        {workout.workout_type}
+        {workout.target_distance_m ? ` · ${formatDistance(workout.target_distance_m)}` : ''}
+      </div>
+    </Link>
+  )
+}
+
 export default function Dashboard() {
   const stats = useApi<StatsSummary>('/api/stats/summary')
   const fitness = useApi<FitnessPoint[]>('/api/trends/fitness?model=trimp&days=120')
   const weekly = useApi<WeeklyStat[]>('/api/trends/weekly?weeks=26')
   const recent = useApi<ActivityList>('/api/activities?limit=6')
   const [weeklyMetric, setWeeklyMetric] = useState<WeeklyMetric>('distance')
+  const plan = useApi<PlannedWorkout[]>(`/api/plan?start=${isoToday()}&end=${isoToday(28)}`)
+  const nextKey = plan.data?.find(
+    (w) => KEY_TYPES.includes(w.workout_type) && !w.completed_activity_id
+  )
 
   if (stats.error) return <div className="error-box">Failed to load stats: {stats.error}</div>
 
@@ -61,13 +101,17 @@ export default function Dashboard() {
             value={week.load_trimp.toFixed(0)}
             delta={`last week ${last.load_trimp.toFixed(0)}`}
           />
-          {form && (
-            <StatCard
-              label="Form (TSB) · today"
-              value={form.tsb.toFixed(0)}
-              delta={`fitness ${form.ctl.toFixed(0)} · fatigue ${form.atl.toFixed(0)}`}
-              deltaGood={form.tsb >= 0}
-            />
+          {nextKey ? (
+            <NextWorkoutTile workout={nextKey} />
+          ) : (
+            form && (
+              <StatCard
+                label="Form (TSB) · today"
+                value={form.tsb.toFixed(0)}
+                delta={`fitness ${form.ctl.toFixed(0)} · fatigue ${form.atl.toFixed(0)}`}
+                deltaGood={form.tsb >= 0}
+              />
+            )
           )}
         </div>
       )}

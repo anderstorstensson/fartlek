@@ -600,6 +600,18 @@ tr.lap-active td {
   border: 1px dashed var(--series-planned);
 }
 
+a.next-workout {
+  display: block;
+}
+
+a.next-workout:hover {
+  background: var(--surface-2);
+}
+
+a.next-workout .delta {
+  text-transform: capitalize;
+}
+
 /* ---------- Modal ---------- */
 .modal-overlay {
   position: fixed;

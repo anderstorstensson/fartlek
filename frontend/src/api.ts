@@ -131,6 +131,25 @@ export interface Settings {
   zones: Zone[]
 }
 
+export interface PlannedWorkout {
+  id: number
+  day: string
+  title: string
+  workout_type: string
+  description: string
+  target_distance_m: number | null
+  target_duration_s: number | null
+  plan_name: string
+  completed_activity_id: number | null
+}
+
+export interface PlanInfo {
+  plan_name: string
+  workouts: number
+  first_day: string
+  last_day: string
+}
+
 export interface AnalysisNote {
   id: number
   activity_id: number | null

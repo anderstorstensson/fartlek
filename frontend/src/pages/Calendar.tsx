@@ -1,27 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
-import { fetchJson } from '../api'
+import { fetchJson, PlanInfo, PlannedWorkout } from '../api'
 import { formatDistance, formatDuration, sportEmoji } from '../format'
-
-interface PlannedWorkout {
-  id: number
-  day: string
-  title: string
-  workout_type: string
-  description: string
-  target_distance_m: number | null
-  target_duration_s: number | null
-  plan_name: string
-  completed_activity_id: number | null
-}
-
-interface PlanInfo {
-  plan_name: string
-  workouts: number
-  first_day: string
-  last_day: string
-}
 
 interface DayActivity {
   id: number
