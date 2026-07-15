@@ -24,6 +24,16 @@ yourself (read-only):
 
 Do not trust the drafting session's stated baseline — spot-check it against the data.
 
+## Scientific authority — the literature review
+
+`docs/endurance-training-science-review.md` is the evidence base for this review. **Read
+the sections relevant to the plan** (§12 is the app-element→principle map; grep the
+headings to jump). Judge the plan against the review's conclusions, not against generic
+lore, and cite section numbers in your findings. Where the plan contradicts the review
+(e.g. defaulting to polarized distribution when the review calls pyramidal at least as
+good for most phases; treating ACWR as a hard rail; omitting durability work or 2×/week
+strength), that is a finding.
+
 ## Review rubric (evaluate every item)
 
 1. **Goal–demand alignment**: does the plan's emphasis match the race's demand profile
@@ -34,8 +44,12 @@ Do not trust the drafting session's stated baseline — spot-check it against th
    realistic.
 3. **Load progression**: weekly volume growth ≤10%, down week every ~4th, first week
    must not exceed the recent 4–6-week median volume, implied CTL ramp ≤5/week.
-4. **Intensity distribution**: ~80/20 easy/hard by time; ≤2 quality sessions +
-   1 long run per week; no hard days back-to-back; long run ≤30–35% of weekly volume.
+4. **Intensity distribution**: ~80/20 easy/hard by time (firm); the arrangement of the
+   hard 20% should be phase/level-appropriate — pyramidal is at least as good as
+   polarized for most athletes/phases, polarization is a peaking tool (review §2). ≤2
+   quality sessions + 1 long run per week; no hard days back-to-back; long run ≤30–35%
+   of weekly volume. Expect a standing ~2×/week strength element (review §6) and
+   durability work via long runs (review §5).
 5. **Session quality**: every session has a target-system tag and a prescription
    consistent with that system (e.g. VO2max reps 3–5 min at ~3K–5K effort with ~1:1
    recovery; threshold work at ~10K–HM effort, cumulatively 20–40 min). Paces must be

@@ -73,9 +73,14 @@ Timestamps are naive; use `start_time_local` for day/week grouping.
 - **Ramp rate**: CTL increase per week. Sustainable ≈ 3–5 points/week; >8 is injury risk.
 - **Form (TSB)**: > +10 fresh (race-ready), −10…+10 neutral, −10…−25 productive training
   stress, < −30 overreaching risk.
-- **ACWR proxy**: ATL/CTL ratio; keep roughly 0.8–1.3.
+- **ACWR proxy**: ATL/CTL ratio, roughly 0.8–1.3. Treat as a *soft* heuristic only —
+  the ratio is statistically and conceptually flawed (review §8, §13); weight absolute
+  ramp rate, consistency and monotony above it.
 - **Consistency**: runs/week and weekly distance variance matter more than any single week.
 - **Monotony**: many identical-load days with no hard/easy polarity is a warning sign.
+- **Durability** (review §5): resistance to pace/HR decoupling late in long runs is a
+  trainable "fourth determinant". Read it from aerobic-decoupling trends on long runs
+  over months — improving decoupling at a given duration = growing resilience.
 - **Progress signals**: pace at fixed HR over months, PR trajectory from `best_efforts`,
   weekly distance trend from `/api/trends/weekly`.
 
@@ -101,6 +106,24 @@ A tailored plan requires knowing the athlete, not just their data. The profile l
 - Keep the file short and factual; date-stamp updates. Record plan-relevant conclusions
   from check-ins there too ("responds badly to back-to-back quality days").
 
+## Scientific basis — consult the literature review
+
+The repo carries a curated, cited evidence synthesis at
+`docs/endurance-training-science-review.md`. It is the authoritative source for the
+principles behind plan design — prefer it over general knowledge, and cite it when
+explaining choices to the athlete.
+
+- **Read it (at least the relevant sections) before generating or substantially revising
+  a plan.** Section 12 is an "app-element → best-supported principle → refs" map; section
+  13 lists where the evidence has moved. Pull specific sections by grepping the headings
+  (`grep -nE "^#{1,3} " docs/endurance-training-science-review.md`).
+- When you justify an emphasis or session design to the athlete, ground it in the review
+  (e.g. "sub-threshold controlled intervals rather than all-out tempo, per the review's
+  §3 on the Norwegian method") rather than asserting it.
+- The guidance below reflects the review's current conclusions; where a specific number
+  or distribution matters, verify against the review rather than this summary, since the
+  review is versioned and may be updated.
+
 ## Suggesting a training plan
 
 Plans are built from the athlete's data + profile, never from generic templates.
@@ -115,12 +138,20 @@ Plans are built from the athlete's data + profile, never from generic templates.
    analysis (e.g. threshold pace already sufficient for the 10K goal but CTL low →
    endurance-heavy plan), and the plan must say so explicitly.
 3. **Every session names its target system.** No session goes in the plan without a
-   stated physiological purpose: `endurance` (Z1–Z2 aerobic base), `threshold` (LT2,
-   ~10K–HM effort), `vo2max` (3–5 min reps at ~3K–5K effort, 1:1 recovery — Billat),
-   `speed` (short reps/strides, full recovery, neuromuscular), `race-specific`
-   (goal pace work), `recovery`. Weekly structure follows polarized/pyramidal
-   distribution (~80% easy / 20% hard by time — Seiler); typically max 2 quality
-   sessions + 1 long run per week, never hard days back-to-back.
+   stated physiological purpose: `endurance` (Z1–Z2 aerobic base, also builds durability
+   via long runs + late-run quality — review §5), `threshold` (LT2; prefer controlled,
+   interval-based *sub-threshold* / lactate-guided work over all-out tempo — review §3),
+   `vo2max` (3–5 min reps at ~3–5K effort, ~1:1 recovery; anchor to critical speed if
+   data allow — review §4), `speed` (short neuromuscular reps/strides, full recovery),
+   `race-specific` (goal-pace work), `recovery`.
+   - **Intensity distribution**: ~80% easy / 20% hard by time is the firm part. The
+     *arrangement* of the hard 20% is phase- and level-dependent, not fixed: **pyramidal**
+     (substantial threshold) is at least as good as **polarized** for most athletes and
+     base/build phases; reserve polarization as a peaking tool (review §2, §13). Don't
+     default to "polarized" — justify the choice from phase and athlete level.
+   - Typically max 2 quality sessions + 1 long run per week, never hard days back-to-back.
+   - **Standing strength element**: include ~2×/week heavy-resistance + plyometric work
+     as `cross` sessions — among the best-evidenced, load-free economy gains (review §6).
 4. **Training paces from the athlete's numbers** (not tables): easy ≈ threshold pace
    +25–35%, marathon pace ≈ +8–12%, threshold ≈ 100%, VO2max reps ≈ −8–10%, all
    cross-checked against actual recent performances and the athlete's zones.
