@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 import { fetchJson } from '../api'
 import { formatDistance, formatDuration, sportEmoji } from '../format'
 
@@ -74,6 +75,73 @@ function plannedTitle(w: PlannedWorkout): string {
   return parts.join(' · ')
 }
 
+const TYPE_ICONS: Record<string, string> = {
+  cross: '🏋️',
+  race: '🏁',
+  rest: '😴'
+}
+
+function WorkoutModal({
+  workout,
+  onClose,
+  onOpenActivity
+}: {
+  workout: PlannedWorkout
+  onClose: () => void
+  onOpenActivity: (id: number) => void
+}) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal card" onClick={(e) => e.stopPropagation()}>
+        <div className="note-head">
+          <div>
+            <span className="badge">{workout.workout_type}</span>
+            <strong style={{ marginLeft: 10 }}>{workout.title}</strong>
+          </div>
+          <button className="ghost" onClick={onClose}>
+            Close
+          </button>
+        </div>
+        <p className="muted" style={{ margin: '4px 0 10px', fontSize: 13 }}>
+          {workout.day}
+          {workout.plan_name && ` · ${workout.plan_name}`}
+        </p>
+        <div className="stat-grid" style={{ marginBottom: 12 }}>
+          {workout.target_distance_m !== null && workout.target_distance_m > 0 && (
+            <div className="stat-tile">
+              <div className="label">Target distance</div>
+              <div className="value" style={{ fontSize: 18 }}>
+                {formatDistance(workout.target_distance_m)}
+              </div>
+            </div>
+          )}
+          {workout.target_duration_s !== null && workout.target_duration_s > 0 && (
+            <div className="stat-tile">
+              <div className="label">Target duration</div>
+              <div className="value" style={{ fontSize: 18 }}>
+                {formatDuration(workout.target_duration_s)}
+              </div>
+            </div>
+          )}
+        </div>
+        {workout.description && (
+          <div className="markdown">
+            <ReactMarkdown>{workout.description}</ReactMarkdown>
+          </div>
+        )}
+        {workout.completed_activity_id && (
+          <button
+            style={{ marginTop: 12 }}
+            onClick={() => onOpenActivity(workout.completed_activity_id!)}
+          >
+            ✓ View completed activity
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function Calendar() {
   const navigate = useNavigate()
   const today = new Date()
@@ -83,6 +151,7 @@ export default function Calendar() {
   const [activities, setActivities] = useState<Record<string, DayActivity[]>>({})
   const [plans, setPlans] = useState<PlanInfo[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [selected, setSelected] = useState<PlannedWorkout | null>(null)
 
   const weeks = buildGrid(year, month)
   const gridStart = isoDate(weeks[0][0])
@@ -192,8 +261,17 @@ export default function Calendar() {
               {name}
             </div>
           ))}
+          <div className="day-head">Week</div>
         </div>
-        {weeks.map((week) => (
+        {weeks.map((week) => {
+          const weekKeys = week.map(isoDate)
+          const plannedKm =
+            weekKeys.flatMap((k) => planned[k] ?? []).reduce(
+              (sum, w) => sum + (w.target_distance_m ?? 0), 0) / 1000
+          const doneKm =
+            weekKeys.flatMap((k) => activities[k] ?? []).reduce(
+              (sum, a) => sum + a.distance_m, 0) / 1000
+          return (
           <div className="calendar-row" key={isoDate(week[0])}>
             {week.map((day) => {
               const key = isoDate(day)
@@ -221,21 +299,40 @@ export default function Calendar() {
                       key={workout.id}
                       className={`cal-chip planned${workout.completed_activity_id ? ' completed' : ''}`}
                       title={plannedTitle(workout)}
-                      onClick={() =>
-                        workout.completed_activity_id &&
-                        navigate(`/activities/${workout.completed_activity_id}`)
-                      }
+                      onClick={() => setSelected(workout)}
                     >
                       {workout.completed_activity_id ? '✓ ' : ''}
+                      {TYPE_ICONS[workout.workout_type] ? `${TYPE_ICONS[workout.workout_type]} ` : ''}
                       {workout.title}
                     </button>
                   ))}
                 </div>
               )
             })}
+            <div className="calendar-cell week-summary">
+              {plannedKm > 0 && (
+                <div>
+                  <span className="muted">plan</span> {plannedKm.toFixed(0)} km
+                </div>
+              )}
+              {doneKm > 0 && (
+                <div>
+                  <span className="muted">done</span> {doneKm.toFixed(1)} km
+                </div>
+              )}
+            </div>
           </div>
-        ))}
+          )
+        })}
       </div>
+
+      {selected && (
+        <WorkoutModal
+          workout={selected}
+          onClose={() => setSelected(null)}
+          onOpenActivity={(id) => navigate(`/activities/${id}`)}
+        />
+      )}
 
       {plans.length > 0 && (
         <>

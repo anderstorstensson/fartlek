@@ -230,9 +230,15 @@ Rules:
 - `workout_type` ∈ easy | long | intervals | tempo | race | rest | cross.
 - `description` starts with the session's target system in brackets —
   `[endurance]`, `[threshold]`, `[vo2max]`, `[speed]`, `[race-specific]`, `[recovery]` —
-  followed by the concrete prescription (paces/HR, structure). This is mandatory:
-  it shows in the calendar tooltip and is how planned intent is audited against
-  execution later.
+  followed by the **complete prescription**. The calendar shows this in a detail view
+  (markdown supported), so it must stand alone: warmup, the work (reps × distance/time
+  @ pace or HR), **recovery between reps** (duration and jog/stand), cooldown, and
+  execution cues. A session a coach couldn't hand to a stranger is underspecified.
+- `target_distance_m` is mandatory for every running session and must be the **total
+  session volume including warmup/cooldown/recovery jogs** — the calendar sums it into
+  weekly planned totals, so per-session totals must add up to the week's stated km.
+  For `cross`/strength sessions set `target_duration_s` instead, and list the exercises
+  (movements, sets × reps, loads) in the description.
 - Use one consistent `plan_name` (include the goal + race date) for the whole plan;
   `replace_plan: true` replaces any previous version of that plan atomically.
 - Put paces and structure in `description` — it shows in the calendar tooltip.
