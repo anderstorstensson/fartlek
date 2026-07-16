@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { CoachMessage, CoachStatus, fetchJson } from '../api'
@@ -22,6 +23,19 @@ export default function Coach() {
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState<CoachStatus | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Quick links from other pages arrive as ?draft=… — pre-fill the input
+  // (editable, not auto-sent) and clean the URL.
+  useEffect(() => {
+    const draft = searchParams.get('draft')
+    if (draft) {
+      setInput(draft)
+      setSearchParams({}, { replace: true })
+      inputRef.current?.focus()
+    }
+  }, [searchParams, setSearchParams])
 
   useEffect(() => {
     fetchJson<CoachStatus>('/api/coach/status')
@@ -171,6 +185,7 @@ export default function Coach() {
 
       <form className="coach-input" onSubmit={send}>
         <textarea
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {

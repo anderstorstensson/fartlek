@@ -1,6 +1,7 @@
 import { FormEvent, useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ActivityDetail, AnalysisNote, fetchJson, Streams, useApi } from '../api'
+import { ActivityDetail, AnalysisNote, CoachStatus, fetchJson, Streams, useApi } from '../api'
+import { analyzePrompt, coachUrl } from '../coachLink'
 import ActivityMap from '../components/ActivityMap'
 import NoteCard from '../components/NoteCard'
 import PaceZoneChart from '../components/PaceZoneChart'
@@ -128,6 +129,9 @@ export default function ActivityDetailPage() {
   const detail = useApi<ActivityDetail>(id ? `/api/activities/${id}?v=${version}` : null)
   const streams = useApi<Streams>(id ? `/api/activities/${id}/streams` : null)
   const notes = useApi<AnalysisNote[]>(id ? `/api/notes?activity_id=${id}` : null)
+  const coachStatus = useApi<CoachStatus>('/api/coach/status')
+  const coachReady =
+    coachStatus.data?.enabled === true && coachStatus.data?.cli_available === true
 
   // Chart hover → map marker. The chart reports a stream index; resolve it to
   // the nearest GPS fix (samples can lack a position, e.g. in tunnels).
@@ -185,6 +189,18 @@ export default function ActivityDetailPage() {
         >
           Edit
         </button>
+        {coachReady && (
+          <>
+            {' '}
+            <Link
+              to={coachUrl(analyzePrompt(activity))}
+              className="btn-ghost"
+              style={{ padding: '2px 10px', fontSize: 12 }}
+            >
+              🎓 {activity.tag === 'race' ? 'Race analysis with the coach' : 'Analyze with the coach'}
+            </Link>
+          </>
+        )}
       </p>
 
       {editing && (
