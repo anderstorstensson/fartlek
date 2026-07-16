@@ -146,14 +146,29 @@ methodology as a terminal session, but as a chat in the browser. Requirements:
 the Claude Code CLI installed and logged in on the machine running Fartlek
 (uses your Claude subscription, not an API key).
 
-- Tool access is a **whitelist** (the app's own API via curl, read-only SQLite,
-  repo reads, the athlete profile, the plan-review subagent) — no blanket shell
-  or file-write access, since headless sessions can't ask for permission.
+> [!WARNING]
+> **The Coach runs an AI agent with shell access on your machine, so it ships
+> disabled.** Enable it deliberately with `FARTLEK_COACH_ENABLED=1`, and only when
+> the app is bound to `127.0.0.1`. The agent also reads your synced data
+> (activity names, notes, the athlete profile) into its context, so treat it as
+> exposed to *prompt injection*: content in that data could try to steer it. The
+> tool whitelist below limits the blast radius — it does not guarantee the agent
+> can't be nudged — so don't enable the Coach on a machine bound to a wider
+> interface or fed data you don't trust.
+
+- **Off by default.** Set `FARTLEK_COACH_ENABLED=1` to turn it on; without it the
+  Coach tab shows a disabled notice and the endpoint refuses.
+- Tool access is a **whitelist** that fails closed: repo reads, the app's own
+  loopback API via `scripts/api` (origin pinned to `127.0.0.1` in code),
+  **read-only** SQL via `scripts/db` (`mode=ro` + `query_only` — writes fail at
+  the SQLite level), and writes limited to `data/athlete-profile.md`. No blanket
+  shell, no curl, no arbitrary network, and no subagents (`Task`) — a subagent
+  would run with its own broader permissions and escape the whitelist.
+- Two guards on top of the localhost bind: the endpoint refuses unless the app
+  is bound to localhost (`config.host`), **and** each request's `Host` header
+  must be loopback, so a rebound DNS name on another site can't drive the agent.
 - Conversations persist (resumable session + chat history in the DB);
   "New conversation" resets both.
-- The endpoint refuses to work unless the app is bound to localhost — if you
-  ever expose Fartlek through a reverse proxy, the coach stays off without
-  authentication in front of it.
 
 ## Training plans
 
@@ -173,7 +188,8 @@ Environment variables (prefix `FARTLEK_`): `FARTLEK_PORT` (8077), `FARTLEK_HOST`
 `FARTLEK_STREAM_MAX_POINTS` (3000, per-activity stream resolution in the DB),
 `FARTLEK_RCLONE_REMOTE` (backup destination, empty = off), `FARTLEK_BACKUP_KEEP` (7),
 `FARTLEK_BACKUP_HOUR` (3), `FARTLEK_BACKUP_INCLUDE_FIT` (1),
-`FARTLEK_BACKUP_INCLUDE_TOKENS` (0).
+`FARTLEK_BACKUP_INCLUDE_TOKENS` (0), `FARTLEK_COACH_ENABLED` (0 — the in-app Coach
+agent, off by default; see [The Coach tab](#the-coach-tab-in-app-claude-code)).
 Athlete parameters (max/resting HR, LTHR, threshold pace) are edited in the web UI
 under Settings; saving triggers a metric recompute.
 
@@ -183,9 +199,11 @@ outdoor activity's *rounded* start coordinates and date to the free Open-Meteo A
 acceptable.
 
 **Security model**: the API has no authentication — it serves your complete GPS and
-health history to anyone who can reach it. The default bind to `127.0.0.1` is the
-protection; keep it there, or put the app behind a reverse proxy with auth before
-setting `FARTLEK_HOST` to anything wider.
+health history to anyone who can reach it, and (when `FARTLEK_COACH_ENABLED=1`) exposes
+an AI agent with whitelisted shell access. The default bind to `127.0.0.1` is the
+protection; keep it there. Do **not** set `FARTLEK_HOST` to a wider interface without
+putting authentication in front of the app, and leave the Coach disabled if you do —
+its localhost and `Host`-header guards assume a single trusted local user.
 
 ## Data layout
 

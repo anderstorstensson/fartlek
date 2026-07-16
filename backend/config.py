@@ -11,6 +11,11 @@ class AppConfig(BaseSettings):
     data_dir: Path = BASE_DIR / "data"
     host: str = "127.0.0.1"
     port: int = 8077
+
+    # The in-app Coach runs an AI agent with (whitelisted) shell access on this
+    # machine via the Claude CLI. Off by default: opt in deliberately, and only
+    # when the app is bound to localhost (see backend/api/coach.py).
+    coach_enabled: bool = False
     sync_interval_minutes: int = 30
     scheduler_enabled: bool = True
     # Max number of points kept per stored stream; raw FIT files keep full resolution.

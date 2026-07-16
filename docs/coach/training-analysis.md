@@ -10,7 +10,10 @@ what it means, and how to analyze it.
 
 Two options, prefer the API when the app is running (it reuses the app's own math):
 
-1. **HTTP API** (app runs at `http://127.0.0.1:8077`, check with `curl -s http://127.0.0.1:8077/api/health`):
+1. **HTTP API** via the repo's loopback client: `scripts/api GET|POST|PUT|DELETE /api/... ['<json>' | -]`
+   (a body of `-` reads stdin). Check the app is up with `scripts/api GET /api/health`.
+   Always use `scripts/api`, not curl — it is the only form the coach allowlists permit,
+   and it works identically in terminal sessions:
    - `GET /api/activities?limit=50&offset=0&sport=running&q=text` — paged summaries (newest first)
    - `GET /api/activities/{id}` — detail with laps and best efforts
    - `GET /api/activities/{id}/streams` — time/distance/HR/speed/GAP-speed/altitude/
@@ -35,8 +38,10 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
      target_time_s); responses include `days_until` and a Riegel `predicted_time_s`
      from the last 120 days of best efforts
 
-2. **SQLite directly** (works even when the app is down; DB uses WAL mode, open read-only):
-   `sqlite3 "file:data/fartlek.sqlite3?mode=ro" "<query>"` from the project root.
+2. **SQLite directly** (works even when the app is down) via the repo's read-only
+   query client: `scripts/db "<query>"` from the project root (SQL of `-` reads
+   stdin; output is tab-separated with a header row). It opens the DB with
+   `mode=ro` + `query_only`, needs no sqlite3 binary, and writes always fail.
 
 ### Schema (SQLite)
 
@@ -206,7 +211,7 @@ After completing an analysis, save it — mention that you did; skip only for tr
 one-line answers or when the user says not to.
 
 ```bash
-curl -s -X POST http://127.0.0.1:8077/api/notes -H 'Content-Type: application/json' -d '{
+scripts/api POST /api/notes '{
   "activity_id": 23604865594,
   "kind": "session",
   "title": "Odsherred intervals — rep consistency and HR response",
@@ -430,9 +435,7 @@ The app has a Calendar page that displays planned workouts next to completed run
 approves a plan, publish it:
 
 ```bash
-curl -s -X POST http://127.0.0.1:8077/api/plan \
-  -H 'Content-Type: application/json' \
-  -d '{
+scripts/api POST /api/plan '{
     "replace_plan": true,
     "workouts": [
       {"day": "2026-07-20", "title": "Easy 8K", "workout_type": "easy",

@@ -20,9 +20,9 @@ goal. If any of these are missing, or you want to verify claims, gather ground t
 yourself (read-only):
 
 - Athlete profile: `data/athlete-profile.md` (constraints, injury history, availability)
-- Database: `sqlite3 "file:data/fartlek.sqlite3?mode=ro" "<query>"` — verify recent
+- Database: `scripts/db "<query>"` (read-only, tab-separated output) — verify recent
   weekly volume (activities table), best efforts, current training frequency
-- API when running: `curl -s http://127.0.0.1:8077/api/trends/fitness?model=trimp&days=90`
+- API when running: `scripts/api GET "/api/trends/fitness?model=trimp&days=90"`
   (current CTL/ATL/TSB), `/api/stats/summary`, `/api/records`, `/api/settings`,
   `/api/trends/zones` (actual intensity distribution), `/api/trends/efficiency`
   (efficiency + decoupling trends — durability evidence), `/api/wellness?days=60`

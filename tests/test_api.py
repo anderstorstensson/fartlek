@@ -356,17 +356,35 @@ def test_coach_history_and_guards(client, monkeypatch):
     history = client.get("/api/coach/messages").json()
     assert [m["role"] for m in history] == ["user", "assistant"]
 
-    # refuses to run when not bound to localhost
     from backend.api import coach as coach_module
+    loopback = {"host": f"127.0.0.1:{coach_module.config.port}"}
+
+    # off by default: the agent endpoint refuses until explicitly enabled
+    assert client.get("/api/coach/status").json()["enabled"] is False
+    assert client.post(
+        "/api/coach/messages", json={"text": "hi"}, headers=loopback
+    ).status_code == 403
+    monkeypatch.setattr(coach_module.config, "coach_enabled", True, raising=False)
+
+    # refuses to run when not bound to localhost
     monkeypatch.setattr(coach_module.config, "host", "0.0.0.0", raising=False)
-    assert client.post("/api/coach/messages", json={"text": "hi"}).status_code == 403
+    assert client.post(
+        "/api/coach/messages", json={"text": "hi"}, headers=loopback
+    ).status_code == 403
     monkeypatch.setattr(coach_module.config, "host", "127.0.0.1", raising=False)
+
+    # refuses a non-loopback Host header (DNS-rebinding guard) even when bound locally
+    assert client.post(
+        "/api/coach/messages", json={"text": "hi"}, headers={"host": "evil.example.com"}
+    ).status_code == 403
 
     # clear error when the CLI is missing
     monkeypatch.setattr(coach_module.shutil, "which", lambda _: None)
-    assert client.post("/api/coach/messages", json={"text": "hi"}).status_code == 503
+    assert client.post(
+        "/api/coach/messages", json={"text": "hi"}, headers=loopback
+    ).status_code == 503
 
-    assert client.post("/api/coach/reset").json() == {"reset": True}
+    assert client.post("/api/coach/reset", headers=loopback).json() == {"reset": True}
     assert client.get("/api/coach/messages").json() == []
 
 
