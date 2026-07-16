@@ -9,7 +9,7 @@ from backend.analysis.plan_projection import projected_daily_loads
 from backend.analysis.training_load import fitness_series
 from backend.analysis.zones import time_in_zones, zones_for_settings
 from backend.db import get_session
-from backend.models import Activity, BestEffort, Stream
+from backend.models import Activity, AnalysisNote, BestEffort, Stream
 from backend.schemas import (
     EfficiencyPoint,
     FitnessPoint,
@@ -191,6 +191,14 @@ def logbook(
         .order_by(Activity.start_time_local)
     ).all()
 
+    analyzed = set(
+        session.scalars(
+            select(AnalysisNote.activity_id).where(
+                AnalysisNote.activity_id.in_([a.id for a in activities])
+            )
+        ).all()
+    ) if activities else set()
+
     for activity in activities:
         day = activity.start_time_local.date()
         week = buckets.get(_week_start(day))
@@ -210,6 +218,7 @@ def logbook(
                 moving_s=activity.moving_s,
                 start_time_local=activity.start_time_local,
                 is_workout=activity.is_workout,
+                has_analysis=activity.id in analyzed,
             )
         )
 

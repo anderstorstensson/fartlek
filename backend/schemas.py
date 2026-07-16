@@ -23,6 +23,7 @@ class ActivitySummary(BaseModel):
     has_gps: bool
     is_workout: bool
     tag: str | None = None
+    has_analysis: bool = False  # a saved analysis note references this activity
 
 
 class ActivityUpdate(BaseModel):
@@ -148,6 +149,7 @@ class LogbookActivity(BaseModel):
     moving_s: float
     start_time_local: datetime
     is_workout: bool
+    has_analysis: bool = False
 
 
 class LogbookWeek(BaseModel):

@@ -151,6 +151,11 @@ export default function Activities() {
                       <td className="strong">
                         {sportEmoji(activity.sport)} {activity.name}
                         {activity.is_workout && <span className="badge workout">workout</span>}
+                        {activity.has_analysis && (
+                          <span title="Has a saved analysis" style={{ marginLeft: 6 }}>
+                            🧠
+                          </span>
+                        )}
                         <div className="muted" style={{ fontSize: 12, fontWeight: 400 }}>
                           {formatSportName(activity.sport)}
                         </div>

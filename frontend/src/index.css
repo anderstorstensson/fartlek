@@ -267,6 +267,12 @@ button.series-toggle.off {
   width: 100%;
 }
 
+.cal-chip .chip-analysis {
+  font-size: 9px;
+  margin-left: 3px;
+  vertical-align: top;
+}
+
 /* ---------- Tables & lists ---------- */
 .table-wrap {
   overflow-x: auto;
