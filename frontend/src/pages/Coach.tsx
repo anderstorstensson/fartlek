@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { CoachMessage, fetchJson } from '../api'
 
 interface ActivityLine {
@@ -122,7 +123,7 @@ export default function Coach() {
           <div key={message.id} className={`coach-msg ${message.role}`}>
             {message.role === 'assistant' ? (
               <div className="markdown">
-                <ReactMarkdown>{message.content}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
               </div>
             ) : (
               message.content
@@ -138,7 +139,7 @@ export default function Coach() {
             ))}
             {live.text ? (
               <div className="markdown">
-                <ReactMarkdown>{live.text}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{live.text}</ReactMarkdown>
               </div>
             ) : (
               <div className="muted">thinking…</div>

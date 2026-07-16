@@ -828,6 +828,28 @@ a.next-workout .delta {
   margin: 3px 0;
 }
 
+.markdown table {
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid var(--baseline);
+  padding: 5px 10px;
+  text-align: left;
+}
+
+.markdown th {
+  color: var(--text-primary);
+  background: var(--surface-2);
+}
+
 .markdown strong {
   color: var(--text-primary);
 }

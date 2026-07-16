@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { AnalysisNote, fetchJson } from '../api'
 import { formatDate } from '../format'
 
@@ -46,7 +47,7 @@ export default function NoteCard({ note, onDeleted }: NoteCardProps) {
         </div>
       </div>
       <div className="markdown">
-        <ReactMarkdown>{note.content}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
       </div>
     </div>
   )
