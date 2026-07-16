@@ -35,6 +35,12 @@ recompute:
 rescan:
 	$(PY) -m backend.cli rescan
 
+weather:
+	$(PY) -m backend.cli weather
+
+wellness:
+	$(PY) -m backend.cli wellness
+
 serve:
 	$(PY) -m backend.cli serve
 

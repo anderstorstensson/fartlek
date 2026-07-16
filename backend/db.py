@@ -42,11 +42,41 @@ def init_db() -> None:
 def _migrate() -> None:
     """Additive schema migrations for databases created by older versions."""
     new_columns = {
-        "activities": [("is_workout", "BOOLEAN NOT NULL DEFAULT 0")],
+        "activities": [
+            ("is_workout", "BOOLEAN NOT NULL DEFAULT 0"),
+            ("avg_power_w", "FLOAT"),
+            ("avg_vertical_oscillation_mm", "FLOAT"),
+            ("avg_vertical_ratio_pct", "FLOAT"),
+            ("avg_step_length_mm", "FLOAT"),
+            ("avg_stance_time_ms", "FLOAT"),
+            ("avg_respiration_brpm", "FLOAT"),
+            ("gap_speed_mps", "FLOAT"),
+            ("decoupling_pct", "FLOAT"),
+            ("efficiency_index", "FLOAT"),
+            ("weather_temp_c", "FLOAT"),
+            ("weather_humidity_pct", "FLOAT"),
+            ("weather_wind_mps", "FLOAT"),
+            ("weather_code", "INTEGER"),
+            ("tag", "VARCHAR"),
+            ("user_note", "VARCHAR NOT NULL DEFAULT ''"),
+            ("name_locked", "BOOLEAN NOT NULL DEFAULT 0"),
+        ],
         "laps": [("intensity", "VARCHAR")],
         "athlete_settings": [
             ("zone_mode", "VARCHAR NOT NULL DEFAULT 'max_hr'"),
             ("manual_zone_bounds", "JSON"),
+            ("rtss_use_gap", "BOOLEAN NOT NULL DEFAULT 1"),
+            ("pace_zone_mode", "VARCHAR NOT NULL DEFAULT 'threshold'"),
+            ("manual_pace_zone_bounds", "JSON"),
+            ("coaching_tone", "VARCHAR NOT NULL DEFAULT 'balanced'"),
+        ],
+        "streams": [
+            ("power", "JSON"),
+            ("vertical_oscillation", "JSON"),
+            ("vertical_ratio", "JSON"),
+            ("step_length", "JSON"),
+            ("stance_time", "JSON"),
+            ("respiration", "JSON"),
         ],
     }
     with engine.connect() as conn:

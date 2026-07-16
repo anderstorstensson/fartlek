@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from backend.db import session_scope  # noqa: E402
 from backend.main import app  # noqa: E402
-from backend.models import Activity, Stream  # noqa: E402
+from backend.models import Activity, BestEffort, DailyWellness, Stream  # noqa: E402
 
 
 @pytest.fixture(scope="module")
@@ -187,6 +187,44 @@ def test_plan_import_and_completion(client):
     assert client.get("/api/plan/plans").json() == []
 
 
+def test_plan_typed_completion_and_doubles(client):
+    payload = {
+        "workouts": [
+            # Three sessions on the seeded run's date: a double (two runs) + strength.
+            {"day": "2026-07-13", "title": "AM Easy 10K", "workout_type": "easy",
+             "target_distance_m": 10000, "plan_name": "typed-test"},
+            {"day": "2026-07-13", "title": "PM Easy 6K", "workout_type": "easy",
+             "target_distance_m": 6000, "plan_name": "typed-test"},
+            {"day": "2026-07-13", "title": "Strength A", "workout_type": "cross",
+             "target_duration_s": 2700, "plan_name": "typed-test"},
+        ],
+    }
+    client.post("/api/plan", json=payload)
+
+    # One run exists that day: it completes the first run workout only — never the
+    # second half of the double, and never the strength session.
+    by_title = {w["title"]: w for w in
+                client.get("/api/plan?start=2026-07-13&end=2026-07-13").json()}
+    assert by_title["AM Easy 10K"]["completed_activity_id"] == 1
+    assert by_title["PM Easy 6K"]["completed_activity_id"] is None
+    assert by_title["Strength A"]["completed_activity_id"] is None
+
+    # A strength activity completes the cross workout.
+    with session_scope() as session:
+        session.add(Activity(id=2, name="Gym", sport="strength_training",
+                             start_time_utc=datetime(2026, 7, 13, 16, 0),
+                             start_time_local=datetime(2026, 7, 13, 18, 0),
+                             elapsed_s=2700, moving_s=2700, distance_m=0))
+    by_title = {w["title"]: w for w in
+                client.get("/api/plan?start=2026-07-13&end=2026-07-13").json()}
+    assert by_title["Strength A"]["completed_activity_id"] == 2
+    assert by_title["PM Easy 6K"]["completed_activity_id"] is None
+
+    with session_scope() as session:
+        session.delete(session.get(Activity, 2))
+    client.delete("/api/plan?plan_name=typed-test")
+
+
 def test_plan_update_workout(client):
     payload = {
         "workouts": [
@@ -290,6 +328,14 @@ def test_notes_crud(client):
 
     assert client.post("/api/notes", json={"kind": "bogus", "title": "x", "content": "y"}).status_code == 422
 
+    race_note = client.post(
+        "/api/notes",
+        json={"activity_id": 1, "kind": "race", "title": "City 10K 39:30 — even split",
+              "content": "held plan pace"},
+    ).json()
+    assert client.get("/api/notes?kind=race").json()[0]["id"] == race_note["id"]
+    client.delete(f"/api/notes/{race_note['id']}")
+
     for note_id in (created["id"], weekly["id"]):
         assert client.delete(f"/api/notes/{note_id}").json() == {"deleted": note_id}
     assert client.delete("/api/notes/99999").status_code == 404
@@ -299,3 +345,195 @@ def test_sync_status(client):
     body = client.get("/api/sync/status").json()
     assert body["total_activities"] == 1
     assert body["logged_in"] in (True, False)
+
+
+def test_streams_include_dynamics_arrays(client):
+    """Rows imported before the dynamics columns existed serve [] not null."""
+    body = client.get("/api/activities/1/streams").json()
+    for key in ("power", "vertical_oscillation", "vertical_ratio",
+                "step_length", "stance_time", "respiration"):
+        assert body[key] == []
+
+
+def test_streams_include_pace_zones(client):
+    body = client.get("/api/activities/1/streams").json()
+    assert len(body["pace_zones"]) == 5
+    assert len(body["time_in_pace_zones_s"]) == 5
+    assert body["pace_zones"][4]["high_speed_mps"] is None
+    assert len(body["gap_speed_mps"]) == len(body["speed_mps"])
+
+
+def test_coaching_tone_roundtrip(client):
+    base = {"resting_hr": 48, "max_hr": 188, "lthr": 168,
+            "threshold_pace_s_per_km": 255, "sex": "male"}
+    assert client.get("/api/settings").json()["coaching_tone"] == "balanced"
+    updated = client.put("/api/settings", json={**base, "coaching_tone": "harsh"}).json()
+    assert updated["coaching_tone"] == "harsh"
+    assert client.put(
+        "/api/settings", json={**base, "coaching_tone": "brutal"}
+    ).status_code == 422
+    client.put("/api/settings", json={**base, "coaching_tone": "balanced"})
+
+
+def test_manual_pace_zones_roundtrip(client):
+    base = {"resting_hr": 48, "max_hr": 188, "lthr": 168,
+            "threshold_pace_s_per_km": 255, "sex": "male"}
+
+    updated = client.put("/api/settings", json={
+        **base, "pace_zone_mode": "manual",
+        "manual_pace_zone_bounds": [450, 340, 300, 278, 255],
+    }).json()
+    assert updated["pace_zone_mode"] == "manual"
+    assert updated["pace_zones"][0]["low_speed_mps"] == round(1000 / 450, 3)
+
+    # bounds must get faster (decreasing s/km)
+    assert client.put("/api/settings", json={
+        **base, "pace_zone_mode": "manual",
+        "manual_pace_zone_bounds": [300, 340, 300, 278, 255],
+    }).status_code == 422
+
+    restored = client.put("/api/settings", json={**base, "pace_zone_mode": "threshold"}).json()
+    assert len(restored["pace_zones"]) == 5
+
+
+def test_activity_edit_title_tag_and_note(client):
+    updated = client.patch(
+        "/api/activities/1",
+        json={"name": "Easy shakeout", "tag": "recovery", "user_note": "slept badly"},
+    ).json()
+    assert updated["name"] == "Easy shakeout"
+    assert updated["tag"] == "recovery"
+    assert updated["user_note"] == "slept badly"
+
+    # partial patch leaves other fields alone; empty tag clears it
+    updated = client.patch("/api/activities/1", json={"tag": ""}).json()
+    assert updated["tag"] is None
+    assert updated["name"] == "Easy shakeout"
+
+    assert client.patch("/api/activities/1", json={"tag": "bogus"}).status_code == 422
+    assert client.patch("/api/activities/999", json={"tag": "race"}).status_code == 404
+
+    with session_scope() as session:
+        activity = session.get(Activity, 1)
+        assert activity.name_locked  # user title survives future auto-naming
+        activity.name = "Morning Run"  # restore for other tests
+        activity.name_locked = False
+        activity.user_note = ""
+
+
+def test_activity_detail_has_derived_fields(client):
+    body = client.get("/api/activities/1").json()
+    for key in ("gap_speed_mps", "decoupling_pct", "efficiency_index",
+                "avg_power_w", "weather_temp_c"):
+        assert key in body
+
+
+def test_weekly_zones(client):
+    weeks = client.get("/api/trends/zones?weeks=8").json()
+    assert len(weeks) == 8
+    assert all(len(w["zone_seconds"]) == 5 for w in weeks)
+    # the seeded 3-sample stream contributes a little Z-time somewhere
+    assert client.get("/api/trends/zones?weeks=0").status_code == 422
+
+
+def test_efficiency_trend(client):
+    # seeded activity has no efficiency_index yet -> empty list, not an error
+    assert client.get("/api/trends/efficiency?days=30").json() == []
+
+    with session_scope() as session:
+        activity = session.get(Activity, 1)
+        activity.efficiency_index = 1.25
+        activity.decoupling_pct = 3.2
+    points = client.get("/api/trends/efficiency?days=30").json()
+    assert len(points) == 1
+    assert points[0]["efficiency_index"] == 1.25
+    assert points[0]["decoupling_pct"] == 3.2
+
+
+def test_fitness_projection_from_plan(client):
+    from datetime import date, timedelta
+
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    payload = {
+        "replace_plan": True,
+        "workouts": [
+            {"day": tomorrow, "title": "Easy hour", "workout_type": "easy",
+             "target_duration_s": 3600, "plan_name": "projection-test"},
+        ],
+    }
+    assert client.post("/api/plan", json=payload).status_code == 200
+
+    points = client.get("/api/trends/fitness?model=rtss&days=7&project_days=7").json()
+    assert len(points) == 15  # 7 back + today + 7 forward
+    future = [p for p in points if p["projected"]]
+    assert len(future) == 7
+    assert any(p["load"] > 0 for p in future)  # the planned workout carries load
+
+    unprojected = client.get("/api/trends/fitness?model=rtss&days=7").json()
+    assert all(not p["projected"] for p in unprojected)
+
+    client.delete("/api/plan?plan_name=projection-test")
+
+
+def test_races_crud_and_prediction(client):
+    from datetime import date, datetime as dt, timedelta, timezone as tz
+
+    race_day = (date.today() + timedelta(days=42)).isoformat()
+    created = client.post(
+        "/api/races",
+        json={"name": "City 10K", "day": race_day, "distance_m": 10000,
+              "target_time_s": 2400},
+    ).json()
+    assert created["id"] > 0
+    assert created["days_until"] == 42
+    assert created["predicted_time_s"] is None  # no recent best efforts yet
+
+    with session_scope() as session:
+        session.add(BestEffort(
+            activity_id=1, label="5K", distance_m=5000, duration_s=1200,
+            start_time_utc=dt.now(tz.utc).replace(tzinfo=None),
+        ))
+    listed = client.get("/api/races?upcoming=true").json()
+    assert listed[0]["name"] == "City 10K"
+    assert 2480 < listed[0]["predicted_time_s"] < 2510  # Riegel from the 20:00 5K
+
+    updated = client.put(
+        f"/api/races/{created['id']}",
+        json={"name": "City 10K", "day": race_day, "distance_m": 10000,
+              "target_time_s": 2350},
+    ).json()
+    assert updated["target_time_s"] == 2350
+
+    assert client.post(
+        "/api/races",
+        json={"name": "Bad", "day": race_day, "distance_m": 10000, "priority": "X"},
+    ).status_code == 422
+
+    assert client.delete(f"/api/races/{created['id']}").json() == {"deleted": created["id"]}
+    assert client.delete(f"/api/races/{created['id']}").status_code == 404
+
+
+def test_wellness_and_readiness(client):
+    from datetime import date, timedelta
+
+    assert client.get("/api/wellness").json() == []
+    assert client.get("/api/wellness/readiness").json() is None
+
+    with session_scope() as session:
+        today = date.today()
+        for i in range(1, 11):  # baseline: HRV 60, RHR 50
+            session.add(DailyWellness(
+                day=today - timedelta(days=i), resting_hr=50,
+                hrv_last_night_avg=60.0, sleep_score=80,
+            ))
+        session.add(DailyWellness(  # today: HRV crashed, RHR up, sleep poor
+            day=today, resting_hr=58, hrv_last_night_avg=45.0, sleep_score=50,
+        ))
+
+    days = client.get("/api/wellness?days=30").json()
+    assert len(days) == 11
+
+    readiness = client.get("/api/wellness/readiness").json()
+    assert readiness["status"] == "rest"
+    assert set(readiness["flags"]) == {"hrv-low", "rhr-elevated", "sleep-poor"}
+    assert readiness["hrv_baseline"] == 60.0

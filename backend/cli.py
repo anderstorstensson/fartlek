@@ -63,6 +63,42 @@ def cmd_recompute() -> int:
     return 0
 
 
+def cmd_rename_workouts() -> int:
+    from backend.db import init_db
+    from backend.sync.service import rename_workout_activities
+
+    init_db()
+    count = rename_workout_activities()
+    print(f"Renamed {count} workout activities from their interval structure.")
+    return 0
+
+
+def cmd_weather(limit: int | None) -> int:
+    from backend.db import init_db
+    from backend.sync.weather import enrich_missing_weather
+
+    init_db()
+    count = enrich_missing_weather(limit=limit)
+    print(f"Enriched weather for {count} activities.")
+    return 0
+
+
+def cmd_wellness(days: int) -> int:
+    from backend.db import init_db
+    from backend.sync.garmin import client_from_tokens
+    from backend.sync.wellness import sync_wellness
+
+    init_db()
+    try:
+        client = client_from_tokens()
+    except Exception as exc:
+        print(f"Garmin login required: {exc}", file=sys.stderr)
+        return 1
+    count = sync_wellness(client, backfill_days=days)
+    print(f"Synced wellness for {count} days.")
+    return 0
+
+
 def cmd_serve() -> int:
     import uvicorn
 
@@ -79,7 +115,14 @@ def main() -> int:
     sync_parser = sub.add_parser("sync", help="Sync activities from Garmin")
     sync_parser.add_argument("--full", action="store_true", help="Backfill all history")
     sub.add_parser("recompute", help="Recompute load metrics for all activities")
-    sub.add_parser("rescan", help="Re-detect workout flags from stored FIT files")
+    sub.add_parser(
+        "rescan", help="Re-extract streams, dynamics and derived metrics from stored FIT files"
+    )
+    sub.add_parser("rename-workouts", help="Name interval runs after their structure")
+    weather_parser = sub.add_parser("weather", help="Backfill weather for activities missing it")
+    weather_parser.add_argument("--limit", type=int, default=None, help="Max activities to enrich")
+    wellness_parser = sub.add_parser("wellness", help="Backfill Garmin wellness data")
+    wellness_parser.add_argument("--days", type=int, default=365, help="Days back to fetch")
     sub.add_parser("serve", help="Run the web application")
 
     args = parser.parse_args()
@@ -91,6 +134,12 @@ def main() -> int:
         return cmd_recompute()
     if args.command == "rescan":
         return cmd_rescan()
+    if args.command == "rename-workouts":
+        return cmd_rename_workouts()
+    if args.command == "weather":
+        return cmd_weather(args.limit)
+    if args.command == "wellness":
+        return cmd_wellness(args.days)
     return cmd_serve()
 
 

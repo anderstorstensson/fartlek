@@ -5,10 +5,13 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from backend.analysis.plan_projection import projected_daily_loads
 from backend.analysis.training_load import fitness_series
+from backend.analysis.zones import time_in_zones, zones_for_settings
 from backend.db import get_session
-from backend.models import Activity, BestEffort
+from backend.models import Activity, BestEffort, Stream
 from backend.schemas import (
+    EfficiencyPoint,
     FitnessPoint,
     FormSnapshot,
     LogbookActivity,
@@ -16,8 +19,10 @@ from backend.schemas import (
     RecordEntry,
     StatsSummary,
     WeeklyStat,
+    WeeklyZones,
     WeekSummary,
 )
+from backend.sync.service import get_or_create_settings
 
 router = APIRouter(prefix="/api", tags=["trends"])
 
@@ -41,14 +46,26 @@ def _daily_loads(session: Session, model: str) -> dict[date, float]:
 def fitness_trend(
     model: str = Query("trimp", pattern="^(trimp|rtss)$"),
     days: int = Query(365, ge=7, le=3650),
+    project_days: int = Query(0, ge=0, le=365),
     session: Session = Depends(get_session),
 ) -> list[FitnessPoint]:
+    """CTL/ATL/TSB series; with project_days > 0 the curve continues past today
+    using estimated loads from uncompleted planned workouts."""
     today = date.today()
-    series = fitness_series(_daily_loads(session, model), today - timedelta(days=days), today)
+    loads = _daily_loads(session, model)
+    end = today
+    if project_days > 0:
+        settings = get_or_create_settings(session)
+        future = projected_daily_loads(
+            session, settings, today + timedelta(days=1), today + timedelta(days=project_days), model
+        )
+        loads.update(future)
+        end = today + timedelta(days=project_days)
+    series = fitness_series(loads, today - timedelta(days=days), end)
     return [
         FitnessPoint(
             day=p.day, load=round(p.load, 1), ctl=round(p.ctl, 1),
-            atl=round(p.atl, 1), tsb=round(p.tsb, 1),
+            atl=round(p.atl, 1), tsb=round(p.tsb, 1), projected=p.day > today,
         )
         for p in series
     ]
@@ -84,6 +101,71 @@ def weekly_trend(
             stat.runs += 1
             stat.run_distance_m += activity.distance_m
     return [buckets[k] for k in sorted(buckets)]
+
+
+@router.get("/trends/zones", response_model=list[WeeklyZones])
+def weekly_zones(
+    weeks: int = Query(26, ge=1, le=520), session: Session = Depends(get_session)
+) -> list[WeeklyZones]:
+    """Weekly time-in-HR-zone (all activities with HR streams), Z1..Z5."""
+    settings = get_or_create_settings(session)
+    zones = zones_for_settings(settings)
+    first_week = _week_start(date.today()) - timedelta(weeks=weeks - 1)
+    buckets: dict[date, list[float]] = {
+        first_week + timedelta(weeks=i): [0.0] * len(zones) for i in range(weeks)
+    }
+
+    start_dt = datetime.combine(first_week, datetime.min.time())
+    rows = session.execute(
+        select(Activity.start_time_local, Stream)
+        .join(Stream, Stream.activity_id == Activity.id)
+        .where(Activity.start_time_local >= start_dt)
+    ).all()
+    for start_time_local, stream in rows:
+        bucket = buckets.get(_week_start(start_time_local.date()))
+        if bucket is None or not stream.hr:
+            continue
+        for i, seconds in enumerate(
+            time_in_zones([t for t in stream.time_s if t is not None], stream.hr, zones)
+        ):
+            bucket[i] += seconds
+
+    return [
+        WeeklyZones(
+            week_start=ws,
+            zone_seconds=[round(s, 0) for s in buckets[ws]],
+            total_s=round(sum(buckets[ws]), 0),
+        )
+        for ws in sorted(buckets)
+    ]
+
+
+@router.get("/trends/efficiency", response_model=list[EfficiencyPoint])
+def efficiency_trend(
+    days: int = Query(365, ge=7, le=3650), session: Session = Depends(get_session)
+) -> list[EfficiencyPoint]:
+    """Per-run efficiency index and aerobic decoupling, oldest first (runs only)."""
+    since = datetime.combine(date.today() - timedelta(days=days), datetime.min.time())
+    activities = session.scalars(
+        select(Activity)
+        .where(Activity.sport.contains("running"))
+        .where(Activity.start_time_local >= since)
+        .where(Activity.efficiency_index.is_not(None))
+        .order_by(Activity.start_time_local)
+    ).all()
+    return [
+        EfficiencyPoint(
+            day=a.start_time_local.date(),
+            activity_id=a.id,
+            name=a.name,
+            efficiency_index=a.efficiency_index,
+            decoupling_pct=a.decoupling_pct,
+            distance_m=a.distance_m,
+            moving_s=a.moving_s,
+            is_workout=a.is_workout,
+        )
+        for a in activities
+    ]
 
 
 @router.get("/logbook", response_model=list[LogbookWeek])
