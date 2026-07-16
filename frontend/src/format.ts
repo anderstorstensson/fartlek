@@ -1,3 +1,24 @@
+/** Locale for all date/time rendering; undefined = browser default. Cached in
+ * localStorage so the first paint already uses the saved preference; the
+ * server-stored setting (athlete_settings.display_locale) is applied on load
+ * and on save via setDisplayLocale. */
+let displayLocale: string | undefined =
+  (typeof localStorage !== 'undefined' && localStorage.getItem('fartlek-locale')) || undefined
+
+export function setDisplayLocale(newLocale: string): void {
+  displayLocale = newLocale || undefined
+  try {
+    localStorage.setItem('fartlek-locale', newLocale)
+  } catch {
+    /* private browsing — server setting still applies next load */
+  }
+}
+
+/** Pass as the first argument of any toLocale*String call. */
+export function locale(): string | undefined {
+  return displayLocale
+}
+
 export function formatDistance(meters: number): string {
   if (meters >= 1000) return `${(meters / 1000).toFixed(meters >= 100000 ? 0 : 2)} km`
   return `${Math.round(meters)} m`
@@ -29,7 +50,7 @@ export function formatPaceFromSeconds(secPerKm: number): string {
 }
 
 export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
+  return new Date(iso).toLocaleDateString(locale(), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -38,11 +59,11 @@ export function formatDate(iso: string): string {
 }
 
 export function formatShortDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+  return new Date(iso).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })
 }
 
 export function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+  return new Date(iso).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })
 }
 
 export function formatSportName(sport: string): string {

@@ -8,6 +8,7 @@ import {
   formatPace,
   formatSportName,
   formatTime,
+  locale,
   sportEmoji
 } from '../format'
 
@@ -31,7 +32,7 @@ function formatWeekLabel(key: string): string {
   const sunday = new Date(monday)
   sunday.setDate(monday.getDate() + 6)
   const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
-  return `${monday.toLocaleDateString(undefined, opts)} – ${sunday.toLocaleDateString(undefined, opts)}`
+  return `${monday.toLocaleDateString(locale(), opts)} – ${sunday.toLocaleDateString(locale(), opts)}`
 }
 
 export default function Activities() {
@@ -136,7 +137,7 @@ export default function Activities() {
                       onClick={() => navigate(`/activities/${activity.id}`)}
                     >
                       <td style={{ width: 110 }}>
-                        {new Date(activity.start_time_local).toLocaleDateString(undefined, {
+                        {new Date(activity.start_time_local).toLocaleDateString(locale(), {
                           weekday: 'short',
                           day: 'numeric',
                           month: 'short'

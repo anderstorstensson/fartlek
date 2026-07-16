@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { CoachStatus, fetchJson, PlanInfo, PlannedWorkout, useApi } from '../api'
 import { coachUrl, PLAN_PROMPT } from '../coachLink'
-import { formatDistance, formatDuration, sportEmoji } from '../format'
+import { formatDistance, formatDuration, locale, sportEmoji } from '../format'
 
 interface DayActivity {
   id: number
@@ -201,7 +201,7 @@ export default function Calendar() {
       .catch((e: Error) => setError(e.message))
   }
 
-  const monthLabel = new Date(year, month, 1).toLocaleDateString(undefined, {
+  const monthLabel = new Date(year, month, 1).toLocaleDateString(locale(), {
     month: 'long',
     year: 'numeric'
   })
