@@ -28,6 +28,7 @@ def _response(settings) -> SettingsResponse:
         manual_pace_zone_bounds=settings.manual_pace_zone_bounds,
         coaching_tone=settings.coaching_tone,
         display_locale=settings.display_locale,
+        coach_model=settings.coach_model,
         zones=zones,
         pace_zones=[
             PaceZoneOut(
@@ -62,6 +63,7 @@ def update_settings(
     settings.manual_pace_zone_bounds = payload.manual_pace_zone_bounds
     settings.coaching_tone = payload.coaching_tone
     settings.display_locale = payload.display_locale
+    settings.coach_model = payload.coach_model
     session.commit()
     # Load metrics depend on these values — refresh them for all activities.
     recompute_in_background()

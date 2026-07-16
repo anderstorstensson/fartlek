@@ -70,6 +70,7 @@ def _migrate() -> None:
             ("manual_pace_zone_bounds", "JSON"),
             ("coaching_tone", "VARCHAR NOT NULL DEFAULT 'balanced'"),
             ("display_locale", "VARCHAR NOT NULL DEFAULT ''"),
+            ("coach_model", "VARCHAR NOT NULL DEFAULT ''"),
         ],
         "streams": [
             ("power", "JSON"),

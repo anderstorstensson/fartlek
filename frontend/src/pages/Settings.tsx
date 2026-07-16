@@ -45,7 +45,8 @@ export default function SettingsPage() {
         pace_zone_mode: settings.pace_zone_mode,
         manual_pace_zone_bounds: settings.manual_pace_zone_bounds,
         coaching_tone: settings.coaching_tone,
-        display_locale: settings.display_locale
+        display_locale: settings.display_locale,
+        coach_model: settings.coach_model
       })
     })
       .then((updated) => {
@@ -183,6 +184,23 @@ export default function SettingsPage() {
               <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
                 How the AI coach talks in analyses and plans. Tone only — the numbers and
                 recommendations never change.
+              </div>
+            </label>
+            <label>
+              <div className="muted">Coach model</div>
+              <select
+                value={settings.coach_model}
+                onChange={(e) => update({ coach_model: e.target.value })}
+              >
+                <option value="">CLI default</option>
+                <option value="fable">Fable — most capable</option>
+                <option value="opus">Opus — deep reasoning</option>
+                <option value="sonnet">Sonnet — fast, capable</option>
+                <option value="haiku">Haiku — fastest, cheapest</option>
+              </select>
+              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                Claude model for the in-app Coach. Aliases resolve to the latest
+                version; usage counts against your subscription either way.
               </div>
             </label>
             <label>
