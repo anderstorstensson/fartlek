@@ -204,6 +204,69 @@ button.series-toggle.off {
   opacity: 0.45;
 }
 
+/* ---------- Coach chat ---------- */
+.coach-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 48px);
+}
+
+.coach-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.coach-thread {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 2px;
+}
+
+.coach-msg {
+  max-width: 72ch;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.coach-msg.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #fff;
+  white-space: pre-wrap;
+}
+
+.coach-msg.assistant {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.coach-activity {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  overflow-wrap: anywhere;
+}
+
+.coach-input {
+  display: flex;
+  gap: 10px;
+  padding-top: 12px;
+  align-items: flex-end;
+}
+
+.coach-input textarea {
+  flex: 1;
+  resize: none;
+  width: 100%;
+}
+
 /* ---------- Tables & lists ---------- */
 .table-wrap {
   overflow-x: auto;

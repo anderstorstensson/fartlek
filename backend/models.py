@@ -245,6 +245,18 @@ class Race(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
 
+class CoachMessage(Base):
+    """Chat history for the in-app coach (a headless Claude Code session)."""
+
+    __tablename__ = "coach_messages"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    role: Mapped[str] = mapped_column(String)  # user | assistant
+    content: Mapped[str] = mapped_column(String)  # markdown
+    session_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
+
+
 class SyncState(Base):
     __tablename__ = "sync_state"
 

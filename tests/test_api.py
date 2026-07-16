@@ -11,7 +11,13 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from backend.db import session_scope  # noqa: E402
 from backend.main import app  # noqa: E402
-from backend.models import Activity, BestEffort, DailyWellness, Stream  # noqa: E402
+from backend.models import (  # noqa: E402
+    Activity,
+    BestEffort,
+    CoachMessage,
+    DailyWellness,
+    Stream,
+)
 
 
 @pytest.fixture(scope="module")
@@ -339,6 +345,29 @@ def test_notes_crud(client):
     for note_id in (created["id"], weekly["id"]):
         assert client.delete(f"/api/notes/{note_id}").json() == {"deleted": note_id}
     assert client.delete("/api/notes/99999").status_code == 404
+
+
+def test_coach_history_and_guards(client, monkeypatch):
+    assert client.get("/api/coach/messages").json() == []
+
+    with session_scope() as session:
+        session.add(CoachMessage(role="user", content="how was my run?"))
+        session.add(CoachMessage(role="assistant", content="## Solid\n…"))
+    history = client.get("/api/coach/messages").json()
+    assert [m["role"] for m in history] == ["user", "assistant"]
+
+    # refuses to run when not bound to localhost
+    from backend.api import coach as coach_module
+    monkeypatch.setattr(coach_module.config, "host", "0.0.0.0", raising=False)
+    assert client.post("/api/coach/messages", json={"text": "hi"}).status_code == 403
+    monkeypatch.setattr(coach_module.config, "host", "127.0.0.1", raising=False)
+
+    # clear error when the CLI is missing
+    monkeypatch.setattr(coach_module.shutil, "which", lambda _: None)
+    assert client.post("/api/coach/messages", json={"text": "hi"}).status_code == 503
+
+    assert client.post("/api/coach/reset").json() == {"reset": True}
+    assert client.get("/api/coach/messages").json() == []
 
 
 def test_sync_status(client):
