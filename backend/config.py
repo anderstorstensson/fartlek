@@ -21,6 +21,9 @@ class AppConfig(BaseSettings):
     rclone_remote: str = ""
     backup_keep: int = 7  # rotated local snapshots (mirrored to the remote)
     backup_hour: int = 3  # nightly upload time (local), used when a remote is set
+    # FIT files are re-downloadable from Garmin (make backfill) — backing them up
+    # is insurance against losing the Garmin account itself. Cheap: incremental.
+    backup_include_fit: bool = True
     # Garmin OAuth tokens grant account access — only back them up deliberately.
     backup_include_tokens: bool = False
 

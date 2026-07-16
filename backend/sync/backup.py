@@ -94,7 +94,8 @@ def run_backup() -> dict:
 
     # Mirror the rotated snapshot set; incrementally copy the append-only FIT files.
     _rclone("sync", str(backups_dir()), f"{remote}/snapshots")
-    _rclone("copy", str(config.fit_dir), f"{remote}/fit")
+    if config.backup_include_fit:
+        _rclone("copy", str(config.fit_dir), f"{remote}/fit")
     profile = config.data_dir / "athlete-profile.md"
     if profile.exists():
         _rclone("copy", str(profile), remote)

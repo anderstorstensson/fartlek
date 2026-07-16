@@ -69,6 +69,18 @@ def test_run_backup_uploads_via_rclone(data_dir, monkeypatch):
     assert not any(dest.endswith("/garth") for _, dest in commands)
 
 
+def test_fit_skipped_when_opted_out(data_dir, monkeypatch):
+    monkeypatch.setattr(backup.config, "rclone_remote", "gdrive:fartlek", raising=False)
+    monkeypatch.setattr(backup.config, "backup_include_fit", False, raising=False)
+    monkeypatch.setattr(backup.shutil, "which", lambda _: "/usr/bin/rclone")
+    (data_dir / "fit").mkdir()
+
+    calls = []
+    monkeypatch.setattr(backup, "_rclone", lambda *args: calls.append(args))
+    backup.run_backup()
+    assert not any(c[-1].endswith("/fit") for c in calls)
+
+
 def test_tokens_only_when_opted_in(data_dir, monkeypatch):
     monkeypatch.setattr(backup.config, "rclone_remote", "crypt:fartlek", raising=False)
     monkeypatch.setattr(backup.config, "backup_include_tokens", True, raising=False)

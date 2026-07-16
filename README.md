@@ -106,7 +106,9 @@ every night at 03:30**. What goes to the remote:
 
 - `snapshots/` — the rotated DB snapshots (mirrored)
 - `fit/` — raw FIT files; append-only, so after the one-time ~1 GB seed upload
-  only new activities transfer
+  only new activities transfer. Skippable with `FARTLEK_BACKUP_INCLUDE_FIT=0`:
+  they are re-downloadable from Garmin (`make backfill`), so this is insurance
+  against losing the Garmin account itself, at a slow rate-limited re-fetch.
 - `athlete-profile.md`
 - Garmin tokens (`garth/`) only with `FARTLEK_BACKUP_INCLUDE_TOKENS=1` — they
   grant access to your Garmin account, so leave them out of plain-text remotes
@@ -153,7 +155,8 @@ Environment variables (prefix `FARTLEK_`): `FARTLEK_PORT` (8077), `FARTLEK_HOST`
 `FARTLEK_DATA_DIR`, `FARTLEK_SYNC_INTERVAL_MINUTES` (30), `FARTLEK_SCHEDULER_ENABLED`,
 `FARTLEK_STREAM_MAX_POINTS` (3000, per-activity stream resolution in the DB),
 `FARTLEK_RCLONE_REMOTE` (backup destination, empty = off), `FARTLEK_BACKUP_KEEP` (7),
-`FARTLEK_BACKUP_HOUR` (3), `FARTLEK_BACKUP_INCLUDE_TOKENS` (0).
+`FARTLEK_BACKUP_HOUR` (3), `FARTLEK_BACKUP_INCLUDE_FIT` (1),
+`FARTLEK_BACKUP_INCLUDE_TOKENS` (0).
 Athlete parameters (max/resting HR, LTHR, threshold pace) are edited in the web UI
 under Settings; saving triggers a metric recompute.
 
