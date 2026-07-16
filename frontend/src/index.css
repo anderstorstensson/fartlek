@@ -208,7 +208,9 @@ button.series-toggle.off {
 .coach-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 48px);
+  /* Fill the viewport minus .content's vertical padding (28px + 60px), with a
+     small buffer — the page itself must never grow a scrollbar. */
+  height: calc(100vh - 92px);
 }
 
 .coach-head {
