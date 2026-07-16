@@ -271,6 +271,11 @@ export interface CoachMessage {
   created_at: string
 }
 
+export interface CoachStatus {
+  enabled: boolean
+  cli_available: boolean
+}
+
 export type LoadModel = 'trimp' | 'rtss'
 
 export async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {

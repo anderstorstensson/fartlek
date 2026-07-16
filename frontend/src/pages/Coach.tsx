@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { CoachMessage, fetchJson } from '../api'
+import { CoachMessage, CoachStatus, fetchJson } from '../api'
 
 interface ActivityLine {
   name: string
@@ -20,9 +20,13 @@ export default function Coach() {
   const [input, setInput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [status, setStatus] = useState<CoachStatus | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    fetchJson<CoachStatus>('/api/coach/status')
+      .then(setStatus)
+      .catch(() => setStatus({ enabled: false, cli_available: false }))
     fetchJson<CoachMessage[]>('/api/coach/messages')
       .then(setMessages)
       .catch((e: Error) => setError(e.message))
@@ -32,10 +36,13 @@ export default function Coach() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, live])
 
+  const coachOff = status !== null && !status.enabled
+  const cliMissing = status !== null && status.enabled && !status.cli_available
+
   const send = async (event: FormEvent) => {
     event.preventDefault()
     const text = input.trim()
-    if (!text || busy) return
+    if (!text || busy || coachOff) return
     setInput('')
     setError(null)
     setBusy(true)
@@ -110,6 +117,19 @@ export default function Coach() {
         sessions and trends, and manage plans, notes and races through the same instructions
         as a terminal session. Uses your Claude subscription.
       </p>
+      {coachOff && (
+        <div className="notice-box">
+          <strong>The Coach is turned off.</strong> It runs a Claude Code agent with
+          shell access on this machine, so it ships disabled. To enable it, start the
+          app with <code>FARTLEK_COACH_ENABLED=1</code> (only when bound to localhost).
+        </div>
+      )}
+      {cliMissing && (
+        <div className="notice-box">
+          <strong>Claude Code CLI not found.</strong> Install it and run{' '}
+          <code>claude</code> once to log in, then reload this page.
+        </div>
+      )}
       {error && <div className="error-box">{error}</div>}
 
       <div className="coach-thread">
@@ -159,11 +179,17 @@ export default function Coach() {
               e.currentTarget.form?.requestSubmit()
             }
           }}
-          placeholder={busy ? 'The coach is working…' : 'Message the coach (Enter to send)'}
+          placeholder={
+            coachOff
+              ? 'The coach is turned off'
+              : busy
+                ? 'The coach is working…'
+                : 'Message the coach (Enter to send)'
+          }
           rows={2}
-          disabled={busy}
+          disabled={busy || coachOff}
         />
-        <button type="submit" disabled={busy || !input.trim()}>
+        <button type="submit" disabled={busy || coachOff || !input.trim()}>
           Send
         </button>
       </form>

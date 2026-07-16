@@ -42,9 +42,12 @@ cat > "$PLIST" <<EOF
   <dict><key>SuccessfulExit</key><false/></dict>
   <key>StandardOutPath</key><string>$HOME/Library/Logs/fartlek.log</string>
   <key>StandardErrorPath</key><string>$HOME/Library/Logs/fartlek.log</string>
-  <!-- Optional overrides, e.g. nightly cloud backups:
+  <!-- Optional overrides, e.g. nightly cloud backups or the in-app Coach agent:
   <key>EnvironmentVariables</key>
-  <dict><key>FARTLEK_RCLONE_REMOTE</key><string>gdrive:fartlek</string></dict>
+  <dict>
+    <key>FARTLEK_RCLONE_REMOTE</key><string>gdrive:fartlek</string>
+    <key>FARTLEK_COACH_ENABLED</key><string>1</string>
+  </dict>
   -->
 </dict>
 </plist>

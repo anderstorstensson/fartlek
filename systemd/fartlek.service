@@ -12,6 +12,8 @@ Restart=on-failure
 RestartSec=10
 # Optional overrides (see README), e.g. nightly cloud backups:
 #Environment=FARTLEK_RCLONE_REMOTE=gdrive:fartlek
+# Enable the in-app Coach agent (whitelisted shell access; localhost only):
+#Environment=FARTLEK_COACH_ENABLED=1
 
 [Install]
 WantedBy=default.target
