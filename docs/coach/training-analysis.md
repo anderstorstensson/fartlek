@@ -213,7 +213,8 @@ the single-session steps above, and the coaching tone applies as everywhere.
    - *Anchors*: a raced maximal effort is the cleanest anchor there is. Recompute the
      threshold-pace estimate from the result (Riegel to the ~1-hour-effort distance)
      and, after confirming with the athlete, update `threshold_pace_s_per_km` via
-     `PUT /api/settings` (this rescales pace zones and rTSS — recompute runs
+     `PUT /api/settings` (merge semantics — send **only** the fields you change,
+     the rest keep their values; rescales pace zones and rTSS, recompute runs
      automatically). Note the race in the profile's benchmark-context list as
      verified-maximal (or not, with why).
    - *Taper evaluation*: compare actual race-day TSB (`/api/trends/fitness`) against

@@ -142,16 +142,50 @@ def test_settings_zone_modes(client):
         json={**base, "zone_mode": "manual", "manual_zone_bounds": [100, 90, 145, 160, 172]},
     )
     assert bad.status_code == 422
-    assert client.put("/api/settings", json={**base, "zone_mode": "manual"}).status_code == 422
+    # Merge semantics: stored bounds satisfy a bare mode switch, so clearing
+    # them explicitly is what makes manual-without-bounds invalid.
+    assert client.put(
+        "/api/settings",
+        json={**base, "zone_mode": "manual", "manual_zone_bounds": None},
+    ).status_code == 422
 
-    # Restore default mode for other tests.
-    client.put("/api/settings", json={**base, "zone_mode": "max_hr"})
+    # Restore default mode (and clear the stored bounds) for other tests.
+    client.put(
+        "/api/settings",
+        json={**base, "zone_mode": "max_hr", "manual_zone_bounds": None},
+    )
 
 
 def test_settings_validation(client):
     bad = {"resting_hr": 5, "max_hr": 188, "lthr": 168,
            "threshold_pace_s_per_km": 255, "sex": "male"}
     assert client.put("/api/settings", json=bad).status_code == 422
+
+
+def test_partial_settings_update_preserves_other_fields(client):
+    """A partial PUT (e.g. the coach updating threshold pace) must never reset
+    unmentioned settings to their defaults — the bug that wiped tone/model."""
+    client.put("/api/settings", json={
+        "coaching_tone": "drill", "coach_model": "sonnet", "display_locale": "en-GB",
+    })
+
+    updated = client.put("/api/settings", json={"threshold_pace_s_per_km": 240}).json()
+    assert updated["threshold_pace_s_per_km"] == 240
+    assert updated["coaching_tone"] == "drill"
+    assert updated["coach_model"] == "sonnet"
+    assert updated["display_locale"] == "en-GB"
+
+    # Cross-field rules validate against the MERGED state: switching to manual
+    # zones with bounds explicitly null is rejected, without touching other fields.
+    assert client.put(
+        "/api/settings", json={"zone_mode": "manual", "manual_zone_bounds": None}
+    ).status_code == 422
+    assert client.get("/api/settings").json()["coaching_tone"] == "drill"
+
+    # restore
+    client.put("/api/settings", json={
+        "coaching_tone": "balanced", "coach_model": "", "display_locale": "",
+    })
 
 
 def test_logbook(client):

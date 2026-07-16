@@ -298,6 +298,36 @@ class SettingsIn(BaseModel):
         return self
 
 
+class SettingsUpdate(BaseModel):
+    """PUT payload — merge semantics: omitted fields keep their current values.
+
+    Per-field constraints mirror SettingsIn; cross-field rules (manual zone
+    bounds) are validated in the endpoint against the *merged* state, so a
+    partial update can't be rejected for — or silently reset — fields it
+    never mentioned.
+    """
+
+    resting_hr: int | None = Field(default=None, ge=25, le=120)
+    max_hr: int | None = Field(default=None, ge=120, le=230)
+    lthr: int | None = Field(default=None, ge=100, le=220)
+    threshold_pace_s_per_km: float | None = Field(default=None, ge=120, le=720)
+    sex: str | None = Field(default=None, pattern="^(male|female)$")
+    zone_mode: str | None = Field(default=None, pattern="^(max_hr|lthr|manual)$")
+    manual_zone_bounds: list[int] | None = None
+    rtss_use_gap: bool | None = None
+    pace_zone_mode: str | None = Field(default=None, pattern="^(threshold|manual)$")
+    manual_pace_zone_bounds: list[float] | None = None
+    coaching_tone: str | None = Field(
+        default=None, pattern="^(drill|harsh|balanced|supportive)$"
+    )
+    display_locale: str | None = Field(
+        default=None, pattern="^[A-Za-z]{0,3}(-[A-Za-z0-9]{2,8})*$"
+    )
+    coach_model: str | None = Field(
+        default=None, max_length=64, pattern=r"^[A-Za-z0-9.\-\[\]]*$"
+    )
+
+
 class SettingsResponse(SettingsOut):
     zones: list[ZoneOut]
     pace_zones: list["PaceZoneOut"] = []
