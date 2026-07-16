@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
-import { fetchJson, PlanInfo, PlannedWorkout } from '../api'
+import { CoachStatus, fetchJson, PlanInfo, PlannedWorkout, useApi } from '../api'
+import { coachUrl, PLAN_PROMPT } from '../coachLink'
 import { formatDistance, formatDuration, sportEmoji } from '../format'
 
 interface DayActivity {
@@ -131,6 +132,9 @@ export default function Calendar() {
   const [planned, setPlanned] = useState<Record<string, PlannedWorkout[]>>({})
   const [activities, setActivities] = useState<Record<string, DayActivity[]>>({})
   const [plans, setPlans] = useState<PlanInfo[]>([])
+  const coachStatus = useApi<CoachStatus>('/api/coach/status')
+  const coachReady =
+    coachStatus.data?.enabled === true && coachStatus.data?.cli_available === true
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<PlannedWorkout | null>(null)
 
@@ -232,6 +236,11 @@ export default function Calendar() {
           <span className="legend-dot run" /> Done
           <span className="legend-dot planned" /> Planned
         </span>
+        {coachReady && (
+          <Link to={coachUrl(PLAN_PROMPT)} className="btn-ghost" style={{ marginLeft: 'auto' }}>
+            🎓 Plan with the coach
+          </Link>
+        )}
       </div>
       {error && <div className="error-box">{error}</div>}
 
