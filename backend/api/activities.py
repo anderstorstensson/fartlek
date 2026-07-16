@@ -6,10 +6,11 @@ from backend.analysis.gap import gap_speed_series
 from backend.analysis.pace_zones import pace_zones_for_settings, time_in_pace_zones
 from backend.analysis.zones import time_in_zones, zones_for_settings
 from backend.db import get_session
-from backend.models import Activity, Stream
+from backend.models import Activity, AnalysisNote, Stream
 from backend.schemas import (
     ActivityDetail,
     ActivityList,
+    ActivitySummary,
     ActivityUpdate,
     PaceZoneOut,
     StreamsOut,
@@ -41,7 +42,23 @@ def list_activities(
     items = session.scalars(
         query.order_by(Activity.start_time_utc.desc()).limit(min(limit, 500)).offset(offset)
     ).all()
-    return ActivityList(items=items, total=total)
+    analyzed = _analyzed_ids(session, [a.id for a in items])
+    summaries = []
+    for activity in items:
+        summary = ActivitySummary.model_validate(activity)
+        summary.has_analysis = activity.id in analyzed
+        summaries.append(summary)
+    return ActivityList(items=summaries, total=total)
+
+
+def _analyzed_ids(session: Session, ids: list[int]) -> set[int]:
+    if not ids:
+        return set()
+    return set(
+        session.scalars(
+            select(AnalysisNote.activity_id).where(AnalysisNote.activity_id.in_(ids))
+        ).all()
+    )
 
 
 @router.get("/sports", response_model=list[str])
@@ -55,7 +72,9 @@ def get_activity(activity_id: int, session: Session = Depends(get_session)) -> A
     activity = session.get(Activity, activity_id)
     if activity is None:
         raise HTTPException(status_code=404, detail="Activity not found")
-    return activity
+    detail = ActivityDetail.model_validate(activity)
+    detail.has_analysis = bool(_analyzed_ids(session, [activity_id]))
+    return detail
 
 
 @router.patch("/{activity_id}", response_model=ActivityDetail)

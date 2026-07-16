@@ -18,6 +18,7 @@ export interface ActivitySummary {
   has_gps: boolean
   is_workout: boolean
   tag: string | null
+  has_analysis: boolean
 }
 
 export interface Lap {

@@ -66,6 +66,23 @@ def test_list_activities(client):
     assert body["items"][0]["name"] == "Morning Run"
 
 
+def test_has_analysis_marker(client):
+    assert client.get("/api/activities").json()["items"][0]["has_analysis"] is False
+
+    note = client.post(
+        "/api/notes",
+        json={"activity_id": 1, "kind": "session", "title": "t", "content": "c"},
+    ).json()
+    assert client.get("/api/activities").json()["items"][0]["has_analysis"] is True
+    assert client.get("/api/activities/1").json()["has_analysis"] is True
+    week = next(w for w in client.get("/api/logbook?weeks=4").json()
+                if w["week_start"] == "2026-07-13")
+    assert week["activities"][0]["has_analysis"] is True
+
+    client.delete(f"/api/notes/{note['id']}")
+    assert client.get("/api/activities").json()["items"][0]["has_analysis"] is False
+
+
 def test_activity_detail_and_404(client):
     assert client.get("/api/activities/1").status_code == 200
     assert client.get("/api/activities/999").status_code == 404

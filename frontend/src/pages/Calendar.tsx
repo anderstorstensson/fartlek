@@ -13,6 +13,7 @@ interface DayActivity {
   distance_m: number
   moving_s: number
   is_workout: boolean
+  has_analysis: boolean
 }
 
 interface LogbookWeek {
@@ -276,12 +277,13 @@ export default function Calendar() {
                     <button
                       key={activity.id}
                       className={`cal-chip done${activity.is_workout ? ' workout' : ''}`}
-                      title={activity.name}
+                      title={activity.name + (activity.has_analysis ? ' · has analysis' : '')}
                       onClick={() => navigate(`/activities/${activity.id}`)}
                     >
                       {activity.sport.includes('running')
                         ? `${(activity.distance_m / 1000).toFixed(1)} km`
                         : sportEmoji(activity.sport)}
+                      {activity.has_analysis && <span className="chip-analysis">🧠</span>}
                     </button>
                   ))}
                   {(planned[key] ?? []).map((workout) => (
