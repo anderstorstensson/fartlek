@@ -29,12 +29,31 @@ const TOOLTIP_STYLE = {
 interface FitnessChartProps {
   data: FitnessPoint[]
   height?: number
+  raceDay?: string | null
 }
 
-export default function FitnessChart({ data, height = 320 }: FitnessChartProps) {
+/** Points after today (projected from the plan) render dashed; the boundary
+ * point is duplicated into both halves so the lines connect. */
+function splitRows(data: FitnessPoint[]) {
+  const lastActualIdx = data.reduce((last, p, i) => (p.projected ? last : i), -1)
+  return data.map((p, i) => ({
+    day: p.day,
+    load: p.load,
+    ctl: p.projected ? null : p.ctl,
+    atl: p.projected ? null : p.atl,
+    tsb: p.projected ? null : p.tsb,
+    ctl_proj: p.projected || i === lastActualIdx ? p.ctl : null,
+    atl_proj: p.projected || i === lastActualIdx ? p.atl : null,
+    tsb_proj: p.projected || i === lastActualIdx ? p.tsb : null
+  }))
+}
+
+export default function FitnessChart({ data, height = 320, raceDay }: FitnessChartProps) {
+  const hasProjection = data.some((p) => p.projected)
+  const rows = hasProjection ? splitRows(data) : data
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -12 }}>
+      <LineChart data={rows} margin={{ top: 8, right: 12, bottom: 0, left: -12 }}>
         <CartesianGrid stroke="var(--grid)" vertical={false} />
         <XAxis
           dataKey="day"
@@ -54,6 +73,24 @@ export default function FitnessChart({ data, height = 320 }: FitnessChartProps) 
         />
         <Legend wrapperStyle={{ fontSize: 13, color: 'var(--text-secondary)' }} />
         <ReferenceLine y={0} stroke="var(--baseline)" />
+        {raceDay && (
+          <ReferenceLine
+            x={raceDay}
+            stroke="var(--series-workout)"
+            strokeDasharray="4 4"
+            label={({ viewBox }: { viewBox: { x: number; y: number } }) => (
+              <text
+                x={viewBox.x - 5}
+                y={viewBox.y + 12}
+                textAnchor="end"
+                fill="var(--text-muted)"
+                fontSize={11}
+              >
+                race
+              </text>
+            )}
+          />
+        )}
         {SERIES.map((series) => (
           <Line
             key={series.key}
@@ -67,6 +104,22 @@ export default function FitnessChart({ data, height = 320 }: FitnessChartProps) 
             isAnimationActive={false}
           />
         ))}
+        {hasProjection &&
+          SERIES.map((series) => (
+            <Line
+              key={`${series.key}_proj`}
+              type="monotone"
+              dataKey={`${series.key}_proj`}
+              stroke={series.color}
+              strokeWidth={2}
+              strokeDasharray="6 4"
+              strokeOpacity={0.75}
+              dot={false}
+              legendType="none"
+              tooltipType="none"
+              isAnimationActive={false}
+            />
+          ))}
       </LineChart>
     </ResponsiveContainer>
   )

@@ -4,6 +4,7 @@ import { formatDate } from '../format'
 
 const KIND_LABELS: Record<AnalysisNote['kind'], string> = {
   session: 'Session analysis',
+  race: 'Race analysis',
   weekly: 'Weekly check-in',
   trend: 'Trend review',
   'plan-checkin': 'Plan check-in',

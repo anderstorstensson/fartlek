@@ -1,7 +1,9 @@
+import { FormEvent, useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ActivityDetail, AnalysisNote, Streams, useApi } from '../api'
+import { ActivityDetail, AnalysisNote, fetchJson, Streams, useApi } from '../api'
 import ActivityMap from '../components/ActivityMap'
 import NoteCard from '../components/NoteCard'
+import PaceZoneChart from '../components/PaceZoneChart'
 import StreamCharts from '../components/StreamCharts'
 import ZoneChart from '../components/ZoneChart'
 import {
@@ -14,22 +16,142 @@ import {
   sportEmoji
 } from '../format'
 
-function Stat({ label, value }: { label: string; value: string }) {
+function formatWeatherSub(windMps: number | null, humidityPct: number | null): string | undefined {
+  const parts = []
+  if (windMps !== null) parts.push(`${Math.round(windMps)} m/s wind`)
+  if (humidityPct !== null) parts.push(`${Math.round(humidityPct)}% RH`)
+  return parts.length ? parts.join(' · ') : undefined
+}
+
+const TAGS = ['', 'easy', 'recovery', 'long', 'intervals', 'tempo', 'race', 'cross']
+
+function EditForm({
+  activity,
+  onSaved,
+  onCancel
+}: {
+  activity: ActivityDetail
+  onSaved: () => void
+  onCancel: () => void
+}) {
+  const [name, setName] = useState(activity.name)
+  const [tag, setTag] = useState(activity.tag ?? '')
+  const [note, setNote] = useState(activity.user_note)
+  const [error, setError] = useState<string | null>(null)
+
+  const save = (event: FormEvent) => {
+    event.preventDefault()
+    fetchJson(`/api/activities/${activity.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, tag, user_note: note })
+    })
+      .then(onSaved)
+      .catch((e: Error) => setError(e.message))
+  }
+
+  return (
+    <form className="card" style={{ marginBottom: 16 }} onSubmit={save}>
+      {error && <div className="error-box">{error}</div>}
+      <div className="form-grid" style={{ marginBottom: 12 }}>
+        <label style={{ gridColumn: 'span 2' }}>
+          <div className="muted">Title</div>
+          <input value={name} onChange={(e) => setName(e.target.value)} required />
+        </label>
+        <label>
+          <div className="muted">Tag</div>
+          <select value={tag} onChange={(e) => setTag(e.target.value)}>
+            {TAGS.map((t) => (
+              <option key={t} value={t}>
+                {t || '(none)'}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <label style={{ display: 'block', marginBottom: 12 }}>
+        <div className="muted">Your note (visible to the AI coach in analyses)</div>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={3}
+          style={{ width: '100%', boxSizing: 'border-box', marginTop: 4 }}
+          placeholder="e.g. felt flat, slept 4h · new shoes · raced this one"
+        />
+      </label>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button type="submit">Save</button>
+        <button type="button" className="ghost" onClick={onCancel}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  )
+}
+
+function DynamicsLine({ activity }: { activity: ActivityDetail }) {
+  const parts: string[] = []
+  if (activity.avg_vertical_oscillation_mm !== null)
+    parts.push(`vertical oscillation ${activity.avg_vertical_oscillation_mm.toFixed(0)} mm`)
+  if (activity.avg_vertical_ratio_pct !== null)
+    parts.push(`vertical ratio ${activity.avg_vertical_ratio_pct.toFixed(1)}%`)
+  if (activity.avg_stance_time_ms !== null)
+    parts.push(`ground contact ${activity.avg_stance_time_ms.toFixed(0)} ms`)
+  if (activity.avg_step_length_mm !== null)
+    parts.push(`step length ${(activity.avg_step_length_mm / 10).toFixed(0)} cm`)
+  if (activity.avg_respiration_brpm !== null)
+    parts.push(`respiration ${activity.avg_respiration_brpm.toFixed(0)} brpm`)
+  if (parts.length === 0) return null
+  return (
+    <p className="muted" style={{ fontSize: 13 }}>
+      Running dynamics: {parts.join(' · ')}
+    </p>
+  )
+}
+
+function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="stat-tile card">
       <div className="label">{label}</div>
-      <div className="value" style={{ fontSize: 20 }}>
+      <div className="value" style={{ fontSize: 17 }}>
         {value}
       </div>
+      {sub && <div className="delta">{sub}</div>}
     </div>
   )
 }
 
 export default function ActivityDetailPage() {
   const { id } = useParams()
-  const detail = useApi<ActivityDetail>(id ? `/api/activities/${id}` : null)
+  const [version, setVersion] = useState(0)
+  const [editing, setEditing] = useState(false)
+  const detail = useApi<ActivityDetail>(id ? `/api/activities/${id}?v=${version}` : null)
   const streams = useApi<Streams>(id ? `/api/activities/${id}/streams` : null)
   const notes = useApi<AnalysisNote[]>(id ? `/api/notes?activity_id=${id}` : null)
+
+  // Chart hover → map marker. The chart reports a stream index; resolve it to
+  // the nearest GPS fix (samples can lack a position, e.g. in tunnels).
+  const [hoverPoint, setHoverPoint] = useState<[number, number] | null>(null)
+  const streamData = streams.data
+  const handleHoverIndex = useCallback(
+    (index: number | null) => {
+      if (index === null || !streamData) {
+        setHoverPoint(null)
+        return
+      }
+      const { lat, lng } = streamData
+      for (let offset = 0; offset < 25; offset++) {
+        for (const j of offset === 0 ? [index] : [index - offset, index + offset]) {
+          if (j >= 0 && j < lat.length && lat[j] !== null && lng[j] !== null) {
+            setHoverPoint([lat[j] as number, lng[j] as number])
+            return
+          }
+        }
+      }
+      setHoverPoint(null)
+    },
+    [streamData]
+  )
 
   if (detail.error) return <div className="error-box">Failed to load: {detail.error}</div>
   if (!detail.data) return <p className="muted">Loading…</p>
@@ -46,30 +168,113 @@ export default function ActivityDetailPage() {
       </p>
       <h1 style={{ marginBottom: 4 }}>
         {sportEmoji(activity.sport)} {activity.name}
-        {activity.is_workout && <span className="badge workout">workout</span>}
+        {activity.tag ? (
+          <span className="badge workout">{activity.tag}</span>
+        ) : (
+          activity.is_workout && <span className="badge workout">workout</span>
+        )}
       </h1>
       <p className="muted" style={{ marginTop: 0 }}>
         {formatSportName(activity.sport)} · {formatDate(activity.start_time_local)} at{' '}
         {formatTime(activity.start_time_local)}
+        {' · '}
+        <button
+          className="ghost"
+          style={{ padding: '2px 10px', fontSize: 12 }}
+          onClick={() => setEditing(!editing)}
+        >
+          Edit
+        </button>
       </p>
 
-      <div className="stat-grid" style={{ marginBottom: 20 }}>
+      {editing && (
+        <EditForm
+          activity={activity}
+          onSaved={() => {
+            setEditing(false)
+            setVersion((v) => v + 1)
+          }}
+          onCancel={() => setEditing(false)}
+        />
+      )}
+
+      {activity.user_note && !editing && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <span className="badge">your note</span>
+          <span style={{ marginLeft: 10 }}>{activity.user_note}</span>
+        </div>
+      )}
+
+      <div className="stat-grid dense" style={{ marginBottom: 20 }}>
         {activity.distance_m > 0 && <Stat label="Distance" value={formatDistance(activity.distance_m)} />}
-        <Stat label="Moving time" value={formatDuration(activity.moving_s)} />
-        {isRun && <Stat label="Avg pace" value={formatPace(activity.avg_speed_mps)} />}
+        <Stat
+          label="Moving time"
+          value={formatDuration(activity.moving_s)}
+          sub={activity.calories !== null ? `${Math.round(activity.calories)} kcal` : undefined}
+        />
+        {isRun && (
+          <Stat
+            label="Avg pace"
+            value={formatPace(activity.avg_speed_mps)}
+            sub={
+              activity.gap_speed_mps !== null
+                ? `GAP ${formatPace(activity.gap_speed_mps)}`
+                : undefined
+            }
+          />
+        )}
         {activity.avg_hr !== null && (
           <Stat
             label="Heart rate"
-            value={`${Math.round(activity.avg_hr)} / ${activity.max_hr ? Math.round(activity.max_hr) : '–'} bpm`}
+            value={`${Math.round(activity.avg_hr)} / ${activity.max_hr ? Math.round(activity.max_hr) : '–'}`}
+            sub="avg / max bpm"
           />
         )}
         {activity.ascent_m !== null && activity.ascent_m > 0 && (
           <Stat label="Ascent" value={`${Math.round(activity.ascent_m)} m`} />
         )}
-        {activity.calories !== null && <Stat label="Calories" value={`${Math.round(activity.calories)}`} />}
-        {activity.trimp !== null && <Stat label="TRIMP" value={activity.trimp.toFixed(0)} />}
-        {activity.rtss !== null && <Stat label="rTSS" value={activity.rtss.toFixed(0)} />}
+        {(activity.trimp !== null || activity.rtss !== null) && (
+          <Stat
+            label="Load"
+            value={[
+              activity.trimp !== null ? activity.trimp.toFixed(0) : null,
+              activity.rtss !== null ? activity.rtss.toFixed(0) : null
+            ]
+              .filter((v) => v !== null)
+              .join(' · ')}
+            sub={
+              activity.trimp !== null && activity.rtss !== null
+                ? 'TRIMP · rTSS'
+                : activity.trimp !== null
+                  ? 'TRIMP'
+                  : 'rTSS'
+            }
+          />
+        )}
+        {activity.avg_power_w !== null && (
+          <Stat label="Power" value={`${Math.round(activity.avg_power_w)} W`} />
+        )}
+        {activity.decoupling_pct !== null && (
+          <Stat
+            label="Decoupling"
+            value={`${activity.decoupling_pct.toFixed(1)}%`}
+            sub={
+              activity.efficiency_index !== null
+                ? `EF ${activity.efficiency_index.toFixed(2)}`
+                : undefined
+            }
+          />
+        )}
+        {activity.weather_temp_c !== null && (
+          <Stat
+            label="Weather"
+            value={`${Math.round(activity.weather_temp_c)}°C`}
+            sub={formatWeatherSub(activity.weather_wind_mps, activity.weather_humidity_pct)}
+          />
+        )}
       </div>
+
+      <DynamicsLine activity={activity} />
 
       {activity.best_efforts.length > 0 && (
         <p>
@@ -90,9 +295,16 @@ export default function ActivityDetailPage() {
         </>
       )}
 
-      {streams.data && <ActivityMap streams={streams.data} />}
-      {streams.data && <StreamCharts streams={streams.data} />}
+      {streams.data && <ActivityMap streams={streams.data} hoverPoint={hoverPoint} />}
+      {streams.data && (
+        <StreamCharts
+          streams={streams.data}
+          activity={activity}
+          onHoverIndex={handleHoverIndex}
+        />
+      )}
       {streams.data && <ZoneChart streams={streams.data} />}
+      {streams.data && isRun && <PaceZoneChart streams={streams.data} />}
 
       {activity.laps.length > 1 && (
         <>

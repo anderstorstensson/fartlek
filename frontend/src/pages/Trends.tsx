@@ -1,7 +1,16 @@
 import { useState } from 'react'
-import { FitnessPoint, LoadModel, useApi, WeeklyStat } from '../api'
+import {
+  EfficiencyPoint,
+  FitnessPoint,
+  LoadModel,
+  useApi,
+  WeeklyStat,
+  WeeklyZones
+} from '../api'
+import EfficiencyChart from '../components/EfficiencyChart'
 import FitnessChart from '../components/FitnessChart'
 import WeeklyChart, { WeeklyMetric } from '../components/WeeklyChart'
+import ZoneDistributionChart from '../components/ZoneDistributionChart'
 
 const RANGES = [
   { label: '3 m', days: 90 },
@@ -23,8 +32,17 @@ export default function Trends() {
   const [metric, setMetric] = useState<WeeklyMetric>('distance')
   const [weeks, setWeeks] = useState(26)
 
+  const [zoneWeeks, setZoneWeeks] = useState(26)
+  const [efficiencyDays, setEfficiencyDays] = useState(365)
+  const [longRunsOnly, setLongRunsOnly] = useState(false)
+
   const fitness = useApi<FitnessPoint[]>(`/api/trends/fitness?model=${model}&days=${days}`)
   const weekly = useApi<WeeklyStat[]>(`/api/trends/weekly?weeks=${weeks}`)
+  const zones = useApi<WeeklyZones[]>(`/api/trends/zones?weeks=${zoneWeeks}`)
+  const efficiency = useApi<EfficiencyPoint[]>(`/api/trends/efficiency?days=${efficiencyDays}`)
+  const efficiencyPoints = (efficiency.data ?? []).filter(
+    (p) => !longRunsOnly || p.moving_s >= 4500
+  )
 
   return (
     <>
@@ -100,6 +118,59 @@ export default function Trends() {
         </div>
         {weekly.error && <div className="error-box">{weekly.error}</div>}
         {weekly.data && <WeeklyChart data={weekly.data} metric={metric} />}
+      </div>
+
+      <div className="chart-card">
+        <div className="chart-title">
+          <span>Intensity distribution (time in HR zones)</span>
+          <span className="segmented">
+            {WEEK_RANGES.map((range) => (
+              <button
+                key={range.weeks}
+                className={zoneWeeks === range.weeks ? 'on' : ''}
+                onClick={() => setZoneWeeks(range.weeks)}
+              >
+                {range.label}
+              </button>
+            ))}
+          </span>
+        </div>
+        {zones.error && <div className="error-box">{zones.error}</div>}
+        {zones.data && <ZoneDistributionChart data={zones.data} />}
+      </div>
+
+      <div className="chart-card">
+        <div className="chart-title">
+          <span>Efficiency &amp; decoupling (runs)</span>
+          <span style={{ display: 'flex', gap: 10 }}>
+            <span className="segmented">
+              <button
+                className={longRunsOnly ? 'on' : ''}
+                onClick={() => setLongRunsOnly(!longRunsOnly)}
+              >
+                Runs ≥ 75 min
+              </button>
+            </span>
+            <span className="segmented">
+              {RANGES.map((range) => (
+                <button
+                  key={range.days}
+                  className={efficiencyDays === range.days ? 'on' : ''}
+                  onClick={() => setEfficiencyDays(range.days)}
+                >
+                  {range.label}
+                </button>
+              ))}
+            </span>
+          </span>
+        </div>
+        {efficiency.error && <div className="error-box">{efficiency.error}</div>}
+        {efficiency.data && <EfficiencyChart data={efficiencyPoints} />}
+        <p className="muted" style={{ fontSize: 12, padding: '4px 8px' }}>
+          Efficiency is grade-adjusted meters per minute per heartbeat — higher at the same
+          effort means growing aerobic fitness. Decoupling compares the first and second half
+          speed:HR of each run; staying under ~5% (dashed line) on long runs signals durability.
+        </p>
       </div>
     </>
   )

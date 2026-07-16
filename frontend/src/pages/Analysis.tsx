@@ -5,6 +5,7 @@ import NoteCard from '../components/NoteCard'
 const FILTERS = [
   { key: '', label: 'All' },
   { key: 'session', label: 'Sessions' },
+  { key: 'race', label: 'Races' },
   { key: 'weekly', label: 'Weekly' },
   { key: 'trend', label: 'Trends' },
   { key: 'plan-checkin', label: 'Plan check-ins' }
