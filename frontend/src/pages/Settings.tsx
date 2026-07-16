@@ -1,6 +1,9 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { fetchJson, Settings, SyncStatus } from '../api'
+import RacesSection from '../components/RacesSection'
 import { formatPaceFromSeconds } from '../format'
+
+const PACE_ZONE_LABELS = ['recovery', 'easy', 'marathon', 'threshold', 'VO2max+']
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null)
@@ -37,7 +40,11 @@ export default function SettingsPage() {
         threshold_pace_s_per_km: settings.threshold_pace_s_per_km,
         sex: settings.sex,
         zone_mode: settings.zone_mode,
-        manual_zone_bounds: settings.manual_zone_bounds
+        manual_zone_bounds: settings.manual_zone_bounds,
+        rtss_use_gap: settings.rtss_use_gap,
+        pace_zone_mode: settings.pace_zone_mode,
+        manual_pace_zone_bounds: settings.manual_pace_zone_bounds,
+        coaching_tone: settings.coaching_tone
       })
     })
       .then((updated) => {
@@ -97,10 +104,12 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      <RacesSection />
+
       <h2>Athlete</h2>
       {settings && (
         <form className="card" onSubmit={save}>
-          <div className="stat-grid" style={{ marginBottom: 16 }}>
+          <div className="form-grid" style={{ marginBottom: 16 }}>
             <label>
               <div className="muted">Resting HR</div>
               <input
@@ -143,6 +152,36 @@ export default function SettingsPage() {
                 <option value="female">female</option>
               </select>
             </label>
+            <label>
+              <div className="muted">rTSS pace source</div>
+              <select
+                value={settings.rtss_use_gap ? 'gap' : 'raw'}
+                onChange={(e) => update({ rtss_use_gap: e.target.value === 'gap' })}
+              >
+                <option value="gap">Grade-adjusted pace (GAP)</option>
+                <option value="raw">Raw pace</option>
+              </select>
+              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                Switch to raw pace if the watch&apos;s barometric altitude is unreliable.
+              </div>
+            </label>
+            <label>
+              <div className="muted">Coaching tone</div>
+              <select
+                value={settings.coaching_tone}
+                onChange={(e) =>
+                  update({ coaching_tone: e.target.value as Settings['coaching_tone'] })
+                }
+              >
+                <option value="harsh">Harsh — frank, no sugarcoating</option>
+                <option value="balanced">Balanced — honest, encouraging</option>
+                <option value="supportive">Supportive — gentle framing</option>
+              </select>
+              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                How the AI coach talks in analyses and plans. Tone only — the numbers and
+                recommendations never change.
+              </div>
+            </label>
           </div>
           <button type="submit">Save settings</button>
         </form>
@@ -171,7 +210,7 @@ export default function SettingsPage() {
               </select>
             </label>
             {settings.zone_mode === 'manual' && settings.manual_zone_bounds && (
-              <div className="stat-grid" style={{ marginTop: 12 }}>
+              <div className="form-grid" style={{ marginTop: 12 }}>
                 {settings.manual_zone_bounds.map((bound, i) => (
                   <label key={i}>
                     <div className="muted">Z{i + 1} from (bpm)</div>
@@ -203,6 +242,77 @@ export default function SettingsPage() {
                       <td>
                         {zone.low_bpm}
                         {zone.high_bpm ? ` – ${zone.high_bpm}` : '+'} bpm
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h2>Pace zones</h2>
+          <div className="card">
+            <label>
+              <div className="muted">Zones based on</div>
+              <select
+                value={settings.pace_zone_mode}
+                onChange={(e) => {
+                  const mode = e.target.value as Settings['pace_zone_mode']
+                  const patch: Partial<Settings> = { pace_zone_mode: mode }
+                  if (mode === 'manual' && !settings.manual_pace_zone_bounds) {
+                    patch.manual_pace_zone_bounds = settings.pace_zones.map((z) =>
+                      Math.round(1000 / z.low_speed_mps)
+                    )
+                  }
+                  update(patch)
+                }}
+              >
+                <option value="threshold">% of threshold pace</option>
+                <option value="manual">Manual (s/km)</option>
+              </select>
+            </label>
+            {settings.pace_zone_mode === 'manual' && settings.manual_pace_zone_bounds && (
+              <div className="form-grid" style={{ marginTop: 12 }}>
+                {settings.manual_pace_zone_bounds.map((bound, i) => (
+                  <label key={i}>
+                    <div className="muted">Z{i + 1} from (s/km)</div>
+                    <input
+                      type="number"
+                      value={bound}
+                      onChange={(e) => {
+                        const bounds = settings.manual_pace_zone_bounds!.map((b, j) =>
+                          j === i ? Number(e.target.value) : b
+                        )
+                        update({ manual_pace_zone_bounds: bounds })
+                      }}
+                    />
+                    <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                      = {formatPaceFromSeconds(bound)}/km
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+            <p className="muted" style={{ fontSize: 12 }}>
+              Each bound is the zone&apos;s slowest pace; bounds must get faster from Z1 to Z5.
+              Save settings to recalculate the table below. The activity pages classify time in
+              these zones using grade-adjusted pace.
+            </p>
+            <div className="table-wrap">
+              <table>
+                <tbody>
+                  {settings.pace_zones.map((zone, i) => (
+                    <tr key={zone.name}>
+                      <td className="strong" style={{ width: 60 }}>
+                        {zone.name}
+                      </td>
+                      <td style={{ width: 110 }}>{PACE_ZONE_LABELS[i]}</td>
+                      <td>
+                        {formatPaceFromSeconds(1000 / zone.low_speed_mps)}
+                        {zone.high_speed_mps
+                          ? ` – ${formatPaceFromSeconds(1000 / zone.high_speed_mps)}`
+                          : ' and faster'}{' '}
+                        /km
                       </td>
                     </tr>
                   ))}

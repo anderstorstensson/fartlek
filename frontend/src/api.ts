@@ -17,6 +17,7 @@ export interface ActivitySummary {
   hrtss: number | null
   has_gps: boolean
   is_workout: boolean
+  tag: string | null
 }
 
 export interface Lap {
@@ -42,6 +43,20 @@ export interface ActivityDetail extends ActivitySummary {
   calories: number | null
   avg_cadence: number | null
   has_fit: boolean
+  avg_power_w: number | null
+  avg_vertical_oscillation_mm: number | null
+  avg_vertical_ratio_pct: number | null
+  avg_step_length_mm: number | null
+  avg_stance_time_ms: number | null
+  avg_respiration_brpm: number | null
+  gap_speed_mps: number | null
+  decoupling_pct: number | null
+  efficiency_index: number | null
+  weather_temp_c: number | null
+  weather_humidity_pct: number | null
+  weather_wind_mps: number | null
+  weather_code: number | null
+  user_note: string
   laps: Lap[]
   best_efforts: BestEffortItem[]
 }
@@ -62,12 +77,27 @@ export interface Streams {
   distance_m: (number | null)[]
   hr: (number | null)[]
   speed_mps: (number | null)[]
+  gap_speed_mps: (number | null)[]
   altitude_m: (number | null)[]
   cadence: (number | null)[]
   lat: (number | null)[]
   lng: (number | null)[]
+  power: (number | null)[]
+  vertical_oscillation: (number | null)[]
+  vertical_ratio: (number | null)[]
+  step_length: (number | null)[]
+  stance_time: (number | null)[]
+  respiration: (number | null)[]
   zones: Zone[]
   time_in_zones_s: number[]
+  pace_zones: PaceZone[]
+  time_in_pace_zones_s: number[]
+}
+
+export interface PaceZone {
+  name: string
+  low_speed_mps: number
+  high_speed_mps: number | null
 }
 
 export interface FitnessPoint {
@@ -76,6 +106,65 @@ export interface FitnessPoint {
   ctl: number
   atl: number
   tsb: number
+  projected: boolean
+}
+
+export interface WeeklyZones {
+  week_start: string
+  zone_seconds: number[]
+  total_s: number
+}
+
+export interface EfficiencyPoint {
+  day: string
+  activity_id: number
+  name: string
+  efficiency_index: number | null
+  decoupling_pct: number | null
+  distance_m: number
+  moving_s: number
+  is_workout: boolean
+}
+
+export interface WellnessDay {
+  day: string
+  resting_hr: number | null
+  hrv_last_night_avg: number | null
+  hrv_status: string | null
+  sleep_s: number | null
+  deep_sleep_s: number | null
+  sleep_score: number | null
+  body_battery_max: number | null
+  body_battery_min: number | null
+  stress_avg: number | null
+  steps: number | null
+}
+
+export interface Readiness {
+  day: string
+  resting_hr: number | null
+  resting_hr_baseline: number | null
+  hrv_last_night_avg: number | null
+  hrv_baseline: number | null
+  sleep_score: number | null
+  sleep_s: number | null
+  body_battery_max: number | null
+  stress_avg: number | null
+  flags: string[]
+  status: 'ready' | 'caution' | 'rest'
+}
+
+export interface Race {
+  id: number
+  name: string
+  day: string
+  distance_m: number
+  target_time_s: number | null
+  priority: 'A' | 'B' | 'C'
+  notes: string
+  days_until: number | null
+  predicted_time_s: number | null
+  predicted_from: string | null
 }
 
 export interface WeeklyStat {
@@ -128,7 +217,12 @@ export interface Settings {
   sex: string
   zone_mode: 'max_hr' | 'lthr' | 'manual'
   manual_zone_bounds: number[] | null
+  rtss_use_gap: boolean
+  pace_zone_mode: 'threshold' | 'manual'
+  manual_pace_zone_bounds: number[] | null
+  coaching_tone: 'harsh' | 'balanced' | 'supportive'
   zones: Zone[]
+  pace_zones: PaceZone[]
 }
 
 export interface PlannedWorkout {
@@ -153,7 +247,7 @@ export interface PlanInfo {
 export interface AnalysisNote {
   id: number
   activity_id: number | null
-  kind: 'session' | 'weekly' | 'trend' | 'plan-checkin' | 'other'
+  kind: 'session' | 'race' | 'weekly' | 'trend' | 'plan-checkin' | 'other'
   title: string
   content: string
   period_start: string | null

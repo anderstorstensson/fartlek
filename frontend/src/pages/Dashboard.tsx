@@ -4,6 +4,8 @@ import {
   ActivityList,
   FitnessPoint,
   PlannedWorkout,
+  Race,
+  Readiness,
   StatsSummary,
   useApi,
   WeeklyStat
@@ -26,6 +28,63 @@ function isoToday(offsetDays = 0): string {
   const d = new Date()
   d.setDate(d.getDate() + offsetDays)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+const READINESS_LABEL: Record<Readiness['status'], string> = {
+  ready: '🟢 Ready',
+  caution: '🟡 Caution',
+  rest: '🔴 Take it easy'
+}
+
+const FLAG_LABEL: Record<string, string> = {
+  'hrv-low': 'HRV below baseline',
+  'rhr-elevated': 'resting HR elevated',
+  'sleep-poor': 'poor sleep'
+}
+
+function ReadinessTile({ readiness }: { readiness: Readiness }) {
+  const detail = [
+    readiness.hrv_last_night_avg !== null
+      ? `HRV ${Math.round(readiness.hrv_last_night_avg)}${
+          readiness.hrv_baseline !== null ? `/${Math.round(readiness.hrv_baseline)}` : ''
+        } ms`
+      : null,
+    readiness.resting_hr !== null ? `RHR ${readiness.resting_hr}` : null,
+    readiness.sleep_score !== null ? `sleep ${readiness.sleep_score}` : null
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  return (
+    <div className="card stat-tile">
+      <div className="label">Readiness · {formatDate(readiness.day)}</div>
+      <div className="value" style={{ fontSize: 17 }}>
+        {READINESS_LABEL[readiness.status]}
+      </div>
+      <div className="delta">
+        {readiness.flags.length > 0
+          ? readiness.flags.map((f) => FLAG_LABEL[f] ?? f).join(', ')
+          : detail}
+      </div>
+    </div>
+  )
+}
+
+function RaceTile({ race }: { race: Race }) {
+  return (
+    <div className="card stat-tile">
+      <div className="label">
+        {race.name} · {formatDate(race.day)}
+      </div>
+      <div className="value" style={{ fontSize: 17 }}>
+        {race.days_until !== null && race.days_until >= 0 ? `${race.days_until} days to go` : '–'}
+      </div>
+      <div className="delta">
+        {formatDistance(race.distance_m)}
+        {race.target_time_s ? ` · target ${formatDuration(race.target_time_s)}` : ''}
+        {race.predicted_time_s ? ` · predicted ${formatDuration(race.predicted_time_s)}` : ''}
+      </div>
+    </div>
+  )
 }
 
 function NextWorkoutTile({ workout }: { workout: PlannedWorkout }) {
@@ -51,13 +110,23 @@ function NextWorkoutTile({ workout }: { workout: PlannedWorkout }) {
 
 export default function Dashboard() {
   const stats = useApi<StatsSummary>('/api/stats/summary')
-  const fitness = useApi<FitnessPoint[]>('/api/trends/fitness?model=trimp&days=120')
   const weekly = useApi<WeeklyStat[]>('/api/trends/weekly?weeks=26')
   const recent = useApi<ActivityList>('/api/activities?limit=6')
   const [weeklyMetric, setWeeklyMetric] = useState<WeeklyMetric>('distance')
   const plan = useApi<PlannedWorkout[]>(`/api/plan?start=${isoToday()}&end=${isoToday(28)}`)
   const nextKey = plan.data?.find(
     (w) => KEY_TYPES.includes(w.workout_type) && !w.completed_activity_id
+  )
+  const readiness = useApi<Readiness | null>('/api/wellness/readiness')
+  const races = useApi<Race[]>('/api/races?upcoming=true')
+  const nextRace = races.data?.[0]
+  // Project the fitness curve through the next race (or 4 weeks of plan);
+  // wait for the races call so the chart doesn't fetch twice.
+  const projectDays = Math.min(Math.max(nextRace?.days_until ?? 28, 14), 120)
+  const fitness = useApi<FitnessPoint[]>(
+    races.loading
+      ? null
+      : `/api/trends/fitness?model=trimp&days=120&project_days=${projectDays}`
   )
 
   if (stats.error) return <div className="error-box">Failed to load stats: {stats.error}</div>
@@ -113,12 +182,16 @@ export default function Dashboard() {
               />
             )
           )}
+          {readiness.data && <ReadinessTile readiness={readiness.data} />}
+          {nextRace && <RaceTile race={nextRace} />}
         </div>
       )}
 
-      <h2>Fitness · last 120 days (TRIMP model)</h2>
+      <h2>Fitness · last 120 days (TRIMP model{nextRace ? ', projected to race day' : ''})</h2>
       <div className="chart-card">
-        {fitness.data && <FitnessChart data={fitness.data} height={260} />}
+        {fitness.data && (
+          <FitnessChart data={fitness.data} height={260} raceDay={nextRace?.day ?? null} />
+        )}
       </div>
 
       <div className="chart-card" style={{ marginTop: 28 }}>

@@ -22,6 +22,10 @@
   --series-planned: #9085e9;
   --series-cadence: #199e70;
   --series-elevation: #898781;
+  --series-power: #b07cd8;
+  --series-respiration: #5aa9a2;
+  --series-efficiency: #199e70;
+  --series-decoupling: #d95926;
   --accent: #3987e5;
 }
 
@@ -130,6 +134,12 @@ h2 {
   gap: 12px;
 }
 
+/* Activity-page stats: slimmer tiles so the full set fits one row. */
+.stat-grid.dense {
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 10px;
+}
+
 .stat-tile .label {
   font-size: 12px;
   color: var(--text-muted);
@@ -151,6 +161,47 @@ h2 {
 
 .stat-tile .delta.up {
   color: var(--good);
+}
+
+/* Series show/hide chips under the combined activity chart. */
+.series-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 8px 12px;
+}
+
+button.series-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: 1px solid var(--baseline);
+  border-radius: 16px;
+  padding: 4px 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+button.series-toggle:hover {
+  filter: none;
+  border-color: var(--text-muted);
+}
+
+button.series-toggle .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+button.series-toggle .stat {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+button.series-toggle.off {
+  opacity: 0.45;
 }
 
 /* ---------- Tables & lists ---------- */
@@ -217,8 +268,11 @@ tr.clickable:hover td {
 }
 
 select,
+textarea,
 input[type='text'],
-input[type='number'] {
+input[type='number'],
+input[type='date'],
+input:not([type]) {
   background: var(--surface);
   border: 1px solid var(--baseline);
   color: var(--text-primary);
@@ -226,6 +280,24 @@ input[type='number'] {
   padding: 8px 10px;
   font-size: 14px;
   font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* Settings-style forms: fields fill their cell and never overflow the card. */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.form-grid label {
+  min-width: 0;
+}
+
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  margin-top: 4px;
 }
 
 button {
@@ -315,12 +387,17 @@ a.btn-ghost:hover {
 /* HR zone bars */
 .zone-row {
   display: grid;
-  grid-template-columns: 36px 1fr 110px;
+  /* Shared label width across the HR and pace zone charts so the bars align. */
+  grid-template-columns: 196px 1fr 110px;
   align-items: center;
   gap: 10px;
   padding: 4px 0;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
+}
+
+.zone-row .zone-range {
+  color: var(--text-muted);
 }
 
 .zone-row .bar-track {

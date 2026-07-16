@@ -1,8 +1,8 @@
 import { Streams } from '../api'
 import { formatDuration } from '../format'
 
-/* Ordinal single-hue ramp (validated for the dark surface). */
-const ZONE_COLORS = ['#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95']
+/* Ordinal single-hue red ramp (heart rate), light → dark. */
+const ZONE_COLORS = ['#f6b3b3', '#f08c8c', '#e66767', '#c74848', '#9c3232']
 
 interface ZoneChartProps {
   streams: Streams
@@ -19,9 +19,14 @@ export default function ZoneChart({ streams }: ZoneChartProps) {
         {streams.zones.map((zone, i) => {
           const seconds = streams.time_in_zones_s[i] ?? 0
           const pct = (seconds / total) * 100
+          const range = zone.high_bpm
+            ? `${zone.low_bpm}–${zone.high_bpm} bpm`
+            : `${zone.low_bpm}+ bpm`
           return (
             <div className="zone-row" key={zone.name}>
-              <span>{zone.name}</span>
+              <span>
+                {zone.name} <span className="zone-range">({range})</span>
+              </span>
               <div className="bar-track">
                 <div
                   className="bar-fill"
@@ -34,16 +39,6 @@ export default function ZoneChart({ streams }: ZoneChartProps) {
             </div>
           )
         })}
-        <div className="zone-row muted" style={{ fontSize: 12 }}>
-          <span />
-          <span>
-            {streams.zones
-              .map((z) => `${z.name} ${z.low_bpm}${z.high_bpm ? `–${z.high_bpm}` : '+'}`)
-              .join('  ·  ')}{' '}
-            bpm
-          </span>
-          <span />
-        </div>
       </div>
     </div>
   )
