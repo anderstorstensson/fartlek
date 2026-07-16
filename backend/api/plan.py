@@ -14,21 +14,50 @@ from backend.schemas import PlanImport, PlanInfo, PlannedWorkoutIn, PlannedWorko
 router = APIRouter(prefix="/api/plan", tags=["plan"])
 
 
-def _completion_map(session: Session, start: date, end: date) -> dict[date, int]:
-    """First run activity id per local date in [start, end]."""
+def _activity_map(session: Session, start: date, end: date) -> dict[date, dict[str, list[int]]]:
+    """Activity ids per local date in [start, end], split into runs and other sports.
+
+    Walking is excluded — it is never a prescribed session and would falsely
+    complete cross-training workouts.
+    """
     start_dt = datetime.combine(start, datetime.min.time())
     end_dt = datetime.combine(end + timedelta(days=1), datetime.min.time())
-    runs = session.scalars(
+    activities = session.scalars(
         select(Activity)
         .where(Activity.start_time_local >= start_dt)
         .where(Activity.start_time_local < end_dt)
-        .where(Activity.sport.contains("running"))
+        .where(Activity.sport != "walking")
         .order_by(Activity.start_time_local)
     ).all()
-    completion: dict[date, int] = {}
-    for run in runs:
-        completion.setdefault(run.start_time_local.date(), run.id)
-    return completion
+    days: dict[date, dict[str, list[int]]] = {}
+    for activity in activities:
+        day = days.setdefault(activity.start_time_local.date(), {"runs": [], "other": []})
+        kind = "runs" if "running" in (activity.sport or "") else "other"
+        day[kind].append(activity.id)
+    return days
+
+
+def _assign_completions(
+    workouts: list[PlannedWorkout], days: dict[date, dict[str, list[int]]]
+) -> dict[int, int | None]:
+    """Pair each planned workout with an activity of the matching kind, in order.
+
+    Run-type workouts consume that day's runs in start-time order (so doubles pair
+    AM/PM correctly), `cross` workouts consume non-running activities, `rest` never
+    completes.
+    """
+    consumed: dict[tuple[date, str], int] = {}
+    completions: dict[int, int | None] = {}
+    for workout in workouts:
+        if workout.workout_type == "rest":
+            completions[workout.id] = None
+            continue
+        kind = "other" if workout.workout_type == "cross" else "runs"
+        ids = days.get(workout.day, {}).get(kind, [])
+        index = consumed.get((workout.day, kind), 0)
+        completions[workout.id] = ids[index] if index < len(ids) else None
+        consumed[(workout.day, kind)] = index + 1
+    return completions
 
 
 @router.get("", response_model=list[PlannedWorkoutOut])
@@ -43,9 +72,10 @@ def get_plan(
         select(PlannedWorkout)
         .where(PlannedWorkout.day >= window_start)
         .where(PlannedWorkout.day <= window_end)
-        .order_by(PlannedWorkout.day)
+        .order_by(PlannedWorkout.day, PlannedWorkout.id)
     ).all()
-    completion = _completion_map(session, window_start, window_end)
+    days = _activity_map(session, window_start, window_end)
+    completions = _assign_completions(workouts, days)
     return [
         PlannedWorkoutOut(
             id=w.id,
@@ -56,9 +86,7 @@ def get_plan(
             target_distance_m=w.target_distance_m,
             target_duration_s=w.target_duration_s,
             plan_name=w.plan_name,
-            completed_activity_id=(
-                completion.get(w.day) if w.workout_type not in ("rest",) else None
-            ),
+            completed_activity_id=completions[w.id],
         )
         for w in workouts
     ]
@@ -126,7 +154,8 @@ def update_workout(
     for field, value in payload.model_dump().items():
         setattr(workout, field, value)
     session.commit()
-    completion = _completion_map(session, workout.day, workout.day)
+    days = _activity_map(session, workout.day, workout.day)
+    completions = _assign_completions([workout], days)
     return PlannedWorkoutOut(
         id=workout.id,
         day=workout.day,
@@ -136,9 +165,7 @@ def update_workout(
         target_distance_m=workout.target_distance_m,
         target_duration_s=workout.target_duration_s,
         plan_name=workout.plan_name,
-        completed_activity_id=(
-            completion.get(workout.day) if workout.workout_type != "rest" else None
-        ),
+        completed_activity_id=completions[workout.id],
     )
 
 
