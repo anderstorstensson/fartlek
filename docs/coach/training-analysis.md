@@ -131,18 +131,35 @@ consistently. The coach-advisor's internal review verdicts are unaffected.
    inflates decoupling; strong wind (> ~5 m/s) costs pace without HR change on exposed
    routes. Never grade paces or HR response without this context, and say when a
    "bad" number is weather, not fitness.
-2. Splits and pacing: per-lap pace vs average; positive/negative split; for intervals,
+2. **Was this session prescribed?** Fetch the plan for that date
+   (`GET /api/plan?start=<day>&end=<day>`) and check `completed_activity_id`.
+   - If the activity completes a planned workout, the analysis is **first an
+     execution review**: the workout's `description` carries the full prescription
+     (target system in brackets, reps × distance/time @ pace, recoveries, cues) —
+     grade what was run against it. Reps completed vs prescribed, work pace vs
+     target (name the deviation in s/km), recoveries honored or cut, total volume
+     vs `target_distance_m`. Then the verdict that matters: **did the session
+     achieve its stated physiological purpose?** A sub-threshold session run 5%
+     too fast trained the wrong system even if it felt great; classify deviations
+     as conscious decision vs drift.
+   - If the plan expected something else that day (a rest day, an easy run), say
+     so — unplanned quality on a rest day is itself the finding.
+   - If no plan covers the date, analyze on the session's inferred purpose as below.
+3. Splits and pacing: per-lap pace vs average; positive/negative split; for intervals,
    rep consistency (pace and HR per work rep).
-3. Aerobic decoupling: precomputed (GAP-based) in `activities.decoupling_pct` — read it
+4. Aerobic decoupling: precomputed (GAP-based) in `activities.decoupling_pct` — read it
    rather than recomputing; >5% drift on a steady run suggests the effort was above
    current aerobic fitness, heat (cross-check `weather_temp_c`), or dehydration.
    It is stored for interval sessions too, where high values are expected and benign.
-4. Intensity distribution: time in HR zones vs the session's purpose (easy runs should be
+5. Intensity distribution: time in HR zones vs the session's purpose (easy runs should be
    ~Z1–Z2; if not, flag it).
-5. Compare with similar past sessions (same distance range/route/type) — is pace at a
+6. Compare with similar past sessions (same distance range/route/type) — is pace at a
    given HR improving?
-6. Place it in context: TSB on the day (was the athlete fresh or fatigued?), contribution
-   to the week's load.
+7. Place it in context: TSB on the day (was the athlete fresh or fatigued?), contribution
+   to the week's load, and — when a plan is active — what the deviation (if any)
+   means for the upcoming sessions (e.g. "ran the easy day hard → tomorrow's reps
+   start compromised"; propose adjustments per the plan-adjustment section only if
+   warranted).
 
 ## Analyzing a completed race
 
