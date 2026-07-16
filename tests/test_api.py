@@ -443,8 +443,8 @@ def test_coaching_tone_roundtrip(client):
     base = {"resting_hr": 48, "max_hr": 188, "lthr": 168,
             "threshold_pace_s_per_km": 255, "sex": "male"}
     assert client.get("/api/settings").json()["coaching_tone"] == "balanced"
-    updated = client.put("/api/settings", json={**base, "coaching_tone": "harsh"}).json()
-    assert updated["coaching_tone"] == "harsh"
+    updated = client.put("/api/settings", json={**base, "coaching_tone": "drill"}).json()
+    assert updated["coaching_tone"] == "drill"
     assert client.put(
         "/api/settings", json={**base, "coaching_tone": "brutal"}
     ).status_code == 422

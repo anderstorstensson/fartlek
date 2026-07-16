@@ -175,6 +175,7 @@ export default function SettingsPage() {
                   update({ coaching_tone: e.target.value as Settings['coaching_tone'] })
                 }
               >
+                <option value="drill">Drill sergeant — yells at mistakes</option>
                 <option value="harsh">Harsh — frank, no sugarcoating</option>
                 <option value="balanced">Balanced — honest, encouraging</option>
                 <option value="supportive">Supportive — gentle framing</option>
