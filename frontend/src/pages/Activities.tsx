@@ -151,7 +151,11 @@ export default function Activities() {
                       </td>
                       <td className="strong">
                         {sportEmoji(activity.sport)} {activity.name}
-                        {activity.is_workout && <span className="badge workout">workout</span>}
+                        {activity.tag ? (
+                          <span className="badge workout">{activity.tag}</span>
+                        ) : (
+                          activity.is_workout && <span className="badge workout">workout</span>
+                        )}
                         {activity.has_analysis && (
                           <span title="Has a saved analysis" style={{ marginLeft: 6 }}>
                             🧠

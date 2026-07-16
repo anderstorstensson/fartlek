@@ -64,10 +64,15 @@ function EditForm({
           <select value={tag} onChange={(e) => setTag(e.target.value)}>
             {TAGS.map((t) => (
               <option key={t} value={t}>
-                {t || '(none)'}
+                {t || (activity.is_workout ? '(auto: workout)' : '(none)')}
               </option>
             ))}
           </select>
+          <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+            {activity.is_workout
+              ? 'Interval structure was auto-detected; a tag replaces the generic "workout" badge.'
+              : 'Your session label — shows as a badge and guides the coach.'}
+          </div>
         </label>
       </div>
       <label style={{ display: 'block', marginBottom: 12 }}>

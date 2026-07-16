@@ -150,6 +150,7 @@ class LogbookActivity(BaseModel):
     start_time_local: datetime
     is_workout: bool
     has_analysis: bool = False
+    tag: str | None = None
 
 
 class LogbookWeek(BaseModel):
