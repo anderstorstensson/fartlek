@@ -27,6 +27,19 @@ def start_scheduler() -> None:
         coalesce=True,
         id="garmin_sync",
     )
+    if config.rclone_remote.strip():
+        from backend.sync.backup import run_backup_quietly
+
+        _scheduler.add_job(
+            run_backup_quietly,
+            "cron",
+            hour=config.backup_hour,
+            minute=30,
+            max_instances=1,
+            coalesce=True,
+            id="nightly_backup",
+        )
+        logger.info("Nightly backup scheduled at %02d:30", config.backup_hour)
     _scheduler.start()
     logger.info("Auto-sync scheduled every %d minutes", config.sync_interval_minutes)
 

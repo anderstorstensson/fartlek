@@ -41,6 +41,9 @@ weather:
 wellness:
 	$(PY) -m backend.cli wellness
 
+backup:
+	$(PY) -m backend.cli backup
+
 serve:
 	$(PY) -m backend.cli serve
 
@@ -57,4 +60,8 @@ build-frontend:
 	cd frontend && $(NODE_BIN) node_modules/vite/bin/vite.js build
 
 install-service:
-	./scripts/install-service.sh
+	@if [ "$$(uname -s)" = "Darwin" ]; then \
+		./scripts/install-service-macos.sh; \
+	else \
+		./scripts/install-service.sh; \
+	fi
