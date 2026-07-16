@@ -5,6 +5,7 @@ import Activities from './pages/Activities'
 import ActivityDetailPage from './pages/ActivityDetail'
 import Analysis from './pages/Analysis'
 import Calendar from './pages/Calendar'
+import Coach from './pages/Coach'
 import Dashboard from './pages/Dashboard'
 import Logbook from './pages/Logbook'
 import Records from './pages/Records'
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { to: '/calendar', label: 'Calendar', icon: '📅' },
   { to: '/trends', label: 'Trends', icon: '📈' },
   { to: '/analysis', label: 'Analysis', icon: '🧠' },
+  { to: '/coach', label: 'Coach', icon: '🎓' },
   { to: '/records', label: 'Records', icon: '🏆' },
   { to: '/settings', label: 'Settings', icon: '⚙️' }
 ]
@@ -79,6 +81,7 @@ export default function App() {
           <Route path="/logbook" element={<Logbook />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/analysis" element={<Analysis />} />
+          <Route path="/coach" element={<Coach />} />
           <Route path="/trends" element={<Trends />} />
           <Route path="/records" element={<Records />} />
           <Route path="/settings" element={<SettingsPage />} />

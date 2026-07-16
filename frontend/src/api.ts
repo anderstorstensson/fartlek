@@ -264,6 +264,13 @@ export interface SyncStatus {
   total_activities: number
 }
 
+export interface CoachMessage {
+  id: number
+  role: string
+  content: string
+  created_at: string
+}
+
 export type LoadModel = 'trimp' | 'rtss'
 
 export async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {

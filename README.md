@@ -138,6 +138,23 @@ copy the FIT files back to `data/fit/`, restore `athlete-profile.md`, run
 | `make dev` | Frontend dev server with hot reload (proxies API to :8077) |
 | `make typecheck` | Frontend type checking |
 
+## The Coach tab (in-app Claude Code)
+
+The **Coach** page runs a headless [Claude Code](https://claude.com/claude-code)
+session inside the app — same skills, same data access, same coaching
+methodology as a terminal session, but as a chat in the browser. Requirements:
+the Claude Code CLI installed and logged in on the machine running Fartlek
+(uses your Claude subscription, not an API key).
+
+- Tool access is a **whitelist** (the app's own API via curl, read-only SQLite,
+  repo reads, the athlete profile, the plan-review subagent) — no blanket shell
+  or file-write access, since headless sessions can't ask for permission.
+- Conversations persist (resumable session + chat history in the DB);
+  "New conversation" resets both.
+- The endpoint refuses to work unless the app is bound to localhost — if you
+  ever expose Fartlek through a reverse proxy, the coach stays off without
+  authentication in front of it.
+
 ## Training plans
 
 Plans live in the app, not in documents. Ask Claude Code (in this project) for a plan —
