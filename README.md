@@ -17,10 +17,17 @@ Named after the Swedish training method: *fart* (speed) + *lek* (play).
   FIT parsing with `fitdecode`, background auto-sync every 30 min (APScheduler).
 - **Frontend**: React + Vite + TypeScript, Recharts, Leaflet. Served as static files by the
   backend — one process runs everything.
-- **Metrics**: Banister TRIMP (HR) and rTSS (pace) load models, CTL/ATL/TSB fitness &
-  freshness curves, HR zones, workout/interval detection, best efforts (400m → marathon).
-- **Views**: dashboard, activity list with route thumbnails, Strava-style logbook,
-  training-plan calendar, trends, personal records.
+- **Metrics**: Banister TRIMP (HR) and rTSS (grade-adjusted pace) load models, CTL/ATL/TSB
+  fitness & freshness curves (with plan-based projection to race day), HR zones + weekly
+  intensity distribution, grade-adjusted pace (Minetti), aerobic decoupling & efficiency
+  index trends, running dynamics/power/respiration, workout/interval detection, best
+  efforts (400m → marathon), Riegel race predictions.
+- **Wellness & context**: daily Garmin wellness sync (sleep, overnight HRV, resting HR,
+  body battery, stress) with a readiness flag on the dashboard; historical weather
+  per activity (Open-Meteo).
+- **Views**: dashboard (incl. readiness + race countdown), activity list with route
+  thumbnails, Strava-style logbook, training-plan calendar, trends, personal records,
+  goal races.
 - **Claude Code integration**: `.claude/skills/training-analysis/` teaches Claude how to
   query the data, analyze sessions and trends, publish goal-oriented training plans into
   the calendar, and adjust them when life happens (missed workouts, illness, fatigue).
@@ -64,10 +71,12 @@ Optional `sudo loginctl enable-linger $USER` keeps it running without an open se
 
 | Command | Purpose |
 |---|---|
-| `make sync` | Incremental Garmin sync now |
+| `make sync` | Incremental Garmin sync now (activities + wellness + weather) |
 | `make backfill` | Re-scan complete Garmin history |
 | `make recompute` | Recompute TRIMP/rTSS after changing athlete settings |
-| `make rescan` | Re-detect workout flags from stored FIT files |
+| `make rescan` | Re-extract streams/dynamics/derived metrics from stored FIT files |
+| `make wellness` | Backfill Garmin wellness (sleep/HRV/RHR) history |
+| `make weather` | Backfill historical weather for activities missing it |
 | `make test` | Backend test suite |
 | `make dev` | Frontend dev server with hot reload (proxies API to :8077) |
 | `make typecheck` | Frontend type checking |
@@ -90,6 +99,11 @@ Environment variables (prefix `FARTLEK_`): `FARTLEK_PORT` (8077), `FARTLEK_HOST`
 `FARTLEK_STREAM_MAX_POINTS` (3000, per-activity stream resolution in the DB).
 Athlete parameters (max/resting HR, LTHR, threshold pace) are edited in the web UI
 under Settings; saving triggers a metric recompute.
+
+**Privacy note**: all data stays local except weather enrichment, which sends each
+outdoor activity's *rounded* start coordinates and date to the free Open-Meteo API
+(no key, no account). Remove the `weather` step from sync if that trade-off isn't
+acceptable.
 
 **Security model**: the API has no authentication — it serves your complete GPS and
 health history to anyone who can reach it. The default bind to `127.0.0.1` is the
