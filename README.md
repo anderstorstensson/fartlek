@@ -169,6 +169,13 @@ the Claude Code CLI installed and logged in on the machine running Fartlek
   must be loopback, so a rebound DNS name on another site can't drive the agent.
 - Conversations persist (resumable session + chat history in the DB);
   "New conversation" resets both.
+- **Model choice** (Settings → Coach model): routine session analyses follow a
+  prescriptive methodology (`docs/coach/`), so a fast/economical model handles
+  them well and saves subscription quota. Save the most capable model for
+  judgment-heavy work — race debriefs and especially training plans. Plans are
+  best built in a *terminal* Claude Code session rather than the Coach tab: the
+  in-app coach cannot spawn the independent plan-review subagent (its tool
+  whitelist forbids it), so only terminal sessions get the adversarial review.
 
 ## Training plans
 
