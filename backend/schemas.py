@@ -257,6 +257,7 @@ class SettingsOut(BaseModel):
     manual_pace_zone_bounds: list[float] | None
     coaching_tone: str
     display_locale: str
+    coach_model: str
 
 
 class SettingsIn(BaseModel):
@@ -274,6 +275,7 @@ class SettingsIn(BaseModel):
         default="balanced", pattern="^(drill|harsh|balanced|supportive)$"
     )
     display_locale: str = Field(default="", pattern="^[A-Za-z]{0,3}(-[A-Za-z0-9]{2,8})*$")
+    coach_model: str = Field(default="", max_length=64, pattern=r"^[A-Za-z0-9.\-\[\]]*$")
 
     @model_validator(mode="after")
     def _check_manual_bounds(self) -> "SettingsIn":

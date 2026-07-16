@@ -223,6 +223,7 @@ export interface Settings {
   manual_pace_zone_bounds: number[] | null
   coaching_tone: 'drill' | 'harsh' | 'balanced' | 'supportive'
   display_locale: string
+  coach_model: string
   zones: Zone[]
   pace_zones: PaceZone[]
 }

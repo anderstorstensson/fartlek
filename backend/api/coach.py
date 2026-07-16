@@ -242,6 +242,9 @@ async def _stream_turn(text: str):
     async with _turn_lock:
         with session_scope() as db:
             db.add(CoachMessage(role="user", content=text, session_id=_load_session_id()))
+            from backend.sync.service import get_or_create_settings
+
+            coach_model = get_or_create_settings(db).coach_model.strip()
 
         args = [
             "claude", "-p", text,
@@ -249,6 +252,8 @@ async def _stream_turn(text: str):
             "--append-system-prompt", _SYSTEM_HINT,
             "--allowedTools", *ALLOWED_TOOLS,
         ]
+        if coach_model:
+            args += ["--model", coach_model]
         resume_id = _load_session_id()
         if resume_id:
             args += ["--resume", resume_id]
