@@ -73,6 +73,19 @@ ALLOWED_TOOLS = [
     "Bash(grep:*)",
     "Bash(make sync:*)",
     "Bash(make recompute:*)",
+    # Read-only glue so compound commands and JSON crunching don't get denied
+    # (every segment of a pipe/&&-chain must match a rule). Deliberately absent:
+    # python/awk/sed (arbitrary exec or file writes would escape the whitelist).
+    "Bash(echo:*)",
+    "Bash(jq:*)",
+    "Bash(head:*)",
+    "Bash(tail:*)",
+    "Bash(wc:*)",
+    "Bash(sort:*)",
+    "Bash(uniq:*)",
+    "Bash(cut:*)",
+    "Bash(tr:*)",
+    "Bash(paste:*)",
     "Write(data/athlete-profile.md)",
     "Edit(data/athlete-profile.md)",
 ]
@@ -87,7 +100,12 @@ _SYSTEM_HINT = (
     "through two repo scripts — other forms (curl, sqlite3, WebFetch) are blocked: "
     "`scripts/api GET|POST|PUT|DELETE /api/... ['<json>' | -]` for the app's API, and "
     "`scripts/db \"<sql>\"` for read-only SQL against data/fartlek.sqlite3. "
-    "Replies render as markdown in a chat bubble — keep them conversational and compact."
+    "For number crunching, pipe into `jq` (allowed, and installed) or push the math "
+    "into SQL — python/awk/sed and writing temp files are blocked and retrying them "
+    "wastes turns. echo/head/tail/wc/sort/uniq/cut/tr are allowed as glue; every "
+    "segment of a pipe or && chain must be an allowed tool or the whole command is "
+    "denied. Replies render as markdown in a chat bubble — keep them conversational "
+    "and compact."
 )
 
 
