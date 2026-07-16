@@ -222,6 +222,7 @@ export interface Settings {
   pace_zone_mode: 'threshold' | 'manual'
   manual_pace_zone_bounds: number[] | null
   coaching_tone: 'harsh' | 'balanced' | 'supportive'
+  display_locale: string
   zones: Zone[]
   pace_zones: PaceZone[]
 }

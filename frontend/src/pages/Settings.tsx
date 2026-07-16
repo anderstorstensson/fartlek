@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { fetchJson, Settings, SyncStatus } from '../api'
 import RacesSection from '../components/RacesSection'
-import { formatPaceFromSeconds } from '../format'
+import { formatPaceFromSeconds, locale, setDisplayLocale } from '../format'
 
 const PACE_ZONE_LABELS = ['recovery', 'easy', 'marathon', 'threshold', 'VO2max+']
 
@@ -44,11 +44,13 @@ export default function SettingsPage() {
         rtss_use_gap: settings.rtss_use_gap,
         pace_zone_mode: settings.pace_zone_mode,
         manual_pace_zone_bounds: settings.manual_pace_zone_bounds,
-        coaching_tone: settings.coaching_tone
+        coaching_tone: settings.coaching_tone,
+        display_locale: settings.display_locale
       })
     })
       .then((updated) => {
         setSettings(updated)
+        setDisplayLocale(updated.display_locale)
         setMessage('Saved. Load metrics are being recomputed in the background.')
       })
       .catch((e: Error) => setError(e.message))
@@ -83,7 +85,7 @@ export default function SettingsPage() {
           <p className="muted">
             {sync.total_activities} activities in the database
             {sync.last_sync_at &&
-              ` · last sync ${new Date(sync.last_sync_at + 'Z').toLocaleString()}`}
+              ` · last sync ${new Date(sync.last_sync_at + 'Z').toLocaleString(locale())}`}
             {sync.status === 'running' && ` · ${sync.message || 'syncing…'}`}
             {sync.status === 'error' && (
               <span style={{ color: 'var(--critical)' }}> · {sync.message}</span>
@@ -180,6 +182,22 @@ export default function SettingsPage() {
               <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
                 How the AI coach talks in analyses and plans. Tone only — the numbers and
                 recommendations never change.
+              </div>
+            </label>
+            <label>
+              <div className="muted">Date &amp; time format</div>
+              <select
+                value={settings.display_locale}
+                onChange={(e) => update({ display_locale: e.target.value })}
+              >
+                <option value="">Browser default</option>
+                <option value="en-GB">European — 16/07/2026, 20:46</option>
+                <option value="sv-SE">ISO / Swedish — 2026-07-16, 20:46</option>
+                <option value="en-US">US — 7/16/2026, 8:46 PM</option>
+              </select>
+              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                Date-picker inputs follow the browser&apos;s own language setting and
+                can&apos;t be changed here.
               </div>
             </label>
           </div>

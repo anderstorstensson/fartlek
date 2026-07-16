@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchJson } from '../api'
-import { formatDistance, formatDuration, formatPace, sportEmoji } from '../format'
+import { formatDistance, formatDuration, formatPace, locale, sportEmoji } from '../format'
 
 interface LogbookActivity {
   id: number
@@ -56,7 +56,7 @@ function weekLabel(iso: string): { week: string; date: string } {
   const monday = new Date(y, m - 1, d)
   return {
     week: `W${isoWeekNumber(monday)}`,
-    date: monday.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+    date: monday.toLocaleDateString(locale(), { day: 'numeric', month: 'short' })
   }
 }
 

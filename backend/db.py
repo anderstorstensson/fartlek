@@ -69,6 +69,7 @@ def _migrate() -> None:
             ("pace_zone_mode", "VARCHAR NOT NULL DEFAULT 'threshold'"),
             ("manual_pace_zone_bounds", "JSON"),
             ("coaching_tone", "VARCHAR NOT NULL DEFAULT 'balanced'"),
+            ("display_locale", "VARCHAR NOT NULL DEFAULT ''"),
         ],
         "streams": [
             ("power", "JSON"),

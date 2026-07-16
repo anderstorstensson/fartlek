@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import { fetchJson, SyncStatus } from './api'
+import { locale, setDisplayLocale } from './format'
 import Activities from './pages/Activities'
 import ActivityDetailPage from './pages/ActivityDetail'
 import Analysis from './pages/Analysis'
@@ -26,9 +27,23 @@ const NAV_ITEMS = [
 
 export default function App() {
   const [sync, setSync] = useState<SyncStatus | null>(null)
+  // Bumped when the saved display locale differs from the cached one, so the
+  // whole tree re-renders with the right date/time format.
+  const [, setLocaleVersion] = useState(0)
 
   useEffect(() => {
     let cancelled = false
+
+    fetchJson<{ display_locale: string }>('/api/settings')
+      .then((settings) => {
+        if (cancelled) return
+        if ((settings.display_locale || undefined) !== locale()) {
+          setDisplayLocale(settings.display_locale)
+          setLocaleVersion((v) => v + 1)
+        }
+      })
+      .catch(() => undefined)
+
     const load = () => {
       fetchJson<SyncStatus>('/api/sync/status')
         .then((status) => {
@@ -67,7 +82,7 @@ export default function App() {
             <>
               {sync.status === 'running' ? sync.message || 'Syncing…' : `${sync.total_activities} activities`}
               {sync.last_sync_at && sync.status !== 'running' && (
-                <div>Synced {new Date(sync.last_sync_at + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                <div>Synced {new Date(sync.last_sync_at + 'Z').toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })}</div>
               )}
             </>
           )}

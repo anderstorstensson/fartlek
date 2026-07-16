@@ -208,6 +208,8 @@ class AthleteSettings(Base):
     manual_pace_zone_bounds: Mapped[list | None] = mapped_column(JSON, nullable=True)
     # How the AI coach talks: harsh | balanced | supportive. Tone only — never substance.
     coaching_tone: Mapped[str] = mapped_column(String, default="balanced")
+    # BCP-47 locale for date/time display in the UI; empty = browser default.
+    display_locale: Mapped[str] = mapped_column(String, default="")
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
 
 

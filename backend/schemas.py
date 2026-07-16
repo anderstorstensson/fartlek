@@ -255,6 +255,7 @@ class SettingsOut(BaseModel):
     pace_zone_mode: str
     manual_pace_zone_bounds: list[float] | None
     coaching_tone: str
+    display_locale: str
 
 
 class SettingsIn(BaseModel):
@@ -269,6 +270,7 @@ class SettingsIn(BaseModel):
     pace_zone_mode: str = Field(default="threshold", pattern="^(threshold|manual)$")
     manual_pace_zone_bounds: list[float] | None = None
     coaching_tone: str = Field(default="balanced", pattern="^(harsh|balanced|supportive)$")
+    display_locale: str = Field(default="", pattern="^[A-Za-z]{0,3}(-[A-Za-z0-9]{2,8})*$")
 
     @model_validator(mode="after")
     def _check_manual_bounds(self) -> "SettingsIn":

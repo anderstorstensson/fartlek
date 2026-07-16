@@ -427,6 +427,18 @@ def test_streams_include_pace_zones(client):
     assert len(body["gap_speed_mps"]) == len(body["speed_mps"])
 
 
+def test_display_locale_roundtrip(client):
+    base = {"resting_hr": 48, "max_hr": 188, "lthr": 168,
+            "threshold_pace_s_per_km": 255, "sex": "male"}
+    assert client.get("/api/settings").json()["display_locale"] == ""
+    updated = client.put("/api/settings", json={**base, "display_locale": "en-GB"}).json()
+    assert updated["display_locale"] == "en-GB"
+    assert client.put(
+        "/api/settings", json={**base, "display_locale": "not a locale!!"}
+    ).status_code == 422
+    client.put("/api/settings", json={**base, "display_locale": ""})
+
+
 def test_coaching_tone_roundtrip(client):
     base = {"resting_hr": 48, "max_hr": 188, "lthr": 168,
             "threshold_pace_s_per_km": 255, "sex": "male"}

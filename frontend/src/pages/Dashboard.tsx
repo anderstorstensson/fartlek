@@ -19,6 +19,7 @@ import {
   formatDuration,
   formatPace,
   formatSportName,
+  locale,
   sportEmoji
 } from '../format'
 
@@ -89,7 +90,7 @@ function RaceTile({ race }: { race: Race }) {
 
 function NextWorkoutTile({ workout }: { workout: PlannedWorkout }) {
   const [y, m, d] = workout.day.split('-').map(Number)
-  const dayLabel = new Date(y, m - 1, d).toLocaleDateString(undefined, {
+  const dayLabel = new Date(y, m - 1, d).toLocaleDateString(locale(), {
     weekday: 'short',
     day: 'numeric',
     month: 'short'
