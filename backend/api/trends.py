@@ -219,6 +219,7 @@ def logbook(
                 start_time_local=activity.start_time_local,
                 is_workout=activity.is_workout,
                 has_analysis=activity.id in analyzed,
+                tag=activity.tag,
             )
         )
 
