@@ -269,7 +269,9 @@ class SettingsIn(BaseModel):
     rtss_use_gap: bool = True
     pace_zone_mode: str = Field(default="threshold", pattern="^(threshold|manual)$")
     manual_pace_zone_bounds: list[float] | None = None
-    coaching_tone: str = Field(default="balanced", pattern="^(harsh|balanced|supportive)$")
+    coaching_tone: str = Field(
+        default="balanced", pattern="^(drill|harsh|balanced|supportive)$"
+    )
     display_locale: str = Field(default="", pattern="^[A-Za-z]{0,3}(-[A-Za-z0-9]{2,8})*$")
 
     @model_validator(mode="after")

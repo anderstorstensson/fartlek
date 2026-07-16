@@ -221,7 +221,7 @@ export interface Settings {
   rtss_use_gap: boolean
   pace_zone_mode: 'threshold' | 'manual'
   manual_pace_zone_bounds: number[] | null
-  coaching_tone: 'harsh' | 'balanced' | 'supportive'
+  coaching_tone: 'drill' | 'harsh' | 'balanced' | 'supportive'
   display_locale: string
   zones: Zone[]
   pace_zones: PaceZone[]

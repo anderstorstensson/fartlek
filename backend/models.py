@@ -206,7 +206,7 @@ class AthleteSettings(Base):
     pace_zone_mode: Mapped[str] = mapped_column(String, default="threshold")  # threshold | manual
     # 5 lower bounds as pace (s/km), slowest first (Z1's slowest pace … Z5's slowest pace).
     manual_pace_zone_bounds: Mapped[list | None] = mapped_column(JSON, nullable=True)
-    # How the AI coach talks: harsh | balanced | supportive. Tone only — never substance.
+    # How the AI coach talks: drill | harsh | balanced | supportive. Tone only — never substance.
     coaching_tone: Mapped[str] = mapped_column(String, default="balanced")
     # BCP-47 locale for date/time display in the UI; empty = browser default.
     display_locale: Mapped[str] = mapped_column(String, default="")
