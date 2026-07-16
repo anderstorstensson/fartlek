@@ -217,6 +217,16 @@ data/
 `data/` is gitignored — it holds your Garmin tokens and full GPS/health history.
 Never commit it.
 
+## Acknowledgments
+
+This project was developed in close collaboration with
+[Claude Code](https://claude.com/claude-code): the analytics engine (training
+load, GAP, decoupling, spike filtering), the Garmin/wellness/weather sync, the
+frontend, the backup and cross-platform tooling, and the AI-coach integration
+itself were built in pair-programming sessions with Claude — the same assistant
+that now serves as the in-app coach through the Coach tab and the instructions
+in `docs/coach/`.
+
 ## License
 
 [MIT](LICENSE)
