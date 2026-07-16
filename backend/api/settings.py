@@ -1,13 +1,22 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from backend.analysis.pace_zones import pace_zones_for_settings
 from backend.analysis.zones import zones_for_settings
 from backend.db import get_session
-from backend.schemas import PaceZoneOut, SettingsIn, SettingsResponse, ZoneOut
+from backend.schemas import (
+    PaceZoneOut,
+    SettingsIn,
+    SettingsResponse,
+    SettingsUpdate,
+    ZoneOut,
+)
 from backend.sync.service import get_or_create_settings, recompute_in_background
 
 router = APIRouter(prefix="/api/settings", tags=["settings"])
+
+_SETTINGS_FIELDS = list(SettingsIn.model_fields)
 
 
 def _response(settings) -> SettingsResponse:
@@ -48,22 +57,25 @@ def get_settings(session: Session = Depends(get_session)) -> SettingsResponse:
 
 @router.put("", response_model=SettingsResponse)
 def update_settings(
-    payload: SettingsIn, session: Session = Depends(get_session)
+    payload: SettingsUpdate, session: Session = Depends(get_session)
 ) -> SettingsResponse:
+    """Merge semantics: only fields present in the payload change. Partial
+    writers (the AI coach updating threshold pace, an older Settings tab) must
+    never silently reset unrelated settings to their defaults."""
     settings = get_or_create_settings(session)
-    settings.resting_hr = payload.resting_hr
-    settings.max_hr = payload.max_hr
-    settings.lthr = payload.lthr
-    settings.threshold_pace_s_per_km = payload.threshold_pace_s_per_km
-    settings.sex = payload.sex
-    settings.zone_mode = payload.zone_mode
-    settings.manual_zone_bounds = payload.manual_zone_bounds
-    settings.rtss_use_gap = payload.rtss_use_gap
-    settings.pace_zone_mode = payload.pace_zone_mode
-    settings.manual_pace_zone_bounds = payload.manual_pace_zone_bounds
-    settings.coaching_tone = payload.coaching_tone
-    settings.display_locale = payload.display_locale
-    settings.coach_model = payload.coach_model
+    merged = {field: getattr(settings, field) for field in _SETTINGS_FIELDS}
+    merged.update(payload.model_dump(exclude_unset=True))
+    try:
+        # Full validation (incl. cross-field rules) against the merged state.
+        validated = SettingsIn(**merged)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=exc.errors(include_url=False, include_context=False),
+        ) from exc
+
+    for field in _SETTINGS_FIELDS:
+        setattr(settings, field, getattr(validated, field))
     session.commit()
     # Load metrics depend on these values — refresh them for all activities.
     recompute_in_background()
