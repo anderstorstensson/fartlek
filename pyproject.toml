@@ -13,6 +13,7 @@ dependencies = [
     "garth>=0.5",
     "fitdecode>=0.10",
     "apscheduler>=3.10,<4",
+    "requests>=2.31",
 ]
 
 [dependency-groups]

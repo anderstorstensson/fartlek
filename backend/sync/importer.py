@@ -8,7 +8,21 @@ import fitdecode
 from sqlalchemy.orm import Session
 
 from backend.analysis.best_efforts import best_efforts
-from backend.analysis.metrics import banister_trimp, hrtss, rtss, trimp_from_samples
+from backend.analysis.decoupling import aerobic_decoupling_pct, efficiency_index
+from backend.analysis.gap import average_moving_speed, gap_speed_series
+from backend.analysis.metrics import (
+    banister_trimp,
+    hrtss,
+    rtss,
+    rtss_from_speed,
+    trimp_from_samples,
+)
+from backend.analysis.spikes import (
+    max_plausible_speed,
+    remove_gps_spikes,
+    sustained_caps_for,
+)
+from backend.analysis.workout_naming import workout_name
 from backend.config import config
 from backend.models import Activity, AthleteSettings, BestEffort, Lap, Stream
 
@@ -48,7 +62,12 @@ def activity_from_summary(summary: dict) -> Activity:
 def parse_fit(fit_bytes: bytes) -> tuple[dict[str, list], list[dict], bool]:
     """Extract record streams, laps and a structured-workout flag from a FIT file."""
     streams: dict[str, list] = {
-        k: [] for k in ("time_s", "distance_m", "hr", "speed_mps", "altitude_m", "cadence", "lat", "lng")
+        k: []
+        for k in (
+            "time_s", "distance_m", "hr", "speed_mps", "altitude_m", "cadence",
+            "lat", "lng", "power", "vertical_oscillation", "vertical_ratio",
+            "step_length", "stance_time", "respiration",
+        )
     }
     laps: list[dict] = []
     first_ts: datetime | None = None
@@ -82,6 +101,15 @@ def parse_fit(fit_bytes: bytes) -> tuple[dict[str, list], list[dict], bool]:
                 )
                 streams["lng"].append(
                     round(lng_raw * _SEMICIRCLE_TO_DEG, 6) if lng_raw is not None else None
+                )
+                streams["power"].append(_field(frame, "power"))
+                streams["vertical_oscillation"].append(_field(frame, "vertical_oscillation"))
+                streams["vertical_ratio"].append(_field(frame, "vertical_ratio"))
+                streams["step_length"].append(_field(frame, "step_length"))
+                streams["stance_time"].append(_field(frame, "stance_time"))
+                streams["respiration"].append(
+                    _field(frame, "enhanced_respiration_rate")
+                    or _field(frame, "respiration_rate")
                 )
             elif frame.name == "lap":
                 lap_start = _field(frame, "start_time")
@@ -154,15 +182,114 @@ def import_activity(
         fit_laps = []
 
     if full_streams and len(full_streams["time_s"]) >= 2:
+        _filter_spikes(activity, full_streams, settings)
         activity.has_gps = any(v is not None for v in full_streams["lat"])
         _attach_laps(activity, fit_laps)
         _attach_best_efforts(activity, full_streams)
+        _compute_derived(activity, full_streams)
+        _apply_workout_name(activity, fit_laps)
         stored = _downsample(full_streams, config.stream_max_points)
         activity.stream = Stream(**stored)
 
     _compute_loads(activity, full_streams, settings)
     session.add(activity)
     return activity
+
+
+def _avg(values: list | None) -> float | None:
+    if not values:
+        return None
+    present = [v for v in values if v is not None]
+    if not present:
+        return None
+    return sum(present) / len(present)
+
+
+def _compute_derived(activity: Activity, streams: dict[str, list]) -> None:
+    """Dynamics averages plus GAP / decoupling / efficiency from full streams."""
+    activity.avg_power_w = _round1(_avg(streams.get("power")))
+    activity.avg_vertical_oscillation_mm = _round1(_avg(streams.get("vertical_oscillation")))
+    activity.avg_vertical_ratio_pct = _round1(_avg(streams.get("vertical_ratio")))
+    activity.avg_step_length_mm = _round1(_avg(streams.get("step_length")))
+    activity.avg_stance_time_ms = _round1(_avg(streams.get("stance_time")))
+    activity.avg_respiration_brpm = _round1(_avg(streams.get("respiration")))
+
+    if not activity.is_run:
+        return
+    gap_speeds = gap_speed_series(
+        streams["time_s"], streams["distance_m"], streams["speed_mps"], streams["altitude_m"]
+    )
+    avg_gap = average_moving_speed(streams["time_s"], gap_speeds)
+    activity.gap_speed_mps = round(avg_gap, 3) if avg_gap is not None else None
+    decoupling = aerobic_decoupling_pct(streams["time_s"], gap_speeds, streams["hr"])
+    activity.decoupling_pct = _round1(decoupling)
+
+    hr_values = [h for h in streams["hr"] if h is not None]
+    avg_stream_hr = sum(hr_values) / len(hr_values) if hr_values else activity.avg_hr
+    efficiency = efficiency_index(avg_gap, avg_stream_hr)
+    activity.efficiency_index = round(efficiency, 3) if efficiency is not None else None
+
+
+def _round1(value: float | None) -> float | None:
+    return round(value, 1) if value is not None else None
+
+
+def _filter_spikes(
+    activity: Activity, streams: dict[str, list], settings: AthleteSettings
+) -> None:
+    fixed = remove_gps_spikes(
+        streams,
+        max_plausible_speed(activity.sport),
+        sustained_caps_for(activity.sport, settings.threshold_pace_s_per_km),
+    )
+    if fixed:
+        logger.warning("GPS spike filter: corrected %d samples in activity %s", fixed, activity.id)
+
+
+def _apply_workout_name(activity: Activity, fit_laps: list[dict]) -> None:
+    """Interval runs get named after their structure ("10×3 min / 1 min rest");
+    everything else keeps its Garmin name. User-edited titles are never touched."""
+    if activity.name_locked or not (activity.is_run and activity.is_workout):
+        return
+    derived = workout_name(fit_laps)
+    if derived:
+        activity.name = derived
+
+
+def refresh_from_fit(activity: Activity, fit_bytes: bytes, settings: AthleteSettings) -> bool:
+    """Re-extract streams, workout flags, derived metrics and loads from a stored
+    FIT file, in place. Summary fields, laps (except intensity) and best efforts
+    are left untouched. Returns False if the file can't be parsed."""
+    try:
+        streams, fit_laps, is_workout = parse_fit(fit_bytes)
+    except Exception as exc:
+        logger.warning("FIT re-parse failed for %s: %s", activity.id, exc)
+        return False
+    if len(streams["time_s"]) < 2:
+        return False
+
+    _filter_spikes(activity, streams, settings)
+    activity.has_fit = True
+    activity.is_workout = is_workout
+    intensities = [lap.get("intensity") for lap in fit_laps]
+    for lap in activity.laps:
+        if lap.lap_index < len(intensities):
+            lap.intensity = intensities[lap.lap_index]
+
+    _apply_workout_name(activity, fit_laps)
+    # Best efforts were computed from the (possibly spike-polluted) original
+    # streams — rebuild them from the filtered ones.
+    activity.best_efforts.clear()
+    _attach_best_efforts(activity, streams)
+    _compute_derived(activity, streams)
+    stored = _downsample(streams, config.stream_max_points)
+    if activity.stream is not None:
+        for key, values in stored.items():
+            setattr(activity.stream, key, values)
+    else:
+        activity.stream = Stream(**stored)
+    _compute_loads(activity, streams, settings)
+    return True
 
 
 def compute_loads_for(activity: Activity, settings: AthleteSettings) -> None:
@@ -197,7 +324,15 @@ def _compute_loads(
     else:
         activity.trimp = None
 
-    if activity.is_run and activity.distance_m > 0:
+    if activity.is_run and activity.gap_speed_mps and settings.rtss_use_gap:
+        # Grade-adjusted speed as the NGP approximation, so hills price correctly.
+        activity.rtss = round(
+            rtss_from_speed(
+                activity.moving_s, activity.gap_speed_mps, settings.threshold_pace_s_per_km
+            ),
+            1,
+        )
+    elif activity.is_run and activity.distance_m > 0:
         activity.rtss = round(
             rtss(activity.moving_s, activity.distance_m, settings.threshold_pace_s_per_km), 1
         )

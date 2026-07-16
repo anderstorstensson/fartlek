@@ -60,11 +60,19 @@ def rtss(moving_s: float, distance_m: float, threshold_pace_s_per_km: float) -> 
     IF = NGP / threshold speed (average moving speed as NGP approximation);
     rTSS = hours * IF^2 * 100, i.e. one hour at threshold = 100.
     """
-    if moving_s <= 0 or distance_m <= 0 or threshold_pace_s_per_km <= 0:
+    if moving_s <= 0 or distance_m <= 0:
         return 0.0
-    speed = distance_m / moving_s
+    return rtss_from_speed(moving_s, distance_m / moving_s, threshold_pace_s_per_km)
+
+
+def rtss_from_speed(
+    moving_s: float, speed_mps: float, threshold_pace_s_per_km: float
+) -> float:
+    """rTSS from an already-normalized speed (e.g. grade-adjusted speed as NGP)."""
+    if moving_s <= 0 or speed_mps <= 0 or threshold_pace_s_per_km <= 0:
+        return 0.0
     threshold_speed = 1000.0 / threshold_pace_s_per_km
-    intensity_factor = speed / threshold_speed
+    intensity_factor = speed_mps / threshold_speed
     return (moving_s / 3600.0) * intensity_factor**2 * 100.0
 
 

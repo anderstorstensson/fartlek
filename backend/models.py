@@ -45,11 +45,37 @@ class Activity(Base):
     rtss: Mapped[float | None] = mapped_column(Float, nullable=True)
     hrtss: Mapped[float | None] = mapped_column(Float, nullable=True)
 
+    # Running dynamics / power averages (newer watches only; units in the name).
+    avg_power_w: Mapped[float | None] = mapped_column(Float, nullable=True)
+    avg_vertical_oscillation_mm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    avg_vertical_ratio_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    avg_step_length_mm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    avg_stance_time_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+    avg_respiration_brpm: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+    # Derived running metrics (runs with usable streams only).
+    gap_speed_mps: Mapped[float | None] = mapped_column(Float, nullable=True)
+    decoupling_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # GAP meters per minute per heartbeat: (gap_speed_mps * 60) / avg stream HR.
+    efficiency_index: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+    # Weather at activity start (enriched from Open-Meteo; outdoor activities only).
+    weather_temp_c: Mapped[float | None] = mapped_column(Float, nullable=True)
+    weather_humidity_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    weather_wind_mps: Mapped[float | None] = mapped_column(Float, nullable=True)
+    weather_code: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
     has_gps: Mapped[bool] = mapped_column(Boolean, default=False)
     has_fit: Mapped[bool] = mapped_column(Boolean, default=False)
     # True when the FIT file shows a structured workout / interval session
     # (workout_step messages or laps with rest intensity).
     is_workout: Mapped[bool] = mapped_column(Boolean, default=False)
+    # User-set session tag (easy/long/intervals/tempo/race/recovery/cross).
+    tag: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+    # The athlete's own note ("felt flat, slept 4h", "new shoes") — read by analyses.
+    user_note: Mapped[str] = mapped_column(String, default="")
+    # True once the user edits the title; auto-naming then leaves it alone.
+    name_locked: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     laps: Mapped[list["Lap"]] = relationship(
@@ -102,6 +128,13 @@ class Stream(Base):
     cadence: Mapped[list] = mapped_column(JSON, default=list)
     lat: Mapped[list] = mapped_column(JSON, default=list)
     lng: Mapped[list] = mapped_column(JSON, default=list)
+    # Running dynamics (nullable JSON: rows imported before these existed hold NULL).
+    power: Mapped[list | None] = mapped_column(JSON, nullable=True)  # watts
+    vertical_oscillation: Mapped[list | None] = mapped_column(JSON, nullable=True)  # mm
+    vertical_ratio: Mapped[list | None] = mapped_column(JSON, nullable=True)  # %
+    step_length: Mapped[list | None] = mapped_column(JSON, nullable=True)  # mm
+    stance_time: Mapped[list | None] = mapped_column(JSON, nullable=True)  # ms
+    respiration: Mapped[list | None] = mapped_column(JSON, nullable=True)  # breaths/min
 
     activity: Mapped[Activity] = relationship(back_populates="stream")
 
@@ -168,7 +201,48 @@ class AthleteSettings(Base):
     sex: Mapped[str] = mapped_column(String, default="male")
     zone_mode: Mapped[str] = mapped_column(String, default="max_hr")  # max_hr | lthr | manual
     manual_zone_bounds: Mapped[list | None] = mapped_column(JSON, nullable=True)  # 5 lower bounds (bpm)
+    # rTSS from grade-adjusted pace; disable if the watch's barometric altitude is unreliable.
+    rtss_use_gap: Mapped[bool] = mapped_column(Boolean, default=True)
+    pace_zone_mode: Mapped[str] = mapped_column(String, default="threshold")  # threshold | manual
+    # 5 lower bounds as pace (s/km), slowest first (Z1's slowest pace … Z5's slowest pace).
+    manual_pace_zone_bounds: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # How the AI coach talks: harsh | balanced | supportive. Tone only — never substance.
+    coaching_tone: Mapped[str] = mapped_column(String, default="balanced")
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+
+class DailyWellness(Base):
+    """One row per day of Garmin wellness data (sleep, HRV, RHR, body battery, stress)."""
+
+    __tablename__ = "daily_wellness"
+
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    resting_hr: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    hrv_last_night_avg: Mapped[float | None] = mapped_column(Float, nullable=True)  # ms
+    hrv_status: Mapped[str | None] = mapped_column(String, nullable=True)  # BALANCED/LOW/…
+    sleep_s: Mapped[float | None] = mapped_column(Float, nullable=True)
+    deep_sleep_s: Mapped[float | None] = mapped_column(Float, nullable=True)
+    sleep_score: Mapped[int | None] = mapped_column(Integer, nullable=True)  # 0-100
+    body_battery_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    body_battery_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    stress_avg: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    steps: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+
+class Race(Base):
+    """A goal race the athlete is training for."""
+
+    __tablename__ = "races"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String)
+    day: Mapped[date] = mapped_column(Date, index=True)
+    distance_m: Mapped[float] = mapped_column(Float)
+    target_time_s: Mapped[float | None] = mapped_column(Float, nullable=True)
+    priority: Mapped[str] = mapped_column(String, default="A")  # A/B/C
+    notes: Mapped[str] = mapped_column(String, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
 
 class SyncState(Base):

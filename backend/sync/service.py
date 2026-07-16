@@ -87,6 +87,8 @@ def _run_sync_locked(full: bool) -> dict:
                 break  # a full page of already-known activities: we're caught up
             start += _PAGE_SIZE
 
+        wellness_days = _sync_extras(client, full)
+
         with session_scope() as session:
             _set_state(
                 session,
@@ -95,13 +97,35 @@ def _run_sync_locked(full: bool) -> dict:
                 last_sync_at=datetime.now(timezone.utc),
                 synced_activities=session.query(Activity).count(),
             )
-        logger.info("Sync complete: %d new activities", imported)
-        return {"status": "ok", "new_activities": imported}
+        logger.info(
+            "Sync complete: %d new activities, %d wellness days", imported, wellness_days
+        )
+        return {"status": "ok", "new_activities": imported, "wellness_days": wellness_days}
     except Exception as exc:
         logger.exception("Sync failed")
         with session_scope() as session:
             _set_state(session, status="error", message=f"Sync failed: {exc}")
         return {"status": "error", "message": str(exc), "new_activities": imported}
+
+
+def _sync_extras(client, full: bool) -> int:
+    """Wellness + weather after the activity sync; failures must not fail the sync."""
+    wellness_days = 0
+    try:
+        from backend.sync.wellness import sync_wellness
+
+        wellness_days = sync_wellness(client, backfill_days=365 if full else None)
+    except Exception:
+        logger.exception("Wellness sync failed")
+    try:
+        from backend.sync.weather import enrich_missing_weather
+
+        # Capped per cycle: a large backlog must not stall the 30-min sync loop
+        # for hours — it drains across successive syncs instead.
+        enrich_missing_weather(limit=150)
+    except Exception:
+        logger.exception("Weather enrichment failed")
+    return wellness_days
 
 
 def _import_one(client, summary: dict) -> None:
@@ -136,35 +160,62 @@ def recompute_in_background() -> None:
     thread.start()
 
 
-def rescan_fit_flags() -> int:
-    """Re-parse stored FIT files to (re)detect workout flags and lap intensities.
+def rename_workout_activities() -> int:
+    """Backfill structure-derived names ("10×3 min / 1 min rest") for interval
+    runs already in the DB, from their stored laps. New imports and rescans
+    name themselves; this is for history imported before the feature existed."""
+    from backend.analysis.workout_naming import workout_name
 
-    Needed once for activities imported before those fields existed; new imports
-    detect them automatically. Commits per activity so it can run alongside a sync.
-    """
-    from backend.sync.importer import parse_fit
-
+    renamed = 0
     with session_scope() as session:
-        ids = list(session.scalars(select(Activity.id)).all())
+        workouts = session.scalars(
+            select(Activity)
+            .where(Activity.is_workout.is_(True))
+            .where(Activity.sport.contains("running"))
+        ).all()
+        for activity in workouts:
+            laps = [
+                {"elapsed_s": lap.elapsed_s, "distance_m": lap.distance_m,
+                 "intensity": lap.intensity}
+                for lap in activity.laps
+            ]
+            derived = workout_name(laps)
+            if derived and derived != activity.name:
+                activity.name = derived
+                renamed += 1
+    return renamed
+
+
+def rescan_fit_flags() -> int:
+    """Re-extract streams, workout flags, dynamics and derived metrics from the
+    stored FIT files for every activity.
+
+    Needed once after upgrades that add new stream fields or derived metrics;
+    new imports compute them automatically. Commits per activity so it can run
+    alongside a sync.
+    """
+    from backend.sync.importer import refresh_from_fit
+
+    # Newest first: recent activities are the ones being looked at while a
+    # long backfill grinds through history.
+    with session_scope() as session:
+        ids = list(
+            session.scalars(
+                select(Activity.id).order_by(Activity.start_time_utc.desc())
+            ).all()
+        )
 
     updated = 0
     for activity_id in ids:
         fit_path = config.fit_dir / f"{activity_id}.fit"
         if not fit_path.exists():
             continue
-        try:
-            _streams, fit_laps, is_workout = parse_fit(fit_path.read_bytes())
-        except Exception:
-            logger.warning("Rescan: FIT parse failed for %s", activity_id)
-            continue
-        intensities = [lap.get("intensity") for lap in fit_laps]
+        fit_bytes = fit_path.read_bytes()
         with session_scope() as session:
+            settings = get_or_create_settings(session)
             activity = session.get(Activity, activity_id)
             if activity is None:
                 continue
-            activity.is_workout = is_workout
-            for lap in activity.laps:
-                if lap.lap_index < len(intensities):
-                    lap.intensity = intensities[lap.lap_index]
-        updated += 1
+            if refresh_from_fit(activity, fit_bytes, settings):
+                updated += 1
     return updated
