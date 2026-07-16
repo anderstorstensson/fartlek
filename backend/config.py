@@ -16,6 +16,14 @@ class AppConfig(BaseSettings):
     # Max number of points kept per stored stream; raw FIT files keep full resolution.
     stream_max_points: int = 3000
 
+    # Backups: rclone destination (e.g. "gdrive:fartlek", or a crypt remote for
+    # encryption). Empty = local snapshots only via the backup command, no schedule.
+    rclone_remote: str = ""
+    backup_keep: int = 7  # rotated local snapshots (mirrored to the remote)
+    backup_hour: int = 3  # nightly upload time (local), used when a remote is set
+    # Garmin OAuth tokens grant account access — only back them up deliberately.
+    backup_include_tokens: bool = False
+
     model_config = {"env_prefix": "FARTLEK_"}
 
     @property

@@ -10,6 +10,8 @@ WorkingDirectory=@WORKDIR@
 ExecStart=@VENV@/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8077
 Restart=on-failure
 RestartSec=10
+# Optional overrides (see README), e.g. nightly cloud backups:
+#Environment=FARTLEK_RCLONE_REMOTE=gdrive:fartlek
 
 [Install]
 WantedBy=default.target

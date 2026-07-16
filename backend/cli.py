@@ -99,6 +99,22 @@ def cmd_wellness(days: int) -> int:
     return 0
 
 
+def cmd_backup() -> int:
+    from backend.db import init_db
+    from backend.sync.backup import run_backup
+
+    init_db()
+    try:
+        result = run_backup()
+    except Exception as exc:
+        print(f"Backup failed: {exc}", file=sys.stderr)
+        return 1
+    print(f"Snapshot: {result['snapshot']}")
+    print("Uploaded to remote." if result["uploaded"] else
+          "No FARTLEK_RCLONE_REMOTE configured — local snapshot only.")
+    return 0
+
+
 def cmd_serve() -> int:
     import uvicorn
 
@@ -123,6 +139,7 @@ def main() -> int:
     weather_parser.add_argument("--limit", type=int, default=None, help="Max activities to enrich")
     wellness_parser = sub.add_parser("wellness", help="Backfill Garmin wellness data")
     wellness_parser.add_argument("--days", type=int, default=365, help="Days back to fetch")
+    sub.add_parser("backup", help="Snapshot the DB and upload via rclone (if configured)")
     sub.add_parser("serve", help="Run the web application")
 
     args = parser.parse_args()
@@ -140,6 +157,8 @@ def main() -> int:
         return cmd_weather(args.limit)
     if args.command == "wellness":
         return cmd_wellness(args.days)
+    if args.command == "backup":
+        return cmd_backup()
     return cmd_serve()
 
 

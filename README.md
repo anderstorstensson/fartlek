@@ -28,13 +28,20 @@ Named after the Swedish training method: *fart* (speed) + *lek* (play).
 - **Views**: dashboard (incl. readiness + race countdown), activity list with route
   thumbnails, Strava-style logbook, training-plan calendar, trends, personal records,
   goal races.
-- **Claude Code integration**: `.claude/skills/training-analysis/` teaches Claude how to
-  query the data, analyze sessions and trends, publish goal-oriented training plans into
-  the calendar, and adjust them when life happens (missed workouts, illness, fatigue).
+- **AI-coach integration**: the coaching instructions live in `docs/coach/` (data
+  access, analysis methodology, plan design + independent review) and are platform
+  neutral — Claude Code loads them via `.claude/skills/`, any other agent platform
+  (Codex, Cursor, …) picks them up through `AGENTS.md`. The AI can query the data,
+  analyze sessions/races/trends, publish goal-oriented training plans into the
+  calendar, and adjust them when life happens (missed workouts, illness, fatigue).
 
 ## Setup
 
-Dependencies are defined in `pyproject.toml`.
+Dependencies are defined in `pyproject.toml`. Works on Linux, macOS, and Windows
+(CI runs the test suite on all three). `make` is a convenience wrapper — every
+target is also a plain command, shown below for Windows.
+
+**Linux / macOS**
 
 ```bash
 # 1. Python deps (creates .venv/)
@@ -52,6 +59,16 @@ make backfill
 make serve            # → http://127.0.0.1:8077
 ```
 
+**Windows (PowerShell, no make needed)**
+
+```powershell
+uv sync                                   # 1. Python deps
+cd frontend; npm install; npm run build; cd ..   # 2. Frontend build
+.venv\Scripts\python -m backend.cli login        # 3. Garmin auth
+.venv\Scripts\python -m backend.cli sync --full  # 4. Backfill
+.venv\Scripts\python -m backend.cli serve        #    → http://127.0.0.1:8077
+```
+
 > **Repo on a filesystem without symlink support (e.g. exFAT)?** Put the venv
 > elsewhere — `UV_PROJECT_ENVIRONMENT=~/.venvs/fartlek uv sync` — and run npm with
 > `--no-bin-links`. The Makefile falls back to `~/.venvs/fartlek` automatically when
@@ -59,13 +76,50 @@ make serve            # → http://127.0.0.1:8077
 
 ## Autostart at login
 
-```bash
-make install-service          # systemd user unit, enabled + started
-journalctl --user -u fartlek -f
-```
+- **Linux**: `make install-service` — systemd user unit, enabled + started; logs
+  via `journalctl --user -u fartlek -f`. Optional `sudo loginctl enable-linger $USER`
+  keeps it running without an open session.
+- **macOS**: `make install-service` — launchd user agent
+  (`~/Library/LaunchAgents/com.fartlek.app.plist`); logs in `~/Library/Logs/fartlek.log`.
+- **Windows**: `.\scripts\install-service.ps1` — Scheduled Task started at logon.
 
 The service auto-syncs from Garmin every 30 minutes while running.
-Optional `sudo loginctl enable-linger $USER` keeps it running without an open session.
+
+## Backups
+
+The database holds things Garmin cannot restore (analysis notes, races, plans,
+wellness history, your settings), so back it up. `make backup` (or
+`python -m backend.cli backup`) writes a consistent, gzipped DB snapshot plus the
+athlete profile to `data/backups/` (rotated, 7 kept). To get them **off the
+machine**, install [rclone](https://rclone.org), configure a remote once, and set
+one environment variable:
+
+```bash
+rclone config                    # one-time: create a "gdrive" Google Drive remote
+export FARTLEK_RCLONE_REMOTE=gdrive:fartlek
+make backup                      # snapshot + upload
+```
+
+With the variable set on the service (see the commented line in
+`systemd/fartlek.service` / the launchd plist), a backup runs **automatically
+every night at 03:30**. What goes to the remote:
+
+- `snapshots/` — the rotated DB snapshots (mirrored)
+- `fit/` — raw FIT files; append-only, so after the one-time ~1 GB seed upload
+  only new activities transfer
+- `athlete-profile.md`
+- Garmin tokens (`garth/`) only with `FARTLEK_BACKUP_INCLUDE_TOKENS=1` — they
+  grant access to your Garmin account, so leave them out of plain-text remotes
+  (after a restore, just run `make login` again).
+
+**Encryption (optional):** back up through an [rclone crypt
+remote](https://rclone.org/crypt/) — wrap the Drive remote in a crypt remote and
+point `FARTLEK_RCLONE_REMOTE` at that instead; Google then only ever sees
+ciphertext. Recommended if you enable token backup.
+
+**Restore:** download the newest snapshot, `gunzip` it to `data/fartlek.sqlite3`,
+copy the FIT files back to `data/fit/`, restore `athlete-profile.md`, run
+`make login`, done.
 
 ## Everyday commands
 
@@ -77,6 +131,7 @@ Optional `sudo loginctl enable-linger $USER` keeps it running without an open se
 | `make rescan` | Re-extract streams/dynamics/derived metrics from stored FIT files |
 | `make wellness` | Backfill Garmin wellness (sleep/HRV/RHR) history |
 | `make weather` | Backfill historical weather for activities missing it |
+| `make backup` | DB snapshot + rclone upload (see Backups) |
 | `make test` | Backend test suite |
 | `make dev` | Frontend dev server with hot reload (proxies API to :8077) |
 | `make typecheck` | Frontend type checking |
@@ -96,7 +151,9 @@ Calendar page directly.
 
 Environment variables (prefix `FARTLEK_`): `FARTLEK_PORT` (8077), `FARTLEK_HOST`,
 `FARTLEK_DATA_DIR`, `FARTLEK_SYNC_INTERVAL_MINUTES` (30), `FARTLEK_SCHEDULER_ENABLED`,
-`FARTLEK_STREAM_MAX_POINTS` (3000, per-activity stream resolution in the DB).
+`FARTLEK_STREAM_MAX_POINTS` (3000, per-activity stream resolution in the DB),
+`FARTLEK_RCLONE_REMOTE` (backup destination, empty = off), `FARTLEK_BACKUP_KEEP` (7),
+`FARTLEK_BACKUP_HOUR` (3), `FARTLEK_BACKUP_INCLUDE_TOKENS` (0).
 Athlete parameters (max/resting HR, LTHR, threshold pace) are edited in the web UI
 under Settings; saving triggers a metric recompute.
 
