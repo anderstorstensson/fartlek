@@ -37,6 +37,7 @@ def _response(settings) -> SettingsResponse:
         manual_pace_zone_bounds=settings.manual_pace_zone_bounds,
         coaching_tone=settings.coaching_tone,
         display_locale=settings.display_locale,
+        units=settings.units,
         coach_model=settings.coach_model,
         zones=zones,
         pace_zones=[

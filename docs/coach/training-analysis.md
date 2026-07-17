@@ -91,7 +91,8 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
 - `athlete_settings` — single row: `resting_hr, max_hr, lthr, threshold_pace_s_per_km, sex`,
   plus `rtss_use_gap` (GAP vs raw pace for rTSS), HR-zone config (`zone_mode`,
   `manual_zone_bounds`), pace-zone config (`pace_zone_mode` threshold|manual,
-  `manual_pace_zone_bounds` as s/km, slowest first), and `coaching_tone`
+  `manual_pace_zone_bounds` as s/km, slowest first), `units` (metric|imperial — the
+  athlete's display units for pace *and* distance), and `coaching_tone`
   (harsh|balanced|supportive — see "Coaching tone").
 
 Units are SI in the database: meters, seconds, m/s. **Never show the athlete a
@@ -99,9 +100,13 @@ speed in m/s** — runners think in pace. The `/api/activities/{id}` response al
 carries pace twins (`avg_pace_s_per_km`, `gap_pace_s_per_km`, lap `avg_pace_s_per_km`);
 quote those and just format the seconds as `m:ss` (267 → **4:27 /km**). Only when you
 query the raw `*_speed_mps` columns directly (e.g. via SQL or the stream arrays) do
-you convert yourself: `sec_per_km = 1000 / speed_mps`. The whole app displays pace as
-min/km; match it (this build has no imperial unit setting, so do not emit min/mile
-unless the athlete explicitly asks). Timestamps are naive; use `start_time_local` for
+you convert yourself: `sec_per_km = 1000 / speed_mps`. Display pace **and distance**
+in the units the athlete chose: read `units` from `GET /api/settings`
+(metric|imperial) and match it. The API and DB **stay SI regardless of the
+setting** — with `imperial`, convert yourself: `sec_per_mile = sec_per_km × 1.609344`
+formatted `m:ss /mi` (267 s/km → **7:10 /mi**), `miles = meters / 1609.344`.
+`GET /api/activities/{id}/splits?unit=mile` serves true mile splits for imperial
+athletes (default is km). Timestamps are naive; use `start_time_local` for
 day/week grouping.
 
 ## Load metrics — do not mix scales

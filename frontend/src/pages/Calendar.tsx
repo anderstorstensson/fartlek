@@ -3,7 +3,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { CoachStatus, fetchJson, PlanInfo, PlannedWorkout, useApi } from '../api'
 import { coachUrl, PLAN_PROMPT } from '../coachLink'
-import { formatDistance, formatDuration, locale, sportEmoji } from '../format'
+import {
+  distanceUnitLabel,
+  formatDistance,
+  formatDuration,
+  locale,
+  metersToDistanceUnit,
+  sportEmoji
+} from '../format'
 
 interface DayActivity {
   id: number
@@ -257,12 +264,12 @@ export default function Calendar() {
         </div>
         {weeks.map((week) => {
           const weekKeys = week.map(isoDate)
-          const plannedKm =
+          const plannedDist = metersToDistanceUnit(
             weekKeys.flatMap((k) => planned[k] ?? []).reduce(
-              (sum, w) => sum + (w.target_distance_m ?? 0), 0) / 1000
-          const doneKm =
+              (sum, w) => sum + (w.target_distance_m ?? 0), 0))
+          const doneDist = metersToDistanceUnit(
             weekKeys.flatMap((k) => activities[k] ?? []).reduce(
-              (sum, a) => sum + a.distance_m, 0) / 1000
+              (sum, a) => sum + a.distance_m, 0))
           return (
           <div className="calendar-row" key={isoDate(week[0])}>
             {week.map((day) => {
@@ -287,7 +294,7 @@ export default function Calendar() {
                     >
                       {activity.tag === 'race' && '🏁 '}
                       {activity.sport.includes('running')
-                        ? `${(activity.distance_m / 1000).toFixed(1)} km`
+                        ? `${metersToDistanceUnit(activity.distance_m).toFixed(1)} ${distanceUnitLabel()}`
                         : sportEmoji(activity.sport)}
                       {activity.has_analysis && <span className="chip-analysis">🧠</span>}
                     </button>
@@ -308,14 +315,14 @@ export default function Calendar() {
               )
             })}
             <div className="calendar-cell week-summary">
-              {plannedKm > 0 && (
+              {plannedDist > 0 && (
                 <div>
-                  <span className="muted">plan</span> {plannedKm.toFixed(0)} km
+                  <span className="muted">plan</span> {plannedDist.toFixed(0)} {distanceUnitLabel()}
                 </div>
               )}
-              {doneKm > 0 && (
+              {doneDist > 0 && (
                 <div>
-                  <span className="muted">done</span> {doneKm.toFixed(1)} km
+                  <span className="muted">done</span> {doneDist.toFixed(1)} {distanceUnitLabel()}
                 </div>
               )}
             </div>

@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
@@ -147,11 +147,19 @@ def _lap_splits(laps: list[Lap], stream: Stream | None) -> list[SplitOut]:
     ]
 
 
+_MILE_M = 1609.344
+
+
 @router.get("/{activity_id}/splits", response_model=SplitsOut)
-def get_splits(activity_id: int, session: Session = Depends(get_session)) -> SplitsOut:
+def get_splits(
+    activity_id: int,
+    unit: str = Query("km", pattern="^(km|mile)$"),
+    session: Session = Depends(get_session),
+) -> SplitsOut:
     """Splits for the activity page chart. Structured/tagged workouts serve
     their laps; manual lap-button sessions serve those laps; everything else
-    gets per-km splits cut from the streams (runs only)."""
+    gets per-distance splits cut from the streams (runs only) — km by default,
+    miles with ?unit=mile (mode stays "km", meaning "distance splits")."""
     activity = session.get(Activity, activity_id)
     if activity is None:
         raise HTTPException(status_code=404, detail="Activity not found")
@@ -167,7 +175,13 @@ def get_splits(activity_id: int, session: Session = Depends(get_session)) -> Spl
             return SplitsOut(mode="laps", splits=_lap_splits(laps, stream))
 
     if stream is not None:
-        splits = km_splits(stream.time_s, stream.distance_m, stream.altitude_m, stream.hr)
+        splits = km_splits(
+            stream.time_s,
+            stream.distance_m,
+            stream.altitude_m,
+            stream.hr,
+            split_m=_MILE_M if unit == "mile" else 1000.0,
+        )
         if splits:
             return SplitsOut(
                 mode="km",

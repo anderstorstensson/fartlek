@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import { fetchJson, SyncStatus } from './api'
-import { locale, setDisplayLocale } from './format'
+import { locale, setDisplayLocale, setUnits, Units, units } from './format'
 import Activities from './pages/Activities'
 import ActivityDetailPage from './pages/ActivityDetail'
 import Analysis from './pages/Analysis'
@@ -27,19 +27,23 @@ const NAV_ITEMS = [
 
 export default function App() {
   const [sync, setSync] = useState<SyncStatus | null>(null)
-  // Bumped when the saved display locale differs from the cached one, so the
-  // whole tree re-renders with the right date/time format.
-  const [, setLocaleVersion] = useState(0)
+  // Bumped when a saved display preference (locale, pace unit) differs from
+  // the cached one, so the whole tree re-renders with the right format.
+  const [, setDisplayVersion] = useState(0)
 
   useEffect(() => {
     let cancelled = false
 
-    fetchJson<{ display_locale: string }>('/api/settings')
+    fetchJson<{ display_locale: string; units: Units }>('/api/settings')
       .then((settings) => {
         if (cancelled) return
         if ((settings.display_locale || undefined) !== locale()) {
           setDisplayLocale(settings.display_locale)
-          setLocaleVersion((v) => v + 1)
+          setDisplayVersion((v) => v + 1)
+        }
+        if (settings.units !== units()) {
+          setUnits(settings.units)
+          setDisplayVersion((v) => v + 1)
         }
       })
       .catch(() => undefined)

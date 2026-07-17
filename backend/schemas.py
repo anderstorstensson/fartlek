@@ -331,6 +331,7 @@ class SettingsOut(BaseModel):
     manual_pace_zone_bounds: list[float] | None
     coaching_tone: str
     display_locale: str
+    units: str
     coach_model: str
 
 
@@ -349,6 +350,7 @@ class SettingsIn(BaseModel):
         default="balanced", pattern="^(drill|harsh|balanced|supportive)$"
     )
     display_locale: str = Field(default="", pattern="^[A-Za-z]{0,3}(-[A-Za-z0-9]{2,8})*$")
+    units: str = Field(default="metric", pattern="^(metric|imperial)$")
     coach_model: str = Field(default="", max_length=64, pattern=r"^[A-Za-z0-9.\-\[\]]*$")
 
     @model_validator(mode="after")
@@ -397,6 +399,7 @@ class SettingsUpdate(BaseModel):
     display_locale: str | None = Field(
         default=None, pattern="^[A-Za-z]{0,3}(-[A-Za-z0-9]{2,8})*$"
     )
+    units: str | None = Field(default=None, pattern="^(metric|imperial)$")
     coach_model: str | None = Field(
         default=None, max_length=64, pattern=r"^[A-Za-z0-9.\-\[\]]*$"
     )

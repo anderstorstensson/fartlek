@@ -1,6 +1,13 @@
 import { CSSProperties, MouseEvent, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Split, SplitsResponse, useApi } from '../api'
-import { formatDistance, formatDuration, formatPace } from '../format'
+import {
+  distanceUnitLabel,
+  formatDistance,
+  formatDuration,
+  formatPace,
+  formatPaceValue,
+  units
+} from '../format'
 
 const ACTIVE_COLOR = 'var(--accent)'
 const EASY_COLOR = '#5a5a56' // warmup/cooldown/rest and non-workout bars
@@ -134,7 +141,7 @@ function WorkoutColumns({ splits }: { splits: Split[] }) {
           const speed = split.avg_speed_mps ?? 0
           const height = Math.max((speed / maxSpeed) * CHART_HEIGHT, 3)
           const isActive = barColor(split.intensity) === ACTIVE_COLOR
-          const pace = formatPace(split.avg_speed_mps).replace(' /km', '')
+          const pace = formatPaceValue(split.avg_speed_mps)
           const labelAbove = isActive && columnPx >= LABEL_ABOVE_MIN_PX
           const labelInside =
             isActive &&
@@ -239,7 +246,10 @@ function SplitRows({ splits, mode }: { splits: Split[]; mode: 'km' | 'laps' }) {
             className="split-row"
             key={split.index}
             style={{ gridTemplateColumns: `${labelWidth}px 1fr ${metaWidth}px` }}
-            title={splitTitle(split, mode === 'km' ? `km ${split.index + 1}` : `lap ${split.index + 1}`)}
+            title={splitTitle(
+              split,
+              mode === 'km' ? `${distanceUnitLabel()} ${split.index + 1}` : `lap ${split.index + 1}`
+            )}
           >
             <span className="muted">{label}</span>
             <div className="bar-track">
@@ -257,7 +267,9 @@ function SplitRows({ splits, mode }: { splits: Split[]; mode: 'km' | 'laps' }) {
 }
 
 export default function SplitsChart({ activityId }: { activityId: number }) {
-  const splits = useApi<SplitsResponse>(`/api/activities/${activityId}/splits`)
+  // Distance splits are cut server-side, so ask for them in the display unit.
+  const unitParam = units() === 'imperial' ? '?unit=mile' : ''
+  const splits = useApi<SplitsResponse>(`/api/activities/${activityId}/splits${unitParam}`)
   const data = splits.data
   if (!data || data.mode === 'none' || data.splits.length === 0) return null
 

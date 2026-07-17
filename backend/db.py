@@ -73,6 +73,7 @@ def _migrate() -> None:
             ("coaching_tone", "VARCHAR NOT NULL DEFAULT 'balanced'"),
             ("display_locale", "VARCHAR NOT NULL DEFAULT ''"),
             ("coach_model", "VARCHAR NOT NULL DEFAULT ''"),
+            ("units", "VARCHAR NOT NULL DEFAULT 'metric'"),
         ],
         "daily_wellness": [("vo2max", "FLOAT")],
         "streams": [

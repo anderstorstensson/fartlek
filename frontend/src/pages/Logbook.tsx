@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchJson } from '../api'
-import { formatDistance, formatDuration, formatPace, locale, sportEmoji } from '../format'
+import {
+  distanceUnitLabel,
+  formatDistance,
+  formatDuration,
+  formatPace,
+  locale,
+  metersToDistanceUnit,
+  sportEmoji
+} from '../format'
 
 interface LogbookActivity {
   id: number
@@ -40,7 +48,7 @@ function circleDiameter(activity: LogbookActivity, metric: SizeMetric): number {
 
 function circleLabel(activity: LogbookActivity, diameter: number): string {
   if (diameter < 26 || activity.distance_m <= 0) return ''
-  return (activity.distance_m / 1000).toFixed(1)
+  return metersToDistanceUnit(activity.distance_m).toFixed(1)
 }
 
 function isoWeekNumber(date: Date): number {
@@ -163,7 +171,9 @@ export default function Logbook() {
               )
             })}
             <div className="week-totals">
-              <strong>{(week.run_distance_m / 1000).toFixed(1)} km</strong>
+              <strong>
+                {metersToDistanceUnit(week.run_distance_m).toFixed(1)} {distanceUnitLabel()}
+              </strong>
               <div className="muted">
                 {formatDuration(week.total_moving_s)}
                 {week.runs > 0 && ` · ${week.runs} runs`}

@@ -1,7 +1,15 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { fetchJson, Settings, SyncStatus } from '../api'
 import RacesSection from '../components/RacesSection'
-import { formatPaceFromSeconds, locale, setDisplayLocale } from '../format'
+import {
+  formatPaceFromSeconds,
+  formatPaceValue,
+  locale,
+  paceUnitLabel,
+  secPerKmToDisplay,
+  setDisplayLocale,
+  setUnits
+} from '../format'
 
 const PACE_ZONE_LABELS = ['recovery', 'easy', 'marathon', 'threshold', 'VO2max+']
 
@@ -46,12 +54,14 @@ export default function SettingsPage() {
         manual_pace_zone_bounds: settings.manual_pace_zone_bounds,
         coaching_tone: settings.coaching_tone,
         display_locale: settings.display_locale,
+        units: settings.units,
         coach_model: settings.coach_model
       })
     })
       .then((updated) => {
         setSettings(updated)
         setDisplayLocale(updated.display_locale)
+        setUnits(updated.units)
         setMessage('Saved. Load metrics are being recomputed in the background.')
       })
       .catch((e: Error) => setError(e.message))
@@ -145,7 +155,8 @@ export default function SettingsPage() {
                 onChange={(e) => update({ threshold_pace_s_per_km: Number(e.target.value) })}
               />
               <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
-                = {formatPaceFromSeconds(settings.threshold_pace_s_per_km)}/km
+                = {formatPaceFromSeconds(secPerKmToDisplay(settings.threshold_pace_s_per_km))}{' '}
+                {paceUnitLabel()}
               </div>
             </label>
             <label>
@@ -201,6 +212,19 @@ export default function SettingsPage() {
               <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
                 Claude model for the in-app Coach. Aliases resolve to the latest
                 version; usage counts against your subscription either way.
+              </div>
+            </label>
+            <label>
+              <div className="muted">Units</div>
+              <select
+                value={settings.units}
+                onChange={(e) => update({ units: e.target.value as Settings['units'] })}
+              >
+                <option value="metric">Metric — km, min/km</option>
+                <option value="imperial">Imperial — miles, min/mi</option>
+              </select>
+              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                Display only — stored values and the config inputs above stay in s/km.
               </div>
             </label>
             <label>
@@ -324,7 +348,7 @@ export default function SettingsPage() {
                       }}
                     />
                     <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
-                      = {formatPaceFromSeconds(bound)}/km
+                      = {formatPaceFromSeconds(secPerKmToDisplay(bound))} {paceUnitLabel()}
                     </div>
                   </label>
                 ))}
@@ -345,11 +369,11 @@ export default function SettingsPage() {
                       </td>
                       <td style={{ width: 110 }}>{PACE_ZONE_LABELS[i]}</td>
                       <td>
-                        {formatPaceFromSeconds(1000 / zone.low_speed_mps)}
+                        {formatPaceValue(zone.low_speed_mps)}
                         {zone.high_speed_mps
-                          ? ` – ${formatPaceFromSeconds(1000 / zone.high_speed_mps)}`
+                          ? ` – ${formatPaceValue(zone.high_speed_mps)}`
                           : ' and faster'}{' '}
-                        /km
+                        {paceUnitLabel()}
                       </td>
                     </tr>
                   ))}

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { RecordEntry, useApi } from '../api'
-import { formatDuration, formatPaceFromSeconds, formatShortDate } from '../format'
+import { formatDuration, formatPaceFromSeconds, formatShortDate, paceUnitLabel, paceUnitMeters } from '../format'
 
 export default function Records() {
   const records = useApi<RecordEntry[]>('/api/records?top=3')
@@ -30,7 +30,10 @@ export default function Records() {
                     <td style={{ width: 40 }}>{['🥇', '🥈', '🥉'][i] ?? `${i + 1}.`}</td>
                     <td className="strong">{formatDuration(entry.duration_s)}</td>
                     <td>
-                      {formatPaceFromSeconds((entry.duration_s / entry.distance_m) * 1000)} /km
+                      {formatPaceFromSeconds(
+                        (entry.duration_s / entry.distance_m) * paceUnitMeters()
+                      )}{' '}
+                      {paceUnitLabel()}
                     </td>
                     <td>
                       <Link to={`/activities/${entry.activity_id}`}>{entry.activity_name}</Link>

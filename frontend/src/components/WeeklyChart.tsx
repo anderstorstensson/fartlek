@@ -9,7 +9,7 @@ import {
   YAxis
 } from 'recharts'
 import { WeeklyStat } from '../api'
-import { formatDuration, formatShortDate } from '../format'
+import { distanceUnitLabel, formatDuration, formatShortDate, metersToDistanceUnit } from '../format'
 
 function currentWeekKey(): string {
   const now = new Date()
@@ -23,7 +23,7 @@ function currentWeekKey(): string {
 export type WeeklyMetric = 'distance' | 'time' | 'load'
 
 const METRIC_CONFIG: Record<WeeklyMetric, { name: string; format: (v: number) => string }> = {
-  distance: { name: 'Run distance', format: (v) => `${v.toFixed(1)} km` },
+  distance: { name: 'Run distance', format: (v) => `${v.toFixed(1)} ${distanceUnitLabel()}` },
   time: { name: 'Moving time', format: (v) => formatDuration(v * 3600) },
   load: { name: 'Training load (TRIMP)', format: (v) => v.toFixed(0) }
 }
@@ -41,7 +41,7 @@ export default function WeeklyChart({ data, metric, height = 260 }: WeeklyChartP
     week_start: week.week_start,
     value:
       metric === 'distance'
-        ? week.run_distance_m / 1000
+        ? metersToDistanceUnit(week.run_distance_m)
         : metric === 'time'
           ? week.total_moving_s / 3600
           : week.load_trimp

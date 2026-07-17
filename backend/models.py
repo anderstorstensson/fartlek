@@ -215,6 +215,9 @@ class AthleteSettings(Base):
     coaching_tone: Mapped[str] = mapped_column(String, default="balanced")
     # BCP-47 locale for date/time display in the UI; empty = browser default.
     display_locale: Mapped[str] = mapped_column(String, default="")
+    # Display units: metric (km, min/km) | imperial (miles, min/mi).
+    # Display only — storage stays SI everywhere.
+    units: Mapped[str] = mapped_column(String, default="metric")
     # Claude model for the in-app coach (alias like "fable"/"opus"/"sonnet" or a
     # full model id); empty = the CLI's configured default.
     coach_model: Mapped[str] = mapped_column(String, default="")

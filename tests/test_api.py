@@ -174,6 +174,24 @@ def test_settings_validation(client):
     assert client.put("/api/settings", json=bad).status_code == 422
 
 
+def test_units_setting(client):
+    assert client.get("/api/settings").json()["units"] == "metric"
+
+    updated = client.put("/api/settings", json={"units": "imperial"}).json()
+    assert updated["units"] == "imperial"
+    assert client.get("/api/settings").json()["units"] == "imperial"
+
+    # Display-only setting: a partial update must not touch anything else.
+    assert updated["threshold_pace_s_per_km"] == client.get(
+        "/api/settings"
+    ).json()["threshold_pace_s_per_km"]
+
+    assert client.put("/api/settings", json={"units": "miles"}).status_code == 422
+    assert client.put("/api/settings", json={"units": "freedom"}).status_code == 422
+
+    client.put("/api/settings", json={"units": "metric"})  # restore for other tests
+
+
 def test_partial_settings_update_preserves_other_fields(client):
     """A partial PUT (e.g. the coach updating threshold pace) must never reset
     unmentioned settings to their defaults — the bug that wiped tone/model."""

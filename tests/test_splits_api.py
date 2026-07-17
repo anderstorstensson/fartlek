@@ -125,6 +125,18 @@ def test_easy_run_gets_km_splits_from_streams(client):
     assert body["splits"][2]["distance_m"] < 1000.0
 
 
+def test_mile_splits_on_request(client):
+    # Activity 102 covers 2497.5 m at 2.5 m/s → 1 full mile + 888 m remainder.
+    body = client.get("/api/activities/102/splits?unit=mile").json()
+    assert body["mode"] == "km"  # mode means "distance splits", unit-agnostic
+    assert len(body["splits"]) == 2
+    assert abs(body["splits"][0]["distance_m"] - 1609.344) < 0.1  # stored rounded to 0.1 m
+    assert abs(body["splits"][0]["elapsed_s"] - 1609.344 / 2.5) < 1.0
+    assert body["splits"][1]["distance_m"] < 1609.344
+
+    assert client.get("/api/activities/102/splits?unit=furlong").status_code == 422
+
+
 def test_tagged_intervals_session_is_workout_mode(client):
     body = client.get("/api/activities/103/splits").json()
     assert body["mode"] == "workout"

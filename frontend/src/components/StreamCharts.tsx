@@ -11,7 +11,14 @@ import {
   YAxis
 } from 'recharts'
 import { ActivityDetail, Streams } from '../api'
-import { formatDuration, formatPace, formatPaceFromSeconds } from '../format'
+import {
+  distanceUnitLabel,
+  formatDuration,
+  formatPace,
+  formatPaceFromSeconds,
+  metersToDistanceUnit,
+  paceUnitMeters
+} from '../format'
 
 const TOOLTIP_STYLE = {
   backgroundColor: '#232322',
@@ -57,10 +64,12 @@ function buildRows(streams: Streams): { rows: ChartRow[]; byDistance: boolean } 
     const gapSpeed = streams.gap_speed_mps[i] ?? null
     const cadence = streams.cadence[i]
     rows.push({
-      x: hasDistance && dist !== null ? dist / 1000 : time,
+      x: hasDistance && dist !== null ? metersToDistanceUnit(dist) : time,
       streamIndex: i,
-      pace: speed !== null && speed > 0.5 ? 1000 / speed : null,
-      gapPace: gapSpeed !== null && gapSpeed > 0.5 ? 1000 / gapSpeed : null,
+      // Seconds per display unit (km or mile): axis domain, bands and tooltip
+      // all consume the same numbers, so they stay in one unit by construction.
+      pace: speed !== null && speed > 0.5 ? paceUnitMeters() / speed : null,
+      gapPace: gapSpeed !== null && gapSpeed > 0.5 ? paceUnitMeters() / gapSpeed : null,
       hr: streams.hr[i],
       // FIT records carry running cadence as rpm (one leg); display spm.
       cadence: cadence !== null && cadence > 0 ? cadence * 2 : null,
@@ -231,7 +240,7 @@ function CombinedPanel({
             contentStyle={TOOLTIP_STYLE}
             itemSorter={(item) => TOOLTIP_ORDER[String(item.name)] ?? 9}
             labelFormatter={(v: number) =>
-              byDistance ? `${v.toFixed(2)} km` : formatDuration(v)
+              byDistance ? `${v.toFixed(2)} ${distanceUnitLabel()}` : formatDuration(v)
             }
             formatter={(value: number, name: string) => {
               if (name === 'Pace' || name === 'GAP') return [formatPaceFromSeconds(value), name]
@@ -357,7 +366,7 @@ function Panel({ rows, byDistance, dataKey, title, color, format, onHoverIndex }
           <Tooltip
             contentStyle={TOOLTIP_STYLE}
             labelFormatter={(v: number) =>
-              byDistance ? `${v.toFixed(2)} km` : formatDuration(v)
+              byDistance ? `${v.toFixed(2)} ${distanceUnitLabel()}` : formatDuration(v)
             }
             formatter={(value: number) => [format(value), title]}
           />

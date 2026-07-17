@@ -1,5 +1,5 @@
 import { Streams } from '../api'
-import { formatDuration, formatPace } from '../format'
+import { formatDuration, formatPaceValue, paceUnitLabel } from '../format'
 
 /* Ordinal single-hue blue ramp (pace), light → dark. */
 const ZONE_COLORS = ['#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95']
@@ -18,15 +18,13 @@ export default function PaceZoneChart({ streams }: PaceZoneChartProps) {
 
   return (
     <div className="chart-card">
-      <div className="chart-title">Time in pace zones (min/km)</div>
+      <div className="chart-title">Time in pace zones (min{paceUnitLabel()})</div>
       <div style={{ padding: '0 8px 10px' }}>
         {streams.pace_zones.map((zone, i) => {
           const seconds = streams.time_in_pace_zones_s[i] ?? 0
           const pct = (seconds / total) * 100
-          const slow = formatPace(zone.low_speed_mps).replace(' /km', '')
-          const fast = zone.high_speed_mps
-            ? formatPace(zone.high_speed_mps).replace(' /km', '')
-            : null
+          const slow = formatPaceValue(zone.low_speed_mps)
+          const fast = zone.high_speed_mps ? formatPaceValue(zone.high_speed_mps) : null
           const range = fast ? `${slow}–${fast}` : `<${slow}`
           return (
             <div className="zone-row" key={zone.name}>
