@@ -311,7 +311,7 @@ export default function ActivityDetailPage() {
         <>
           <h2>Analysis</h2>
           {notes.data.map((note) => (
-            <NoteCard key={note.id} note={note} />
+            <NoteCard key={note.id} note={note} showActivityLink={false} />
           ))}
         </>
       )}

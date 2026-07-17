@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown'
+import { Link } from 'react-router-dom'
 import remarkGfm from 'remark-gfm'
 import { AnalysisNote, fetchJson } from '../api'
 import { formatDate } from '../format'
@@ -15,9 +16,11 @@ const KIND_LABELS: Record<AnalysisNote['kind'], string> = {
 interface NoteCardProps {
   note: AnalysisNote
   onDeleted?: (id: number) => void
+  /** Hide on the activity's own page, where the link would be circular. */
+  showActivityLink?: boolean
 }
 
-export default function NoteCard({ note, onDeleted }: NoteCardProps) {
+export default function NoteCard({ note, onDeleted, showActivityLink = true }: NoteCardProps) {
   const remove = () => {
     if (!window.confirm(`Delete "${note.title}"?`)) return
     fetchJson(`/api/notes/${note.id}`, { method: 'DELETE' })
@@ -37,6 +40,11 @@ export default function NoteCard({ note, onDeleted }: NoteCardProps) {
             <span>
               {note.period_start} → {note.period_end}
             </span>
+          )}
+          {showActivityLink && note.activity_id !== null && (
+            <Link to={`/activities/${note.activity_id}`} style={{ color: 'var(--accent)' }}>
+              view activity →
+            </Link>
           )}
           <span>{formatDate(note.created_at)}</span>
           {onDeleted && (
