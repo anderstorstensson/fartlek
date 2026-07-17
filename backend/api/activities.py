@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
@@ -95,6 +95,22 @@ def update_activity(
         activity.user_note = payload.user_note
     session.commit()
     return activity
+
+
+@router.delete("/{activity_id}", status_code=204)
+def delete_activity(activity_id: int, session: Session = Depends(get_session)) -> Response:
+    """Permanently remove an activity and its streams, laps and best efforts (ORM
+    cascade). Analysis notes are intentionally left intact — they carry no foreign
+    key so they survive re-imports, and the same rule applies to a manual delete.
+
+    Note: a real Garmin activity deleted here reappears on the next sync, which
+    recreates rows by activity id; only manually-added or stray rows stay gone."""
+    activity = session.get(Activity, activity_id)
+    if activity is None:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    session.delete(activity)
+    session.commit()
+    return Response(status_code=204)
 
 
 @router.get("/{activity_id}/track", response_model=list[list[float]])

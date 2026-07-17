@@ -1,6 +1,14 @@
 import { FormEvent, useCallback, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ActivityDetail, AnalysisNote, CoachStatus, fetchJson, Streams, useApi } from '../api'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import {
+  ActivityDetail,
+  AnalysisNote,
+  CoachStatus,
+  deleteActivity,
+  fetchJson,
+  Streams,
+  useApi
+} from '../api'
 import { analyzePrompt, coachUrl } from '../coachLink'
 import ActivityMap from '../components/ActivityMap'
 import NoteCard from '../components/NoteCard'
@@ -29,16 +37,19 @@ const TAGS = ['', 'easy', 'recovery', 'long', 'intervals', 'tempo', 'race', 'cro
 function EditForm({
   activity,
   onSaved,
-  onCancel
+  onCancel,
+  onDeleted
 }: {
   activity: ActivityDetail
   onSaved: () => void
   onCancel: () => void
+  onDeleted: () => void
 }) {
   const [name, setName] = useState(activity.name)
   const [tag, setTag] = useState(activity.tag ?? '')
   const [note, setNote] = useState(activity.user_note)
   const [error, setError] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const save = (event: FormEvent) => {
     event.preventDefault()
@@ -49,6 +60,25 @@ function EditForm({
     })
       .then(onSaved)
       .catch((e: Error) => setError(e.message))
+  }
+
+  const remove = () => {
+    if (
+      !window.confirm(
+        `Delete "${activity.name}"? This removes the activity and its charts, laps ` +
+          'and records. A synced Garmin activity will reappear on the next sync; ' +
+          'manually-added ones stay gone. This cannot be undone.'
+      )
+    )
+      return
+    setError(null)
+    setDeleting(true)
+    deleteActivity(activity.id)
+      .then(onDeleted)
+      .catch((e: Error) => {
+        setError(e.message)
+        setDeleting(false)
+      })
   }
 
   return (
@@ -85,10 +115,21 @@ function EditForm({
           placeholder="e.g. felt flat, slept 4h · new shoes · raced this one"
         />
       </label>
-      <div style={{ display: 'flex', gap: 10 }}>
-        <button type="submit">Save</button>
-        <button type="button" className="ghost" onClick={onCancel}>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <button type="submit" disabled={deleting}>
+          Save
+        </button>
+        <button type="button" className="ghost" onClick={onCancel} disabled={deleting}>
           Cancel
+        </button>
+        <button
+          type="button"
+          className="ghost danger"
+          onClick={remove}
+          disabled={deleting}
+          style={{ marginLeft: 'auto' }}
+        >
+          {deleting ? 'Deleting…' : 'Delete activity'}
         </button>
       </div>
     </form>
@@ -129,6 +170,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 
 export default function ActivityDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [version, setVersion] = useState(0)
   const [editing, setEditing] = useState(false)
   const detail = useApi<ActivityDetail>(id ? `/api/activities/${id}?v=${version}` : null)
@@ -216,6 +258,7 @@ export default function ActivityDetailPage() {
             setVersion((v) => v + 1)
           }}
           onCancel={() => setEditing(false)}
+          onDeleted={() => navigate('/activities')}
         />
       )}
 
