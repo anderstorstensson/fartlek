@@ -67,10 +67,11 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
   overwrite it).
   Watch self-evaluation (entered on the Forerunner when saving, NULL when skipped):
   `perceived_exertion` (RPE 1–10) and `feel` (1 = very weak … 5 = very strong).
-  Read them like the note: sRPE (= RPE × duration) is a valid internal-load
-  cross-check on TRIMP/rTSS, and a *divergence* is a finding — high RPE on a day
-  the HR/pace numbers call easy suggests fatigue or illness; low RPE on a strong
-  workout suggests headroom.
+  Read them like the note — they are the athlete's own voice, and "Analyzing long-term
+  trends" sets how much weight that carries against the sensors. They also feed sRPE, the
+  internal-load scale defined under "Load metrics" below; a *divergence* is a finding —
+  high RPE on a day the HR/pace numbers call easy suggests fatigue or illness; low RPE on
+  a strong workout suggests headroom.
 - `laps` — `activity_id, lap_index, start_offset_s, elapsed_s, distance_m, avg_hr, max_hr, avg_speed_mps`.
 - `streams` — one row per activity, parallel JSON arrays (`time_s, distance_m, hr, speed_mps,
   altitude_m, cadence, lat, lng`, and — newer activities — `power, vertical_oscillation,
@@ -87,6 +88,10 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
   sleep_s, deep_sleep_s, sleep_score, body_battery_max, body_battery_min, stress_avg, steps,
   vo2max` (Garmin's daily running VO2 max estimate, ml/kg/min at 0.1 precision — treat
   the *trend* as meaningful, not single-day wiggles or the absolute value).
+  **`deep_sleep_s` is the least trustworthy field in this table** — consumer sleep *staging*
+  is inconsistent against polysomnography and Garmin devices specifically underperformed;
+  trackers also detect wake poorly, so they overestimate sleep. Use `sleep_s` trends; never
+  drive a decision off sleep stages (review §11).
 - `races` — goal races: `id, name, day, distance_m, target_time_s, priority, notes`.
 - `athlete_settings` — single row: `resting_hr, max_hr, lthr, threshold_pace_s_per_km, sex`,
   plus `rtss_use_gap` (GAP vs raw pace for rTSS), HR-zone config (`zone_mode`,
@@ -118,10 +123,20 @@ day/week grouping.
   so hilly runs price correctly.
 - `hrtss` — HR-based TSS approximation (1 h at LTHR = 100); the fallback for
   non-running sports in the rTSS model.
+- **sRPE** — `perceived_exertion × moving_s/60`, whenever the athlete logged RPE on the
+  watch. Not stored — compute it. It needs no sensor, is validated across sports, sexes and
+  levels, and is the origin of the monotony/strain constructs below (review §9). Its value
+  is that it fails in *different* places than the others: HR-based load lags in intervals
+  and inflates in heat, while rTSS deflates in heat as pace drops. **When TRIMP and rTSS
+  disagree about a session, sRPE breaks the tie.**
+- **Heat distorts the scales asymmetrically** (review §13): the same session run hot prices
+  *higher* on TRIMP/hrtss (HR is up) and *lower* on rTSS (pace is down). Neither is wrong —
+  flag hot sessions rather than reading the divergence as a fitness change, and let sRPE
+  arbitrate.
 - CTL (fitness) = 42-day exponentially weighted daily load; ATL (fatigue) = 7-day;
   TSB (form) = yesterday's CTL − ATL. Get these from `/api/trends/fitness` rather than
-  recomputing. TRIMP-based and TSS-based numbers are different scales — compare within
-  one model only.
+  recomputing. TRIMP-based, TSS-based and sRPE numbers are three different scales — compare
+  within one model only.
 
 ## Coaching tone
 
@@ -160,10 +175,14 @@ consistently. The coach-advisor's internal review verdicts are unaffected.
    intervals, long run, race?) — the athlete's `tag` is authoritative when set;
    otherwise infer from laps structure, pace variance, and name. Read `user_note`
    — the athlete's own words outrank any inference.
-   Check conditions first: `weather_temp_c` / `weather_wind_mps` / `weather_humidity_pct`
-   on the activity. Heat (> ~18–20 °C, worse when humid) raises HR at a given pace and
-   inflates decoupling; strong wind (> ~5 m/s) costs pace without HR change on exposed
-   routes. Never grade paces or HR response without this context, and say when a
+   Check conditions first: `weather_temp_c` / `weather_humidity_pct` / `weather_wind_mps`
+   on the activity. Heat (> ~18–20 °C) raises HR at a given pace and inflates decoupling;
+   strong wind (> ~5 m/s) costs pace without HR change on exposed routes. **Read temperature
+   and humidity together, always** — the evidence is indexed to *wet-bulb globe temperature*,
+   not dry-bulb air temperature, and the two diverge sharply as humidity rises (review §13).
+   The app stores no WBGT, so reason from the pair yourself: 22 °C at 80% humidity is a
+   materially harder day than 22 °C at 35%, and humidity is part of the variable rather than
+   a footnote to it. Never grade paces or HR response without this context, and say when a
    "bad" number is weather, not fitness.
 2. **Was this session prescribed?** Fetch the plan for that date
    (`GET /api/plan?start=<day>&end=<day>`) and check `completed_activity_id`.
@@ -185,6 +204,9 @@ consistently. The coach-advisor's internal review verdicts are unaffected.
    rather than recomputing; >5% drift on a steady run suggests the effort was above
    current aerobic fitness, heat (cross-check `weather_temp_c`), or dehydration.
    It is stored for interval sessions too, where high values are expected and benign.
+   Heat inflates HR drift directly (review §13), so a hot-day decoupling number is **not**
+   a durability finding and must not be logged as one — otherwise the fix (more long-run
+   volume, review §5) gets prescribed for a problem that was weather.
 5. Intensity distribution: time in HR zones vs the session's purpose (easy runs should be
    ~Z1–Z2; if not, flag it).
 6. Compare with similar past sessions (same distance range/route/type) — is pace at a
@@ -228,8 +250,12 @@ the single-session steps above, and the coaching tone applies as everywhere.
    - both collapse + GI/hollow feeling → fueling execution (check vs the rehearsed
      protocol: what was actually consumed, when)
    - check `weather_temp_c`/`weather_humidity_pct` before blaming any of the above —
-     state what the performance is *worth* on a fair day (heat costs roughly 1–2%
-     per 5 °C above ~12–15 °C, more when humid).
+     state what the performance is *worth* on a fair day. Marathon times slow
+     progressively as **wet-bulb globe temperature** rises from ~5 → 25 °C, and the cost
+     **scales with ability**: ~1% per 5 °C WBGT for elite men, materially more for slower
+     runners (review §13). So "~1–2% per 5 °C above ~12–15 °C, more when humid" stays a
+     fair working band — but sit at its **upper end or beyond** for a mid-pack athlete
+     rather than in the middle, and read temperature with humidity, never alone.
 5. **Contingency review**: did the pre-decided triggers fire, and were they followed?
    A trigger that fired but was ignored is the finding, not the fade that followed.
 6. **Consequences — update the system** (this is the step most often skipped):
@@ -286,7 +312,7 @@ scripts/api POST /api/notes '{
 - **Form (TSB)**: > +10 fresh (race-ready), −10…+10 neutral, −10…−25 productive training
   stress, < −30 overreaching risk.
 - **ACWR proxy**: ATL/CTL ratio, roughly 0.8–1.3. Treat as a *soft* heuristic only —
-  the ratio is statistically and conceptually flawed (review §8, §13); weight absolute
+  the ratio is statistically and conceptually flawed (review §9, §16); weight absolute
   ramp rate, consistency and monotony above it.
 - **Consistency**: runs/week and weekly distance variance matter more than any single week.
 - **Monotony**: many identical-load days with no hard/easy polarity is a warning sign.
@@ -303,6 +329,39 @@ scripts/api POST /api/notes '{
 - **Recovery context**: `daily_wellness` (or `/api/wellness/readiness`) — interpret a
   bad session against last night's HRV/sleep before blaming fitness, and check the
   readiness status before scheduling or confirming a key workout in plan check-ins.
+- **Sleep is a training variable, not a lifestyle footnote** (review §11) — the cheapest
+  adaptation and injury lever the athlete owns, and chronic short sleep tracks injury risk.
+  Before adding load to a stalled athlete, ask whether the plan is competing with their
+  sleep; before a goal race, deliberate sleep *extension* is a legitimate, risk-free ask.
+  Read the numbers with the sensor's known limits, though:
+  - **Trust duration, distrust stages.** Never change a plan off `deep_sleep_s` or a "poor
+    deep sleep" reading — staging is unreliable and Garmin underperformed in validation.
+  - **The `sleep-poor` flag's threshold is a heuristic**, not a validated cut-off. Label it
+    as such when explaining it, exactly like the ACWR band.
+  - **Devices are least accurate on disrupted nights** — precisely the nights that look
+    alarming. Require a multi-day trend before acting on any single reading.
+- **The athlete's own report outranks the sensors** (review §11): subjective measures track
+  training load *better* than objective markers and do **not** correlate with them, so
+  `perceived_exertion`/`feel` and what the athlete tells you are the more sensitive channel —
+  not a confirmation step. When the wellness numbers and the athlete disagree, that
+  disagreement is itself the finding, and the athlete usually wins. Act when channels
+  *agree*: suppressed HRV **plus** poor sleep **plus** an athlete reporting flatness is a real
+  signal; any one alone is noise.
+- **Screen for low energy availability / RED-S before adding load** (review §14). When
+  volume is up but performance, recovery, mood, resting HR/HRV or (for athletes who
+  menstruate) cycle regularity are heading the *wrong* way together, chronic low energy
+  availability is a first-line explanation — ahead of "needs more training." It impairs
+  performance and health in **both sexes**, is under-recognised in distance runners, and
+  is the one problem where the app's instinct (a stall means add stimulus) is actively
+  harmful: an energy-availability deficit cannot be out-trained and more load makes it
+  worse. Recurrent bone stress injuries or stress fractures are a strong flag. When the
+  pattern fits, **say so, do not prescribe more volume, and point the athlete toward
+  appropriate professional (medical/dietetic) support** — this is a screen and a referral,
+  not a diagnosis you make from the data. Record the finding in the profile so the next
+  plan starts from a corrected energy baseline. (Menstrual-cycle effects on performance
+  are, on average, trivial and highly individual — do **not** impose generic
+  phase-based periodization; allow symptom/performance tracking and adjust only where an
+  athlete reports consistent, repeatable phase effects.)
 
 ## The athlete profile (required before any plan)
 
@@ -332,6 +391,16 @@ A tailored plan requires knowing the athlete, not just their data. The profile l
   7. Life load: sleep quality, work/family stress, other sports.
   8. Age and anything affecting recovery (illness, medication).
   9. Preferences that affect adherence (loves/hates intervals, group runs, doubles).
+  10. Energy availability (review §14): whether fueling keeps up with the training load,
+      any history of low energy availability / RED-S, disordered eating, recurrent bone
+      stress injuries or stress fractures, and — for athletes who menstruate — cycle
+      regularity (irregular or absent periods are a red flag for low energy
+      availability, not a training detail). Ask plainly and without judgement, record
+      the answer even when it is "no concerns," and treat a positive signal as
+      plan-shaping: chronic low energy availability impairs performance and health in
+      **both sexes** and cannot be out-trained. If the profile or interview surfaces it,
+      the first move is to refer the athlete to appropriate professional support and
+      **hold or reduce load rather than add it** — not to design a bigger block.
 - Keep the file short and factual; date-stamp updates. Record plan-relevant conclusions
   from check-ins there too ("responds badly to back-to-back quality days").
 
@@ -343,8 +412,8 @@ principles behind plan design — prefer it over general knowledge, and cite it 
 explaining choices to the athlete.
 
 - **Read it (at least the relevant sections) before generating or substantially revising
-  a plan.** Section 12 is an "app-element → best-supported principle → refs" map; section
-  13 lists where the evidence has moved. Pull specific sections by grepping the headings
+  a plan.** Section 15 is an "app-element → best-supported principle → refs" map; section
+  16 lists where the evidence has moved. Pull specific sections by grepping the headings
   (`grep -nE "^#{1,3} " docs/endurance-training-science-review.md`).
 - When you justify an emphasis or session design to the athlete, ground it in the review
   (e.g. "sub-threshold controlled intervals rather than all-out tempo, per the review's
@@ -366,7 +435,17 @@ Plans are built from the athlete's data + profile, never from generic templates.
      run, a controlled workout, a hilly/trail course, run in heat, or raced mid-block
      without preparation. Before anchoring goal paces on it, open the activity (laps,
      HR vs max, ascent, decoupling) and check it against the profile's benchmark
-     context; if still unclear, ask the athlete. Using a compromised performance as a
+     context; if still unclear, ask the athlete.
+   - *Check what was on their feet* (review §6). Advanced footwear ("super shoes" —
+     compliant foam + stiff plate) buys ~2–4% running economy on flat road, worth
+     roughly **~1% of race time**. So a shoe-aided road PR is a real result but a
+     *fast* anchor: training paces derived from it and then run in trainers come out
+     slightly hot. The effect is small next to heat or a hilly course — but it is
+     systematic, it stacks with the others, and it is invisible in the data, so the
+     profile must record which shoes each anchor was set in. **Verify anchors against
+     effort and HR, not pace alone** — that is what makes a shoe-shifted pace–effort
+     relationship legible. The gain is road-specific and can vanish or reverse on
+     trail or uphill, so never carry it across surfaces. Using a compromised performance as a
      max-effort anchor systematically *underestimates* fitness — the most common way
      plans come out too soft. Also check the `laps` table of recent weeks for quality
      work hidden inside average-pace runs before concluding there was no intensity.
@@ -406,15 +485,29 @@ Plans are built from the athlete's data + profile, never from generic templates.
    - **Intensity distribution**: ~80% easy / 20% hard by time is the firm part. The
      *arrangement* of the hard 20% is phase- and level-dependent, not fixed: **pyramidal**
      (substantial threshold) is at least as good as **polarized** for most athletes and
-     base/build phases; reserve polarization as a peaking tool (review §2, §13). Don't
+     base/build phases; reserve polarization as a peaking tool (review §2, §16). Don't
      default to "polarized" — justify the choice from phase and athlete level.
    - Typically max 2 quality sessions + 1 long run per week, never hard days back-to-back.
    - **Standing strength element**: include ~2×/week heavy-resistance + plyometric work
      as `cross` sessions — among the best-evidenced, load-free economy gains (review §6).
-   - **Fueling is trained, not improvised**: for half-marathon and marathon goals, long
-     runs progressively rehearse the race-day fueling protocol (target carbs/hour,
-     specific products, timing) — prescribe it in the session description like any
-     other target, and never let race day be the first trial.
+     Keep habitual **cold-water immersion away from it**: regular post-session ice baths
+     blunt strength adaptation while leaving running adaptation untouched (review §13), so
+     they cancel precisely what this element buys. CWI is for acute recovery between
+     congested efforts (multi-day racing), never a standing habit — and it is **not**
+     interchangeable with the hot-water immersion used for heat acclimation. Never present
+     "immersion" to the athlete as one undifferentiated recovery tool.
+   - **Fueling is trained, not improvised** (review §12): for half-marathon and marathon
+     goals, long runs progressively rehearse the race-day fueling protocol (target
+     carbs/hour, specific products, timing) — prescribe it in the session description
+     like any other target, and never let race day be the first trial. Target intake
+     scales with race duration: work toward **~60 g/h**, and up to **~90 g/h** using
+     multiple transportable carbohydrates (glucose:fructose mixes) for efforts beyond
+     ~2.5–3 h — gut tolerance is itself trainable, which is *why* the long runs rehearse
+     it. **Keep every quality and long session well-fueled.** Deliberate "train-low"
+     work (fasted / low-glycogen) does **not** improve performance over a high-carb diet
+     and it degrades the quality of hard sessions, so reserve any low-availability
+     stimulus for selected *easy* runs only, never before or during key work, and never
+     sell it to the athlete as a performance enhancer (review §12).
    - **Doubles are a volume tool**: when the profile shows the athlete tolerates
      doubles, prefer AM/PM splits of easy volume over stretching single sessions —
      use them to add volume, never to sneak in extra intensity.
@@ -434,17 +527,58 @@ Plans are built from the athlete's data + profile, never from generic templates.
    their best performances) for their proven taper length, and prefer it over the
    default. After each goal race, record how the taper felt/worked in the profile so
    the next plan starts from evidence, not the textbook.
+   **Heat acclimation — athlete-requested only, never volunteered** (review §13). Heat work is
+   **demand-driven**: do not add it to a plan on your own initiative, do not pitch it as an
+   upgrade, and do not let it become a default for warm races. Prescribe it only when the
+   athlete asks — or when the profile records a standing intention to run a block, which you
+   confirm with them first. (This gate is about *prescribing heat training*. Reading heat as a
+   confounder, adjusting race pacing to the forecast, and heat-safety guidance are analysis, not
+   prescription — those always apply.)
+   When it **is** requested, do it properly:
+   - *Pick the protocol from the purpose — they are different doses.* **Thermoregulatory**
+     acclimation is 1–2 weeks of repeated exercise-heat exposure (≥5 days minimum) finishing near
+     the race, held with short top-ups every ~5 days (decay ~2.5%/day, re-induction 8–12× faster,
+     so top-ups avoid colliding with the taper). The **haematological** "altitude alternative"
+     block is ~5 weeks at ~5 sessions/week. Don't prescribe one dose and claim the other's benefit.
+   - *Judge the race by thermal strain, not the word "hot"* — temperature **×** humidity **×**
+     duration **×** ability. A 2:45 marathon at ~16 °C/60% carries **modest but real** strain
+     (roughly a percent off ideal-condition pace, more at slower paces), so the thermoregulatory
+     rationale holds without being decisive; a 5K on that same day is barely touched. Say which
+     end of that range you think the race sits at rather than implying certainty.
+   - **The disclaimer is mandatory — say it every time, in plain terms:** acclimation reliably
+     improves performance **in the heat**; it does **not** reliably make you faster in a **cool**
+     race. Haemoglobin mass does rise over a long block, but the study showing +42 g found **no**
+     VO₂max advantage alongside it, and whether that converts to cool-race performance is
+     unsettled — an honest bet, not a promise. Passive methods (sauna, hot baths) are accessible
+     but their pooled effects are small and low-certainty. A heat block never substitutes for
+     training. State this even when the athlete is enthusiastic — especially then.
+   - *Rails.* Check the profile for heat experience, tolerance and prior dosing first: a proven,
+     tolerated protocol is athlete-specific evidence and outranks any generic prescription, while
+     a naive athlete starts conservatively. Keep heat on **easy** volume (hot baths, overdressed
+     easy cross-training) with running quality cool — that keeps the cost near zero and is also the
+     design least vulnerable to the "it's just extra training load" critique (review §13). Read
+     those sessions as heat work, not as the cross-training sport's load. Never stack a full block
+     on a taper — use top-ups.
 6. **Race execution plan — the plan ends with a race, not a taper.** For the A-race
    (and PR-attempt tune-ups), produce a race execution plan covering:
    - *Pacing*: goal splits derived from the verified anchors, split policy (even or
      slightly negative), HR caps for the early kilometers, adjusted for the course
      profile and expected conditions — a hilly or hot course gets adjusted splits,
-     not the flat-course dream number.
+     not the flat-course dream number. **In heat the pacing adjustment *is* the
+     intervention**: scale the goal pace to the forecast (temperature *and* humidity)
+     and to the athlete's ability *before the gun*, since cooling helps self-paced
+     exercise least and a pre-race decision beats a mid-race rescue (review §13).
+     Pre-cooling and fluid strategy are adjuncts to that, not substitutes for it.
    - *Fueling*: the protocol exactly as rehearsed in the long runs — pre-race meal,
      carbs/hour, fluids, products, timing. Nothing new on race day.
    - *Race week*: carb load, last quality session, sleep/logistics notes.
    - *Contingencies*: pre-decided responses ("if goal pace feels hard by 25K, back
-     off to plan-B pace X rather than grinding", plan-B/C finish targets).
+     off to plan-B pace X rather than grinding", plan-B/C finish targets). For a hot
+     race, add the safety line: heat is a **risk gradient, not a bright line** — there is
+     no universal WBGT cut-off to quote, thresholds are sport-specific and federations
+     disagree — and exertional heat stroke (core >40.5 °C with confusion or altered
+     consciousness) is a medical emergency whose rule is **cool first with cold-water
+     immersion, transport second** (review §13).
    Publish it as the race workout's `description` (so it lands in the calendar and
    the ICS export) — draft it with the plan, then **finalize it in race week**
    against current form (TSB) and the weather forecast. After the race, run the
@@ -543,18 +677,33 @@ unusual fatigue, or a schedule conflict:
    Also check `/api/wellness/readiness`: a `rest` status (HRV low + RHR elevated) on
    the day of a key session is itself a reason to postpone it, even without symptoms
    reported — but treat it as one signal, not a verdict; confirm with the athlete.
-2. Decide the adjustment using these defaults:
+2. Decide the adjustment using these defaults (the evidence behind them — detraining
+   kinetics, illness, and the minimal maintenance dose — is review §8):
    - **One missed easy run**: just drop it. Never cram it into the following days.
    - **Missed key session** (intervals/tempo/long): shift it 1–2 days if the week has
      room, otherwise drop it — protect the spacing (no hard sessions on consecutive
      days, long run keeps its recovery buffer).
-   - **Illness, no fever** (head cold): easy running only, no intensity until symptoms
-     clear; convert planned key sessions that week to easy or rest.
-   - **Fever or below-neck symptoms**: full rest. On return: easy running at reduced
-     volume for as many days as the illness lasted, then one transition week at
-     ~70–80% volume with one moderate session before resuming the plan. If more than
-     ~10 days were lost, regenerate the remaining plan from a lower starting point
-     rather than patching it.
+   - **A compressed week** (travel, work, life): cut volume and frequency hard but **keep
+     one quality session**. Intensity is what preserves fitness — endurance holds for weeks
+     on as little as ~2 sessions/week *provided intensity is maintained* — so trim the easy
+     volume, never the quality (review §8). This is the taper logic (§7) applied to chaos:
+     cut volume, hold intensity.
+   - **Illness, no systemic symptoms** (head cold, above the neck): easy running only, no
+     intensity until symptoms clear; convert planned key sessions that week to easy or rest.
+   - **Systemic symptoms — ask about fatigue first.** Fever, chills, chest symptoms or
+     breathlessness → full rest. But **excessive fatigue is the single strongest predictor
+     of a prolonged return, ahead of fever** (review §8), so ask about it explicitly rather
+     than waiting for it to be volunteered, and treat it as at least as disqualifying as a
+     temperature. On return: easy running at reduced volume for as many days as the illness
+     lasted, then one transition week at ~70–80% volume with one moderate session before
+     resuming the plan. Let symptoms, not the calendar, pace the return.
+   - **Time off is cheaper than it feels — don't rebuild for a short break.** Most of what a
+     week off costs is plasma volume, the fastest-returning adaptation, so CTL drops faster
+     than the athlete's actual capacity (review §8). **Up to ~10 days lost: resume, don't
+     regenerate. Beyond ~10 days: regenerate the remainder from a lower starting point.**
+     Weight the training history when deciding how far to regress — newly acquired fitness
+     goes first and most completely, while a deep multi-year base is remarkably durable, so
+     a long-time high-volume athlete returns nearer their prior level than the model implies.
    - **Persistent fatigue / TSB deeply negative + user reports feeling flat**: insert
      a down week (~60–70% volume, no intensity), push the remaining plan out a week.
    - **Race date moved**: regenerate from the current date with the new taper.

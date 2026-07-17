@@ -1,5 +1,5 @@
 {
-  "total_dois": 36,
+  "total_dois": 74,
   "verified": [
     "10.1123/ijspp.5.3.276",
     "10.3389/fphys.2014.00033",
@@ -36,7 +36,45 @@
     "10.1186/s12970-021-00435-3",
     "10.1007/s40279-014-0148-z",
     "10.1007/s40279-020-01319-3",
-    "10.1136/bjsports-2023-106994"
+    "10.1136/bjsports-2023-106994",
+    "10.1111/sms.12408",
+    "10.1111/sms.12467",
+    "10.1007/s40279-016-0538-5",
+    "10.1007/s40279-017-0808-x",
+    "10.1152/physrev.00047.2021",
+    "10.1249/mss.0b013e31802d3aba",
+    "10.1152/japplphysiol.00495.2010",
+    "10.1152/ajpheart.00138.2015",
+    "10.1113/JP270879",
+    "10.1113/JP270880",
+    "10.1007/s42978-024-00300-0",
+    "10.1113/EP088544",
+    "10.1113/JP287700",
+    "10.1111/sms.12638",
+    "10.1007/s00421-020-04541-z",
+    "10.1186/s13102-024-01038-6",
+    "10.1007/s40279-023-01831-2",
+    "10.1007/s40279-023-01940-y",
+    "10.1136/bjsports-2022-105942",
+    "10.4085/1062-6050-50.9.07",
+    "10.2165/00007256-200030020-00002",
+    "10.2165/00007256-200030030-00001",
+    "10.1152/jappl.1984.57.6.1857",
+    "10.1519/JSC.0000000000003964",
+    "10.1136/bjsports-2022-105759",
+    "10.1136/bjsports-2020-103782",
+    "10.1080/17461391.2022.2089914",
+    "10.1519/00124278-200102000-00019",
+    "10.1097/00005768-199807000-00023",
+    "10.3389/fnins.2017.00612",
+    "10.1007/s40279-014-0260-0",
+    "10.5665/sleep.1132",
+    "10.1097/BPO.0000000000000151",
+    "10.1136/bjsports-2020-102025",
+    "10.1093/sleep/zsaa291",
+    "10.1136/bjsports-2015-094758",
+    "10.1113/JP270570",
+    "10.1007/s40279-020-01362-0"
   ],
   "failed": [],
   "metadata": {
@@ -363,6 +401,348 @@
       "volume": "57",
       "pages": "1073-1098",
       "doi": "10.1136/bjsports-2023-106994"
+    },
+    "10.1111/sms.12408": {
+      "title": "Adaptations and mechanisms of human heat acclimation: Applications for competitive athletes and sports",
+      "authors": "P\u00e9riard, J., Racinais, S., Sawka, M.",
+      "year": "2015",
+      "journal": "Scandinavian Journal of Medicine &amp; Science in Sports",
+      "volume": "25",
+      "pages": "20-38",
+      "doi": "10.1111/sms.12408"
+    },
+    "10.1111/sms.12467": {
+      "title": "Consensus recommendations on training and competing in the heat",
+      "authors": "Racinais, S., Alonso, J., Coutts, A., et al.",
+      "year": "2015",
+      "journal": "Scandinavian Journal of Medicine &amp; Science in Sports",
+      "volume": "25",
+      "pages": "6-19",
+      "doi": "10.1111/sms.12467"
+    },
+    "10.1007/s40279-016-0538-5": {
+      "title": "The Effects of Heat Adaptation on Physiology, Perception and Exercise Performance in the Heat: A Meta-Analysis",
+      "authors": "Tyler, C., Reeve, T., Hodges, G., et al.",
+      "year": "2016",
+      "journal": "Sports Medicine",
+      "volume": "46",
+      "pages": "1699-1724",
+      "doi": "10.1007/s40279-016-0538-5"
+    },
+    "10.1007/s40279-017-0808-x": {
+      "title": "Heat Acclimation Decay and Re-Induction: A Systematic Review and Meta-Analysis",
+      "authors": "Daanen, H., Racinais, S., P\u00e9riard, J.",
+      "year": "2018",
+      "journal": "Sports Medicine",
+      "volume": "48",
+      "pages": "409-430",
+      "doi": "10.1007/s40279-017-0808-x"
+    },
+    "10.1152/physrev.00047.2021": {
+      "title": "Human temperature regulation under heat stress in health, disease, and injury",
+      "authors": "Cramer, M., Gagnon, D., Laitano, O., et al.",
+      "year": "2022",
+      "journal": "Physiological Reviews",
+      "volume": "102",
+      "pages": "1907-1989",
+      "doi": "10.1152/physrev.00047.2021"
+    },
+    "10.1249/mss.0b013e31802d3aba": {
+      "title": "Impact of Weather on Marathon-Running Performance",
+      "authors": "ELY, M., CHEUVRONT, S., ROBERTS, W., et al.",
+      "year": "2007",
+      "journal": "Medicine &amp; Science in Sports &amp; Exercise",
+      "volume": "39",
+      "pages": "487-493",
+      "doi": "10.1249/mss.0b013e31802d3aba"
+    },
+    "10.1152/japplphysiol.00495.2010": {
+      "title": "Heat acclimation improves exercise performance",
+      "authors": "Lorenzo, S., Halliwill, J., Sawka, M., et al.",
+      "year": "2010",
+      "journal": "Journal of Applied Physiology",
+      "volume": "109",
+      "pages": "1140-1147",
+      "doi": "10.1152/japplphysiol.00495.2010"
+    },
+    "10.1152/ajpheart.00138.2015": {
+      "title": "Heat training increases exercise capacity in hot but not in temperate conditions: a mechanistic counter-balanced cross-over study",
+      "authors": "Keiser, S., Fl\u00fcck, D., H\u00fcppin, F., et al.",
+      "year": "2015",
+      "journal": "American Journal of Physiology-Heart and Circulatory Physiology",
+      "volume": "309",
+      "pages": "H750-H761",
+      "doi": "10.1152/ajpheart.00138.2015"
+    },
+    "10.1113/JP270879": {
+      "title": "CrossTalk proposal: Heat acclimatization does improve performance in a cool condition",
+      "authors": "Minson, C., Cotter, J.",
+      "year": "2016",
+      "journal": "The Journal of Physiology",
+      "volume": "594",
+      "pages": "241-243",
+      "doi": "10.1113/JP270879"
+    },
+    "10.1113/JP270880": {
+      "title": "CrossTalk opposing view: Heat acclimatization does not improve exercise performance in a cool condition",
+      "authors": "Nybo, L., Lundby, C.",
+      "year": "2016",
+      "journal": "The Journal of Physiology",
+      "volume": "594",
+      "pages": "245-247",
+      "doi": "10.1113/JP270880"
+    },
+    "10.1007/s42978-024-00300-0": {
+      "title": "Impact of Exercise Heat Acclimation on Performance in Hot, Cool and Hypoxic Conditions",
+      "authors": "P\u00e9riard, J., Nichols, D., Travers, G., et al.",
+      "year": "2024",
+      "journal": "Journal of Science in Sport and Exercise",
+      "volume": "6",
+      "pages": "275-287",
+      "doi": "10.1007/s42978-024-00300-0"
+    },
+    "10.1113/EP088544": {
+      "title": "Five weeks of heat training increases haemoglobin mass in elite cyclists",
+      "authors": "R\u00f8nnestad, B., Hamarsland, H., Hansen, J., et al.",
+      "year": "2021",
+      "journal": "Experimental Physiology",
+      "volume": "106",
+      "pages": "316-327",
+      "doi": "10.1113/EP088544"
+    },
+    "10.1113/JP287700": {
+      "title": "Altitude or heat training to increase haemoglobin mass and endurance exercise performance in elite sport",
+      "authors": "Lundby, C., Robach, P.",
+      "year": "2025",
+      "journal": "The Journal of Physiology",
+      "volume": "",
+      "pages": "",
+      "doi": "10.1113/JP287700"
+    },
+    "10.1111/sms.12638": {
+      "title": "Post\u2010exercise hot water immersion induces heat acclimation and improves endurance exercise performance in the heat",
+      "authors": "Zurawlew, M., Walsh, N., Fortes, M., et al.",
+      "year": "2016",
+      "journal": "Scandinavian Journal of Medicine &amp; Science in Sports",
+      "volume": "26",
+      "pages": "745-754",
+      "doi": "10.1111/sms.12638"
+    },
+    "10.1007/s00421-020-04541-z": {
+      "title": "Intermittent post-exercise sauna bathing improves markers of exercise capacity in hot and temperate conditions in trained middle-distance runners",
+      "authors": "Kirby, N., Lucas, S., Armstrong, O., et al.",
+      "year": "2021",
+      "journal": "European Journal of Applied Physiology",
+      "volume": "121",
+      "pages": "621-635",
+      "doi": "10.1007/s00421-020-04541-z"
+    },
+    "10.1186/s13102-024-01038-6": {
+      "title": "The effect of post-exercise heat exposure (passive heat acclimation) on endurance exercise performance: a systematic review and meta-analysis",
+      "authors": "Solomon, T., Laye, M.",
+      "year": "2025",
+      "journal": "BMC Sports Science, Medicine and Rehabilitation",
+      "volume": "17",
+      "pages": "",
+      "doi": "10.1186/s13102-024-01038-6"
+    },
+    "10.1007/s40279-023-01831-2": {
+      "title": "Heat Adaptation for Females: A Systematic Review and Meta-Analysis of Physiological Adaptations and Exercise Performance in the Heat",
+      "authors": "Kelly, M., Bowe, S., Jardine, W., et al.",
+      "year": "2023",
+      "journal": "Sports Medicine",
+      "volume": "53",
+      "pages": "1395-1421",
+      "doi": "10.1007/s40279-023-01831-2"
+    },
+    "10.1007/s40279-023-01940-y": {
+      "title": "Performance Benefits of Pre- and Per-cooling on Self-paced Versus Constant Workload Exercise: A Systematic Review and Meta-analysis",
+      "authors": "van de Kerkhof, T., Bongers, C., P\u00e9riard, J., et al.",
+      "year": "2024",
+      "journal": "Sports Medicine",
+      "volume": "54",
+      "pages": "447-471",
+      "doi": "10.1007/s40279-023-01940-y"
+    },
+    "10.1136/bjsports-2022-105942": {
+      "title": "IOC consensus statement on recommendations and regulations for sport events in the heat",
+      "authors": "Racinais, S., Hosokawa, Y., Akama, T., et al.",
+      "year": "2023",
+      "journal": "British Journal of Sports Medicine",
+      "volume": "57",
+      "pages": "8-25",
+      "doi": "10.1136/bjsports-2022-105942"
+    },
+    "10.4085/1062-6050-50.9.07": {
+      "title": "National Athletic Trainers' Association Position Statement: Exertional Heat Illnesses",
+      "authors": "Casa, D., DeMartini, J., Bergeron, M., et al.",
+      "year": "2015",
+      "journal": "Journal of Athletic Training",
+      "volume": "50",
+      "pages": "986-1000",
+      "doi": "10.4085/1062-6050-50.9.07"
+    },
+    "10.2165/00007256-200030020-00002": {
+      "title": "Detraining: Loss of Training-Induced Physiological and Performance Adaptations. Part I",
+      "authors": "Mujika, I., Padilla, S.",
+      "year": "2000",
+      "journal": "Sports Medicine",
+      "volume": "30",
+      "pages": "79-87",
+      "doi": "10.2165/00007256-200030020-00002"
+    },
+    "10.2165/00007256-200030030-00001": {
+      "title": "Detraining: Loss of Training-Induced Physiological and Performance Adaptations. Part II",
+      "authors": "Mujika, I., Padilla, S.",
+      "year": "2000",
+      "journal": "Sports Medicine",
+      "volume": "30",
+      "pages": "145-154",
+      "doi": "10.2165/00007256-200030030-00001"
+    },
+    "10.1152/jappl.1984.57.6.1857": {
+      "title": "Time course of loss of adaptations after stopping prolonged intense endurance training",
+      "authors": "Coyle, E., Martin, W., Sinacore, D., et al.",
+      "year": "1984",
+      "journal": "Journal of Applied Physiology",
+      "volume": "57",
+      "pages": "1857-1864",
+      "doi": "10.1152/jappl.1984.57.6.1857"
+    },
+    "10.1519/JSC.0000000000003964": {
+      "title": "Maintaining Physical Performance: The Minimal Dose of Exercise Needed to Preserve Endurance and Strength Over Time",
+      "authors": "Spiering, B., Mujika, I., Sharp, M., et al.",
+      "year": "2021",
+      "journal": "Journal of Strength &amp; Conditioning Research",
+      "volume": "35",
+      "pages": "1449-1458",
+      "doi": "10.1519/JSC.0000000000003964"
+    },
+    "10.1136/bjsports-2022-105759": {
+      "title": "International Olympic Committee (IOC) consensus statement on acute respiratory illness in athletes part 1: acute respiratory infections",
+      "authors": "Schwellnus, M., Adami, P., Bougault, V., et al.",
+      "year": "2022",
+      "journal": "British Journal of Sports Medicine",
+      "volume": "56",
+      "pages": "1066-1088",
+      "doi": "10.1136/bjsports-2022-105759"
+    },
+    "10.1136/bjsports-2020-103782": {
+      "title": "Symptom cluster is associated with prolonged return-to-play in symptomatic athletes with acute respiratory illness (including COVID-19): a cross-sectional study\u2014AWARE study I",
+      "authors": "Schwellnus, M., Sewry, N., Snyders, C., et al.",
+      "year": "2021",
+      "journal": "British Journal of Sports Medicine",
+      "volume": "55",
+      "pages": "1144-1152",
+      "doi": "10.1136/bjsports-2020-103782"
+    },
+    "10.1080/17461391.2022.2089914": {
+      "title": "The effects of acute respiratory illness on exercise and sports performance outcomes in athletes \u2013 A systematic review by a subgroup of the IOC consensus group on \u201cAcute respiratory illness in the athlete\u201d",
+      "authors": "Kaulback, K., Pyne, D., Hull, J., et al.",
+      "year": "2023",
+      "journal": "European Journal of Sport Science",
+      "volume": "23",
+      "pages": "1356-1374",
+      "doi": "10.1080/17461391.2022.2089914"
+    },
+    "10.1519/00124278-200102000-00019": {
+      "title": "A New Approach to Monitoring Exercise Training",
+      "authors": "FOSTER, C., FLORHAUG, J., FRANKLIN, J., et al.",
+      "year": "2001",
+      "journal": "Journal of Strength and Conditioning Research",
+      "volume": "15",
+      "pages": "109-115",
+      "doi": "10.1519/00124278-200102000-00019"
+    },
+    "10.1097/00005768-199807000-00023": {
+      "title": "Monitoring training in athletes with reference to overtraining syndrome",
+      "authors": "FOSTER, C.",
+      "year": "1998",
+      "journal": "Medicine &amp; Science in Sports &amp; Exercise",
+      "volume": "30",
+      "pages": "1164-1168",
+      "doi": "10.1097/00005768-199807000-00023"
+    },
+    "10.3389/fnins.2017.00612": {
+      "title": "Session-RPE Method for Training Load Monitoring: Validity, Ecological Usefulness, and Influencing Factors",
+      "authors": "Haddad, M., Stylianides, G., Djaoui, L., et al.",
+      "year": "2017",
+      "journal": "Frontiers in Neuroscience",
+      "volume": "11",
+      "pages": "",
+      "doi": "10.3389/fnins.2017.00612"
+    },
+    "10.1007/s40279-014-0260-0": {
+      "title": "Sleep and Athletic Performance: The Effects of Sleep Loss on Exercise Performance, and Physiological and Cognitive Responses to Exercise",
+      "authors": "Fullagar, H., Skorski, S., Duffield, R., et al.",
+      "year": "2015",
+      "journal": "Sports Medicine",
+      "volume": "45",
+      "pages": "161-186",
+      "doi": "10.1007/s40279-014-0260-0"
+    },
+    "10.5665/sleep.1132": {
+      "title": "The Effects of Sleep Extension on the Athletic Performance of Collegiate Basketball Players",
+      "authors": "Mah, C., Mah, K., Kezirian, E., et al.",
+      "year": "2011",
+      "journal": "Sleep",
+      "volume": "34",
+      "pages": "943-950",
+      "doi": "10.5665/sleep.1132"
+    },
+    "10.1097/BPO.0000000000000151": {
+      "title": "Chronic Lack of Sleep is Associated With Increased Sports Injuries in Adolescent Athletes",
+      "authors": "Milewski, M., Skaggs, D., Bishop, G., et al.",
+      "year": "2014",
+      "journal": "Journal of Pediatric Orthopaedics",
+      "volume": "34",
+      "pages": "129-133",
+      "doi": "10.1097/BPO.0000000000000151"
+    },
+    "10.1136/bjsports-2020-102025": {
+      "title": "Sleep and the athlete: narrative review and 2021 expert consensus recommendations",
+      "authors": "Walsh, N., Halson, S., Sargent, C., et al.",
+      "year": "2021",
+      "journal": "British Journal of Sports Medicine",
+      "volume": "55",
+      "pages": "356-368",
+      "doi": "10.1136/bjsports-2020-102025"
+    },
+    "10.1093/sleep/zsaa291": {
+      "title": "Performance of seven consumer sleep-tracking devices compared with polysomnography",
+      "authors": "Chinoy, E., Cuellar, J., Huwa, K., et al.",
+      "year": "2021",
+      "journal": "Sleep",
+      "volume": "44",
+      "pages": "",
+      "doi": "10.1093/sleep/zsaa291"
+    },
+    "10.1136/bjsports-2015-094758": {
+      "title": "Monitoring the athlete training response: subjective self-reported measures trump commonly used objective measures: a systematic review",
+      "authors": "Saw, A., Main, L., Gastin, P.",
+      "year": "2016",
+      "journal": "British Journal of Sports Medicine",
+      "volume": "50",
+      "pages": "281-291",
+      "doi": "10.1136/bjsports-2015-094758"
+    },
+    "10.1113/JP270570": {
+      "title": "Post\u2010exercise cold water immersion attenuates acute anabolic signalling and long\u2010term adaptations in muscle to strength training",
+      "authors": "Roberts, L., Raastad, T., Markworth, J., et al.",
+      "year": "2015",
+      "journal": "The Journal of Physiology",
+      "volume": "593",
+      "pages": "4285-4301",
+      "doi": "10.1113/JP270570"
+    },
+    "10.1007/s40279-020-01362-0": {
+      "title": "The Effects of Regular Cold-Water Immersion Use on Training-Induced Changes in Strength and Endurance Performance: A Systematic Review with Meta-Analysis",
+      "authors": "Malta, E., Dutra, Y., Broatch, J., et al.",
+      "year": "2021",
+      "journal": "Sports Medicine",
+      "volume": "51",
+      "pages": "161-174",
+      "doi": "10.1007/s40279-020-01362-0"
     }
   }
 }

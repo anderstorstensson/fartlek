@@ -34,7 +34,7 @@ Do not trust the drafting session's stated baseline — spot-check it against th
 ## Scientific authority — the literature review
 
 `docs/endurance-training-science-review.md` is the evidence base for this review. **Read
-the sections relevant to the plan** (§12 is the app-element→principle map; grep the
+the sections relevant to the plan** (§15 is the app-element→principle map; grep the
 headings to jump). Judge the plan against the review's conclusions, not against generic
 lore, and cite section numbers in your findings. Where the plan contradicts the review
 (e.g. defaulting to polarized distribution when the review calls pyramidal at least as
@@ -52,8 +52,12 @@ strength), that is a finding.
    activities (laps, HR vs max, ascent) and the profile's benchmark-context notes —
    a hilly/unprepared race or a controlled split inside a training run is not a
    maximal effort, and treating it as one makes the goal look more ambitious than it
-   is. Flag both directions: goals requiring >3–5% improvement per 8 weeks of specific
-   training (say what would be realistic), and plans sandbagged by compromised anchors.
+   is. Also check the footwear the anchor was set in (review §6): a super-shoe road PR
+   is a *fast* anchor (~1% of race time), so training paces derived from it and run in
+   trainers come out hot — a plan that anchors on shoe-aided paces without verifying
+   against effort/HR is a finding. Flag both directions: goals requiring >3–5%
+   improvement per 8 weeks of specific training (say what would be realistic), and
+   plans sandbagged by compromised anchors.
 3. **Load progression — against multi-year capacity, not just recent weeks**: weekly
    volume growth ≤10%, down week every ~4th, implied CTL ramp ≤5/week. The first week
    should not exceed the recent 4–6-week median — but judge the *ceiling* and ramp
@@ -74,7 +78,11 @@ strength), that is a finding.
    >3%.
 6. **Specificity progression**: race-specific work grows toward the goal; the long run
    and key sessions evolve appropriately for the distance (e.g. marathon plans need
-   fueling practice and race-pace segments; 5K plans need speed maintenance).
+   fueling practice and race-pace segments; 5K plans need speed maintenance). For
+   half/marathon goals the fueling protocol must be rehearsed in the long runs with a
+   concrete carbohydrate target (~60–90 g/h, scaled to duration — review §12), not left
+   to race day; a plan that names no fueling target, or defers it to the race, is a
+   finding.
 7. **Taper and race execution**: taper duration must match race distance and priority —
    marathon ≈ 2–3 weeks, half ≈ 10–14 days, 5K/10K ≈ 7–10 days, all with volume
    −40–60% and intensity frequency maintained (review §7); B-races/tune-ups get only
@@ -92,6 +100,14 @@ strength), that is a finding.
    flag adherence risks.
 9. **Recovery logic**: down weeks and TSB trajectory allow adaptation; the plan doesn't
    start deep in fatigue (check current TSB).
+10. **Energy availability / RED-S** (review §14): if the profile or the data show the
+    warning pattern — volume rising while performance, recovery, mood or (for athletes
+    who menstruate) cycle regularity deteriorate, or a history of low energy
+    availability, disordered eating, or recurrent bone stress injuries — a plan that
+    responds by *adding* load is a CRITICAL finding. Low energy availability impairs
+    performance and health in both sexes and cannot be out-trained; the correct response
+    is to hold/reduce load and refer to professional support, not to build a bigger
+    block. Absent any such signal, no finding is needed here.
 
 ## Output format (and nothing else)
 
