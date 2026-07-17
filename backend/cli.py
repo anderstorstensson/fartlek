@@ -99,6 +99,36 @@ def cmd_wellness(days: int) -> int:
     return 0
 
 
+def cmd_self_eval(limit: int | None) -> int:
+    from backend.db import init_db
+    from backend.sync.service import backfill_self_evaluations
+
+    init_db()
+    try:
+        count = backfill_self_evaluations(limit=limit)
+    except Exception as exc:
+        print(f"Self-evaluation backfill failed: {exc}", file=sys.stderr)
+        return 1
+    print(f"Fetched self-evaluations (RPE/feel) for {count} activities.")
+    return 0
+
+
+def cmd_vo2max(days: int) -> int:
+    from backend.db import init_db
+    from backend.sync.garmin import client_from_tokens
+    from backend.sync.wellness import backfill_vo2max
+
+    init_db()
+    try:
+        client = client_from_tokens()
+    except Exception as exc:
+        print(f"Garmin login required: {exc}", file=sys.stderr)
+        return 1
+    count = backfill_vo2max(client, days)
+    print(f"Backfilled VO2 max for {count} days.")
+    return 0
+
+
 def cmd_backup() -> int:
     from backend.db import init_db
     from backend.sync.backup import run_backup
@@ -139,6 +169,12 @@ def main() -> int:
     weather_parser.add_argument("--limit", type=int, default=None, help="Max activities to enrich")
     wellness_parser = sub.add_parser("wellness", help="Backfill Garmin wellness data")
     wellness_parser.add_argument("--days", type=int, default=365, help="Days back to fetch")
+    self_eval_parser = sub.add_parser(
+        "self-eval", help="Backfill watch self-evaluations (RPE + feel) for activities"
+    )
+    self_eval_parser.add_argument("--limit", type=int, default=None, help="Max activities to check")
+    vo2max_parser = sub.add_parser("vo2max", help="Backfill daily VO2 max history")
+    vo2max_parser.add_argument("--days", type=int, default=3650, help="Days back to fetch")
     sub.add_parser("backup", help="Snapshot the DB and upload via rclone (if configured)")
     sub.add_parser("serve", help="Run the web application")
 
@@ -157,6 +193,10 @@ def main() -> int:
         return cmd_weather(args.limit)
     if args.command == "wellness":
         return cmd_wellness(args.days)
+    if args.command == "self-eval":
+        return cmd_self_eval(args.limit)
+    if args.command == "vo2max":
+        return cmd_vo2max(args.days)
     if args.command == "backup":
         return cmd_backup()
     return cmd_serve()

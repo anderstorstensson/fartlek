@@ -7,11 +7,13 @@ import {
   LoadModel,
   useApi,
   WeeklyStat,
-  WeeklyZones
+  WeeklyZones,
+  WellnessDay
 } from '../api'
 import { coachUrl, TREND_PROMPT } from '../coachLink'
 import EfficiencyChart from '../components/EfficiencyChart'
 import FitnessChart from '../components/FitnessChart'
+import Vo2maxChart from '../components/Vo2maxChart'
 import WeeklyChart, { WeeklyMetric } from '../components/WeeklyChart'
 import ZoneDistributionChart from '../components/ZoneDistributionChart'
 
@@ -38,6 +40,7 @@ export default function Trends() {
   const [zoneWeeks, setZoneWeeks] = useState(26)
   const [efficiencyDays, setEfficiencyDays] = useState(365)
   const [longRunsOnly, setLongRunsOnly] = useState(false)
+  const [vo2maxDays, setVo2maxDays] = useState(365)
 
   const coachStatus = useApi<CoachStatus>('/api/coach/status')
   const coachReady =
@@ -47,6 +50,7 @@ export default function Trends() {
   const weekly = useApi<WeeklyStat[]>(`/api/trends/weekly?weeks=${weeks}`)
   const zones = useApi<WeeklyZones[]>(`/api/trends/zones?weeks=${zoneWeeks}`)
   const efficiency = useApi<EfficiencyPoint[]>(`/api/trends/efficiency?days=${efficiencyDays}`)
+  const wellness = useApi<WellnessDay[]>(`/api/wellness?days=${vo2maxDays}`)
   const efficiencyPoints = (efficiency.data ?? []).filter(
     (p) => !longRunsOnly || p.moving_s >= 4500
   )
@@ -184,6 +188,29 @@ export default function Trends() {
           Efficiency is grade-adjusted meters per minute per heartbeat — higher at the same
           effort means growing aerobic fitness. Decoupling compares the first and second half
           speed:HR of each run; staying under ~5% (dashed line) on long runs signals durability.
+        </p>
+      </div>
+
+      <div className="chart-card">
+        <div className="chart-title">
+          <span>VO₂max (Garmin estimate)</span>
+          <span className="segmented">
+            {RANGES.map((range) => (
+              <button
+                key={range.days}
+                className={vo2maxDays === range.days ? 'on' : ''}
+                onClick={() => setVo2maxDays(range.days)}
+              >
+                {range.label}
+              </button>
+            ))}
+          </span>
+        </div>
+        {wellness.error && <div className="error-box">{wellness.error}</div>}
+        {wellness.data && <Vo2maxChart data={wellness.data} />}
+        <p className="muted" style={{ fontSize: 12, padding: '4px 8px' }}>
+          Garmin&apos;s daily running VO₂max estimate. The absolute number is model output —
+          read the direction over weeks, not single-day wiggles.
         </p>
       </div>
     </>

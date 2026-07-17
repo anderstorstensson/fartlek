@@ -65,6 +65,12 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
   comment — **always read it before analyzing a session**; "slept 4h" or "new shoes"
   changes the interpretation), and `name` (`name_locked=1` means user-titled — never
   overwrite it).
+  Watch self-evaluation (entered on the Forerunner when saving, NULL when skipped):
+  `perceived_exertion` (RPE 1–10) and `feel` (1 = very weak … 5 = very strong).
+  Read them like the note: sRPE (= RPE × duration) is a valid internal-load
+  cross-check on TRIMP/rTSS, and a *divergence* is a finding — high RPE on a day
+  the HR/pace numbers call easy suggests fatigue or illness; low RPE on a strong
+  workout suggests headroom.
 - `laps` — `activity_id, lap_index, start_offset_s, elapsed_s, distance_m, avg_hr, max_hr, avg_speed_mps`.
 - `streams` — one row per activity, parallel JSON arrays (`time_s, distance_m, hr, speed_mps,
   altitude_m, cadence, lat, lng`, and — newer activities — `power, vertical_oscillation,
@@ -78,7 +84,9 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
   the usual anchor-verification rules still apply, and short-distance (400m/1K)
   records remain the least trustworthy.
 - `daily_wellness` — one row per day: `day, resting_hr, hrv_last_night_avg, hrv_status,
-  sleep_s, deep_sleep_s, sleep_score, body_battery_max, body_battery_min, stress_avg, steps`.
+  sleep_s, deep_sleep_s, sleep_score, body_battery_max, body_battery_min, stress_avg, steps,
+  vo2max` (Garmin's daily running VO2 max estimate, ml/kg/min at 0.1 precision — treat
+  the *trend* as meaningful, not single-day wiggles or the absolute value).
 - `races` — goal races: `id, name, day, distance_m, target_time_s, priority, notes`.
 - `athlete_settings` — single row: `resting_hr, max_hr, lthr, threshold_pace_s_per_km, sex`,
   plus `rtss_use_gap` (GAP vs raw pace for rTSS), HR-zone config (`zone_mode`,
@@ -282,7 +290,8 @@ scripts/api POST /api/notes '{
   long runs) — improving decoupling at a given duration = growing resilience.
 - **Progress signals**: efficiency index trend from `/api/trends/efficiency` (GAP-based
   pace-per-heartbeat — the cleanest fitness signal), PR trajectory from `best_efforts`,
-  weekly distance trend from `/api/trends/weekly`.
+  weekly distance trend from `/api/trends/weekly`, and the `daily_wellness.vo2max`
+  trend (Garmin's estimate — direction over weeks is credible, absolute value less so).
 - **Intensity distribution**: `/api/trends/zones` gives the weekly Z1–Z5 time split;
   check the easy/moderate/hard shares against the plan's intended distribution before
   concluding anything from load numbers alone.
@@ -564,6 +573,8 @@ unusual fatigue, or a schedule conflict:
 - `make recompute` — refresh metrics after changing athlete settings
 - `make rescan` — re-extract streams/dynamics/derived metrics from stored FIT files
 - `make wellness` — backfill Garmin wellness history (`--days` via CLI)
+- `make self-eval` — backfill watch self-evaluations (RPE + feel) for older activities
+- `make vo2max` — backfill daily VO2 max history (10 years by default; `--days` via CLI)
 - `make weather` — backfill weather for activities missing it
 - `make backup` — DB snapshot + rclone upload when `FARTLEK_RCLONE_REMOTE` is set
 - App/service: `systemctl --user status fartlek`, logs via `journalctl --user -u fartlek`

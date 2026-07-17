@@ -134,9 +134,12 @@ def _import_one(client, summary: dict) -> None:
     if fit_bytes:
         fit_path = config.fit_dir / f"{activity_id}.fit"
         fit_path.write_bytes(fit_bytes)
+    rpe, feel = garmin.fetch_self_evaluation(client, activity_id)
     with session_scope() as session:
         settings = get_or_create_settings(session)
-        import_activity(session, summary, fit_bytes, settings)
+        activity = import_activity(session, summary, fit_bytes, settings)
+        activity.perceived_exertion = rpe
+        activity.feel = feel
 
 
 def run_sync_in_background(full: bool = False) -> None:
@@ -184,6 +187,47 @@ def rename_workout_activities() -> int:
                 activity.name = derived
                 renamed += 1
     return renamed
+
+
+def backfill_self_evaluations(limit: int | None = None, delay_s: float = 0.4) -> int:
+    """Fetch watch self-evaluations (RPE + feel) for activities imported before
+    the feature existed. One detail request per activity, newest first, politely
+    paced. Only activities with both fields NULL are checked; unrated activities
+    stay NULL and get re-checked on a later run (cheap, and it picks up
+    evaluations added in Connect after the fact). Returns the number of
+    activities that received a value."""
+    import time
+
+    with session_scope() as session:
+        ids = list(
+            session.scalars(
+                select(Activity.id)
+                .where(Activity.perceived_exertion.is_(None))
+                .where(Activity.feel.is_(None))
+                .order_by(Activity.start_time_utc.desc())
+            ).all()
+        )
+    if limit is not None:
+        ids = ids[:limit]
+    if not ids:
+        return 0
+
+    client = garmin.client_from_tokens()
+    updated = 0
+    for i, activity_id in enumerate(ids):
+        if i:
+            time.sleep(delay_s)
+        rpe, feel = garmin.fetch_self_evaluation(client, activity_id)
+        if rpe is None and feel is None:
+            continue
+        with session_scope() as session:
+            activity = session.get(Activity, activity_id)
+            if activity is None:
+                continue
+            activity.perceived_exertion = rpe
+            activity.feel = feel
+        updated += 1
+    return updated
 
 
 def rescan_fit_flags() -> int:

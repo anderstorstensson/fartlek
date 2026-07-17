@@ -12,11 +12,13 @@ from sqlalchemy import select
 
 from backend.db import session_scope
 from backend.models import DailyWellness
+from backend.sync.garmin import fetch_vo2max_by_day
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_BACKFILL_DAYS = 90
 _REFRESH_TAIL_DAYS = 2  # today/yesterday keep changing; always re-fetch them
+_VO2MAX_CHUNK_DAYS = 360  # stay under whatever span cap the maxmet endpoint has
 
 
 def _dig(payload, *path):
@@ -63,6 +65,19 @@ def _fetch_day(client, day: date) -> dict:
     return {k: v for k, v in fields.items() if v is not None}
 
 
+def _vo2max_range(client, start: date, end: date) -> dict[date, float]:
+    """Daily VO2 max for [start, end], fetched in ≤_VO2MAX_CHUNK_DAYS chunks
+    (one request per chunk — the maxmet endpoint serves whole spans)."""
+    values: dict[date, float] = {}
+    chunk_start = start
+    while chunk_start <= end:
+        chunk_end = min(chunk_start + timedelta(days=_VO2MAX_CHUNK_DAYS - 1), end)
+        by_iso = fetch_vo2max_by_day(client, chunk_start.isoformat(), chunk_end.isoformat())
+        values = {**values, **{date.fromisoformat(iso): v for iso, v in by_iso.items()}}
+        chunk_start = chunk_end + timedelta(days=1)
+    return values
+
+
 def sync_wellness(client, backfill_days: int | None = None) -> int:
     """Fetch wellness from the day after the newest stored row (or a backfill
     window) through today. Returns the number of days written."""
@@ -79,10 +94,14 @@ def sync_wellness(client, backfill_days: int | None = None) -> int:
     else:
         start = today - timedelta(days=DEFAULT_BACKFILL_DAYS)
 
+    vo2max_by_day = _vo2max_range(client, start, today)
+
     written = 0
     day = start
     while day <= today:
         fields = _fetch_day(client, day)
+        if day in vo2max_by_day:
+            fields = {**fields, "vo2max": vo2max_by_day[day]}
         if fields:
             with session_scope() as session:
                 row = session.get(DailyWellness, day)
@@ -94,3 +113,19 @@ def sync_wellness(client, backfill_days: int | None = None) -> int:
             written += 1
         day += timedelta(days=1)
     return written
+
+
+def backfill_vo2max(client, days: int) -> int:
+    """Backfill the daily VO2 max history on its own. Unlike the full wellness
+    sync (several requests per day), this is range-only — a handful of requests
+    even for years — so it's the tool for deep history. Returns days written."""
+    today = date.today()
+    values = _vo2max_range(client, today - timedelta(days=days), today)
+    for day, value in sorted(values.items()):
+        with session_scope() as session:
+            row = session.get(DailyWellness, day)
+            if row is None:
+                row = DailyWellness(day=day)
+                session.add(row)
+            row.vo2max = value
+    return len(values)

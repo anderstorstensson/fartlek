@@ -36,6 +36,9 @@ class ActivitySummary(BaseModel):
     is_workout: bool
     tag: str | None = None
     has_analysis: bool = False  # a saved analysis note references this activity
+    # Watch self-evaluation: RPE 1-10, feel 1 (very weak) … 5 (very strong).
+    perceived_exertion: int | None = None
+    feel: int | None = None
 
     @computed_field
     @property
@@ -443,6 +446,7 @@ class WellnessDay(BaseModel):
     body_battery_min: int | None
     stress_avg: int | None
     steps: int | None
+    vo2max: float | None = None
 
 
 class ReadinessOut(BaseModel):

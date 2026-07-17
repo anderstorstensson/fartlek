@@ -60,6 +60,8 @@ def _migrate() -> None:
             ("tag", "VARCHAR"),
             ("user_note", "VARCHAR NOT NULL DEFAULT ''"),
             ("name_locked", "BOOLEAN NOT NULL DEFAULT 0"),
+            ("perceived_exertion", "INTEGER"),
+            ("feel", "INTEGER"),
         ],
         "laps": [("intensity", "VARCHAR")],
         "athlete_settings": [
@@ -72,6 +74,7 @@ def _migrate() -> None:
             ("display_locale", "VARCHAR NOT NULL DEFAULT ''"),
             ("coach_model", "VARCHAR NOT NULL DEFAULT ''"),
         ],
+        "daily_wellness": [("vo2max", "FLOAT")],
         "streams": [
             ("power", "JSON"),
             ("vertical_oscillation", "JSON"),

@@ -70,6 +70,11 @@ class Activity(Base):
     # True when the FIT file shows a structured workout / interval session
     # (workout_step messages or laps with rest intensity).
     is_workout: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Watch self-evaluation entered when saving the activity: RPE 1-10 and
+    # feel 1 (very weak) … 5 (very strong). NULL = not entered / not fetched.
+    perceived_exertion: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    feel: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
     # User-set session tag (easy/long/intervals/tempo/race/recovery/cross).
     tag: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     # The athlete's own note ("felt flat, slept 4h", "new shoes") — read by analyses.
@@ -232,6 +237,7 @@ class DailyWellness(Base):
     body_battery_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
     stress_avg: Mapped[int | None] = mapped_column(Integer, nullable=True)
     steps: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    vo2max: Mapped[float | None] = mapped_column(Float, nullable=True)  # ml/kg/min (precise)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
 
 

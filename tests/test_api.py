@@ -39,6 +39,8 @@ def client():
                     trimp=110.0,
                     rtss=95.0,
                     hrtss=90.0,
+                    perceived_exertion=7,
+                    feel=3,
                 )
             )
             session.add(
@@ -65,6 +67,15 @@ def test_list_activities(client):
     body = client.get("/api/activities").json()
     assert body["total"] == 1
     assert body["items"][0]["name"] == "Morning Run"
+
+
+def test_self_evaluation_served(client):
+    item = client.get("/api/activities").json()["items"][0]
+    assert item["perceived_exertion"] == 7
+    assert item["feel"] == 3
+    detail = client.get("/api/activities/1").json()
+    assert detail["perceived_exertion"] == 7
+    assert detail["feel"] == 3
 
 
 def test_has_analysis_marker(client):

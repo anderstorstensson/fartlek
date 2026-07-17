@@ -55,6 +55,57 @@ def list_activities(client: Garmin, start: int, limit: int) -> list[dict]:
     return client.get_activities(start, limit) or []
 
 
+def rpe_from_garmin(value) -> int | None:
+    """Garmin stores the watch's 1-10 RPE as directWorkoutRpe = rating × 10."""
+    if not isinstance(value, (int, float)) or not 10 <= value <= 100:
+        return None
+    return round(value / 10)
+
+
+def feel_from_garmin(value) -> int | None:
+    """Garmin stores the five feel smileys as directWorkoutFeel 0/25/50/75/100;
+    map to 1 (very weak) … 5 (very strong)."""
+    if not isinstance(value, (int, float)) or not 0 <= value <= 100:
+        return None
+    return round(value / 25) + 1
+
+
+def fetch_self_evaluation(client: Garmin, activity_id: int) -> tuple[int | None, int | None]:
+    """(perceived_exertion 1-10, feel 1-5) from the activity detail endpoint —
+    the self-evaluation is not in the list summary or the FIT file. (None, None)
+    when the athlete skipped the prompt or the fetch fails."""
+    try:
+        detail = client.get_activity(activity_id) or {}
+    except Exception as exc:
+        logger.warning("Self-evaluation fetch failed for activity %s: %s", activity_id, exc)
+        return None, None
+    summary = detail.get("summaryDTO") or {}
+    return (
+        rpe_from_garmin(summary.get("directWorkoutRpe")),
+        feel_from_garmin(summary.get("directWorkoutFeel")),
+    )
+
+
+def fetch_vo2max_by_day(client: Garmin, start_iso: str, end_iso: str) -> dict[str, float]:
+    """Daily running VO2 max (precise value, ml/kg/min) for a date span, keyed by
+    ISO date. One request per span; days without a value are simply absent."""
+    try:
+        rows = client.connectapi(
+            f"{client.garmin_connect_metrics_url}/{start_iso}/{end_iso}"
+        ) or []
+    except Exception as exc:
+        logger.warning("VO2 max fetch failed for %s..%s: %s", start_iso, end_iso, exc)
+        return {}
+    result: dict[str, float] = {}
+    for row in rows:
+        generic = row.get("generic") or {}
+        day = generic.get("calendarDate")
+        value = generic.get("vo2MaxPreciseValue") or generic.get("vo2MaxValue")
+        if day and isinstance(value, (int, float)):
+            result[day] = float(value)
+    return result
+
+
 def download_fit(client: Garmin, activity_id: int) -> bytes | None:
     """Download the original upload (a zip usually containing one .fit file)."""
     try:

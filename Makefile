@@ -41,6 +41,12 @@ weather:
 wellness:
 	$(PY) -m backend.cli wellness
 
+self-eval:
+	$(PY) -m backend.cli self-eval
+
+vo2max:
+	$(PY) -m backend.cli vo2max
+
 backup:
 	$(PY) -m backend.cli backup
 

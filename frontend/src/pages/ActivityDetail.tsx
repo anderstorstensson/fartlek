@@ -340,7 +340,13 @@ export default function ActivityDetailPage() {
         )}
       </div>
 
-      {id && <RelativeEffortCard activityId={Number(id)} />}
+      {id && (
+        <RelativeEffortCard
+          activityId={Number(id)}
+          perceivedExertion={activity.perceived_exertion}
+          feel={activity.feel}
+        />
+      )}
 
       <DynamicsLine activity={activity} />
 

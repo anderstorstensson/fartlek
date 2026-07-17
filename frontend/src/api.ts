@@ -19,6 +19,8 @@ export interface ActivitySummary {
   is_workout: boolean
   tag: string | null
   has_analysis: boolean
+  perceived_exertion: number | null
+  feel: number | null
 }
 
 export interface Lap {
@@ -172,6 +174,7 @@ export interface WellnessDay {
   body_battery_min: number | null
   stress_avg: number | null
   steps: number | null
+  vo2max: number | null
 }
 
 export interface Readiness {
