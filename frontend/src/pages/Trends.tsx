@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
+  CoachStatus,
   EfficiencyPoint,
   FitnessPoint,
   LoadModel,
@@ -7,6 +9,7 @@ import {
   WeeklyStat,
   WeeklyZones
 } from '../api'
+import { coachUrl, TREND_PROMPT } from '../coachLink'
 import EfficiencyChart from '../components/EfficiencyChart'
 import FitnessChart from '../components/FitnessChart'
 import WeeklyChart, { WeeklyMetric } from '../components/WeeklyChart'
@@ -36,6 +39,10 @@ export default function Trends() {
   const [efficiencyDays, setEfficiencyDays] = useState(365)
   const [longRunsOnly, setLongRunsOnly] = useState(false)
 
+  const coachStatus = useApi<CoachStatus>('/api/coach/status')
+  const coachReady =
+    coachStatus.data?.enabled === true && coachStatus.data?.cli_available === true
+
   const fitness = useApi<FitnessPoint[]>(`/api/trends/fitness?model=${model}&days=${days}`)
   const weekly = useApi<WeeklyStat[]>(`/api/trends/weekly?weeks=${weeks}`)
   const zones = useApi<WeeklyZones[]>(`/api/trends/zones?weeks=${zoneWeeks}`)
@@ -46,7 +53,14 @@ export default function Trends() {
 
   return (
     <>
-      <h1>Trends</h1>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+        <h1>Trends</h1>
+        {coachReady && (
+          <Link to={coachUrl(TREND_PROMPT)} className="btn-ghost" style={{ marginLeft: 'auto' }}>
+            🎓 Review trends with the coach
+          </Link>
+        )}
+      </div>
 
       <div className="chart-card">
         <div className="chart-title">

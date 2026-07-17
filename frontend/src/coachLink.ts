@@ -17,6 +17,11 @@ export function analyzePrompt(activity: ActivityDetail): string {
   return `Analyze my session ${label}.`
 }
 
+export const TREND_PROMPT =
+  'Review my long-term training trends: fitness and load trajectory (CTL/ATL/TSB), ' +
+  'weekly volume, intensity distribution, and efficiency/decoupling. What is working, ' +
+  'what is drifting, and what should change in the coming weeks?'
+
 export const PLAN_PROMPT =
   'Build me a training plan. Start from my athlete profile, registered races and ' +
   'training data; confirm the goal and baseline with me before designing sessions, ' +
