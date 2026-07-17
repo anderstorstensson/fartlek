@@ -20,14 +20,17 @@ Named after the Swedish training method: *fart* (speed) + *lek* (play).
 - **Metrics**: Banister TRIMP (HR) and rTSS (grade-adjusted pace) load models, CTL/ATL/TSB
   fitness & freshness curves (with plan-based projection to race day), HR zones + weekly
   intensity distribution, grade-adjusted pace (Minetti), aerobic decoupling & efficiency
-  index trends, running dynamics/power/respiration, workout/interval detection, best
+  index trends, running dynamics/power/respiration, workout/interval detection,
+  relative effort (each session's TRIMP ranked against your trailing 90 days), best
   efforts (400m → marathon), Riegel race predictions.
 - **Wellness & context**: daily Garmin wellness sync (sleep, overnight HRV, resting HR,
-  body battery, stress) with a readiness flag on the dashboard; historical weather
-  per activity (Open-Meteo).
+  body battery, stress, VO2 max) with a readiness flag on the dashboard; the watch's
+  post-run self-evaluation (RPE + feel) per activity; historical weather per activity
+  (Open-Meteo).
 - **Views**: dashboard (incl. readiness + race countdown), activity list with route
-  thumbnails, Strava-style logbook, training-plan calendar, trends, personal records,
-  goal races.
+  thumbnails, activity detail with map, streams, splits chart + table (per-split GAP)
+  and relative effort, Strava-style logbook, training-plan calendar, trends, personal
+  records, goal races.
 - **AI-coach integration**: the coaching instructions live in `docs/coach/` (data
   access, analysis methodology, plan design + independent review) and are platform
   neutral — Claude Code loads them via `.claude/skills/`, any other agent platform
@@ -132,6 +135,8 @@ copy the FIT files back to `data/fit/`, restore `athlete-profile.md`, run
 | `make recompute` | Recompute TRIMP/rTSS after changing athlete settings |
 | `make rescan` | Re-extract streams/dynamics/derived metrics from stored FIT files |
 | `make wellness` | Backfill Garmin wellness (sleep/HRV/RHR) history |
+| `make self-eval` | Backfill watch self-evaluations (RPE/feel) for past activities |
+| `make vo2max` | Backfill daily VO2 max history from Garmin |
 | `make weather` | Backfill historical weather for activities missing it |
 | `make backup` | DB snapshot + rclone upload (see Backups) |
 | `make test` | Backend test suite |
@@ -168,7 +173,8 @@ the Claude Code CLI installed and logged in on the machine running Fartlek
   is bound to localhost (`config.host`), **and** each request's `Host` header
   must be loopback, so a rebound DNS name on another site can't drive the agent.
 - Conversations persist (resumable session + chat history in the DB);
-  "New conversation" resets both.
+  "New conversation" resets both. Activity and Trends pages link straight into
+  the Coach with pre-filled prompts ("analyze this session", "review my trends").
 - **Model choice** (Settings → Coach model): routine session analyses follow a
   prescriptive methodology (`docs/coach/`), so a fast/economical model handles
   them well and saves subscription quota. Save the most capable model for
@@ -198,7 +204,8 @@ Environment variables (prefix `FARTLEK_`): `FARTLEK_PORT` (8077), `FARTLEK_HOST`
 `FARTLEK_BACKUP_INCLUDE_TOKENS` (0), `FARTLEK_COACH_ENABLED` (0 — the in-app Coach
 agent, off by default; see [The Coach tab](#the-coach-tab-in-app-claude-code)).
 Athlete parameters (max/resting HR, LTHR, threshold pace) are edited in the web UI
-under Settings; saving triggers a metric recompute.
+under Settings; saving triggers a metric recompute. Display preferences — metric or
+imperial units and date/time format — live there too.
 
 **Privacy note**: all data stays local except weather enrichment, which sends each
 outdoor activity's *rounded* start coordinates and date to the free Open-Meteo API
