@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
@@ -68,6 +69,50 @@ class LapOut(BaseModel):
     @property
     def avg_pace_s_per_km(self) -> float | None:
         return pace_s_per_km(self.avg_speed_mps)
+
+
+class SplitOut(BaseModel):
+    index: int
+    distance_m: float
+    elapsed_s: float
+    avg_speed_mps: float | None
+    elevation_gain_m: float | None = None
+    avg_hr: float | None = None
+    intensity: str | None = None
+
+    @computed_field
+    @property
+    def avg_pace_s_per_km(self) -> float | None:
+        return pace_s_per_km(self.avg_speed_mps)
+
+
+class SplitsOut(BaseModel):
+    """mode 'workout' = structured-session laps (interval column chart);
+    'laps' = manual lap-button splits; 'km' = per-km splits; 'none' = nothing
+    to show (not a run, or no usable data)."""
+
+    mode: Literal["workout", "laps", "km", "none"]
+    splits: list[SplitOut] = []
+
+
+class RecentEffort(BaseModel):
+    activity_id: int
+    day: date
+    name: str
+    load: float
+    current: bool = False
+
+
+class RelativeEffortOut(BaseModel):
+    """TRIMP of this session ranked against the trailing window. `percentile`
+    and `band` are None when the session has no load or history is too thin."""
+
+    load: float | None
+    percentile: float | None = None
+    band: str | None = None
+    window_days: int
+    window_sessions: int
+    recent: list[RecentEffort] = []
 
 
 class BestEffortOut(BaseModel):

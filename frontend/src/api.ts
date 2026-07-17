@@ -32,6 +32,39 @@ export interface Lap {
   intensity: string | null
 }
 
+export interface Split {
+  index: number
+  distance_m: number
+  elapsed_s: number
+  avg_speed_mps: number | null
+  avg_pace_s_per_km: number | null
+  elevation_gain_m: number | null
+  avg_hr: number | null
+  intensity: string | null
+}
+
+export interface SplitsResponse {
+  mode: 'workout' | 'laps' | 'km' | 'none'
+  splits: Split[]
+}
+
+export interface RecentEffort {
+  activity_id: number
+  day: string
+  name: string
+  load: number
+  current: boolean
+}
+
+export interface RelativeEffort {
+  load: number | null
+  percentile: number | null
+  band: string | null
+  window_days: number
+  window_sessions: number
+  recent: RecentEffort[]
+}
+
 export interface BestEffortItem {
   label: string
   distance_m: number

@@ -1,18 +1,26 @@
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from backend.analysis.gap import gap_speed_series
 from backend.analysis.pace_zones import pace_zones_for_settings, time_in_pace_zones
+from backend.analysis.relative_effort import WINDOW_DAYS, effort_band, effort_percentile
+from backend.analysis.splits import is_autolap, km_splits, window_elevation_gains
 from backend.analysis.zones import time_in_zones, zones_for_settings
 from backend.db import get_session
-from backend.models import Activity, AnalysisNote, Stream
+from backend.models import Activity, AnalysisNote, Lap, Stream
 from backend.schemas import (
     ActivityDetail,
     ActivityList,
     ActivitySummary,
     ActivityUpdate,
     PaceZoneOut,
+    RecentEffort,
+    RelativeEffortOut,
+    SplitOut,
+    SplitsOut,
     StreamsOut,
     ZoneOut,
 )
@@ -111,6 +119,120 @@ def delete_activity(activity_id: int, session: Session = Depends(get_session)) -
     session.delete(activity)
     session.commit()
     return Response(status_code=204)
+
+
+# Tags whose sessions get the interval-style splits chart even without the
+# auto-detected structured-workout flag.
+_WORKOUT_TAGS = {"intervals", "tempo"}
+
+
+def _lap_splits(laps: list[Lap], stream: Stream | None) -> list[SplitOut]:
+    windows = [(lap.start_offset_s, lap.start_offset_s + lap.elapsed_s) for lap in laps]
+    gains = (
+        window_elevation_gains(stream.time_s, stream.altitude_m, windows)
+        if stream is not None
+        else [None] * len(laps)
+    )
+    return [
+        SplitOut(
+            index=lap.lap_index,
+            distance_m=lap.distance_m,
+            elapsed_s=lap.elapsed_s,
+            avg_speed_mps=lap.avg_speed_mps,
+            elevation_gain_m=round(gain, 1) if gain is not None else None,
+            avg_hr=lap.avg_hr,
+            intensity=lap.intensity,
+        )
+        for lap, gain in zip(laps, gains)
+    ]
+
+
+@router.get("/{activity_id}/splits", response_model=SplitsOut)
+def get_splits(activity_id: int, session: Session = Depends(get_session)) -> SplitsOut:
+    """Splits for the activity page chart. Structured/tagged workouts serve
+    their laps; manual lap-button sessions serve those laps; everything else
+    gets per-km splits cut from the streams (runs only)."""
+    activity = session.get(Activity, activity_id)
+    if activity is None:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    if not activity.is_run:
+        return SplitsOut(mode="none")
+
+    stream = session.get(Stream, activity_id)
+    laps = activity.laps
+    if len(laps) > 1:
+        if activity.is_workout or activity.tag in _WORKOUT_TAGS:
+            return SplitsOut(mode="workout", splits=_lap_splits(laps, stream))
+        if not is_autolap([lap.distance_m for lap in laps]):
+            return SplitsOut(mode="laps", splits=_lap_splits(laps, stream))
+
+    if stream is not None:
+        splits = km_splits(stream.time_s, stream.distance_m, stream.altitude_m, stream.hr)
+        if splits:
+            return SplitsOut(
+                mode="km",
+                splits=[
+                    SplitOut(
+                        index=s.index,
+                        distance_m=s.distance_m,
+                        elapsed_s=s.elapsed_s,
+                        avg_speed_mps=s.avg_speed_mps,
+                        elevation_gain_m=s.elevation_gain_m,
+                        avg_hr=round(s.avg_hr, 1) if s.avg_hr is not None else None,
+                    )
+                    for s in splits
+                ],
+            )
+    if len(laps) > 1:  # autolap km laps, no usable streams
+        return SplitsOut(mode="km", splits=_lap_splits(laps, stream))
+    return SplitsOut(mode="none")
+
+
+_RECENT_STRIP_SESSIONS = 30
+
+
+@router.get("/{activity_id}/relative-effort", response_model=RelativeEffortOut)
+def get_relative_effort(
+    activity_id: int, session: Session = Depends(get_session)
+) -> RelativeEffortOut:
+    """This session's TRIMP ranked against every loaded session (any sport —
+    TRIMP is comparable across them) in the trailing window, as seen from the
+    session's own date, plus the recent sessions for a context strip."""
+    activity = session.get(Activity, activity_id)
+    if activity is None:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    if activity.trimp is None:
+        return RelativeEffortOut(load=None, window_days=WINDOW_DAYS, window_sessions=0)
+
+    window_start = activity.start_time_local - timedelta(days=WINDOW_DAYS)
+    others = session.scalars(
+        select(Activity)
+        .where(Activity.trimp.is_not(None))
+        .where(Activity.start_time_local >= window_start)
+        .where(Activity.start_time_local <= activity.start_time_local)
+        .where(Activity.id != activity.id)
+        .order_by(Activity.start_time_local)
+    ).all()
+    loads = [a.trimp for a in others]
+    percentile = effort_percentile(activity.trimp, loads)
+    strip = (list(others) + [activity])[-_RECENT_STRIP_SESSIONS:]
+    return RelativeEffortOut(
+        load=activity.trimp,
+        percentile=percentile,
+        band=effort_band(percentile),
+        window_days=WINDOW_DAYS,
+        window_sessions=len(loads),
+        recent=[
+            RecentEffort(
+                activity_id=a.id,
+                day=a.start_time_local.date(),
+                name=a.name,
+                load=a.trimp,
+                current=a.id == activity.id,
+            )
+            for a in strip
+        ],
+    )
 
 
 @router.get("/{activity_id}/track", response_model=list[list[float]])

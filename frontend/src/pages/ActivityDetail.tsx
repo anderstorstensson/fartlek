@@ -13,6 +13,8 @@ import { analyzePrompt, coachUrl } from '../coachLink'
 import ActivityMap from '../components/ActivityMap'
 import NoteCard from '../components/NoteCard'
 import PaceZoneChart from '../components/PaceZoneChart'
+import RelativeEffortCard from '../components/RelativeEffortCard'
+import SplitsChart from '../components/SplitsChart'
 import StreamCharts from '../components/StreamCharts'
 import ZoneChart from '../components/ZoneChart'
 import {
@@ -338,6 +340,8 @@ export default function ActivityDetailPage() {
         )}
       </div>
 
+      {id && <RelativeEffortCard activityId={Number(id)} />}
+
       <DynamicsLine activity={activity} />
 
       {activity.best_efforts.length > 0 && (
@@ -367,6 +371,7 @@ export default function ActivityDetailPage() {
           onHoverIndex={handleHoverIndex}
         />
       )}
+      {id && isRun && <SplitsChart key={version} activityId={Number(id)} />}
       {streams.data && <ZoneChart streams={streams.data} />}
       {streams.data && isRun && <PaceZoneChart streams={streams.data} />}
 
