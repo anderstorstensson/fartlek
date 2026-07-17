@@ -8,7 +8,8 @@ const FILTERS = [
   { key: 'race', label: 'Races' },
   { key: 'weekly', label: 'Weekly' },
   { key: 'trend', label: 'Trends' },
-  { key: 'plan-checkin', label: 'Plan check-ins' }
+  { key: 'plan-checkin', label: 'Plan check-ins' },
+  { key: 'other', label: 'Other' }
 ]
 
 export default function Analysis() {
