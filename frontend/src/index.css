@@ -398,6 +398,11 @@ button.ghost {
   border: 1px solid var(--border);
 }
 
+button.ghost.danger {
+  color: #f0b3b3;
+  border-color: var(--critical);
+}
+
 a.btn-ghost {
   display: inline-block;
   background: var(--surface-2);

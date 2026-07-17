@@ -289,6 +289,13 @@ export async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> 
   return response.json() as Promise<T>
 }
 
+export async function deleteActivity(id: number): Promise<void> {
+  const response = await fetch(`/api/activities/${id}`, { method: 'DELETE' })
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`)
+  }
+}
+
 export function useApi<T>(url: string | null): {
   data: T | null
   error: string | null
