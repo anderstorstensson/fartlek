@@ -15,7 +15,10 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
    Always use `scripts/api`, not curl — it is the only form the coach allowlists permit,
    and it works identically in terminal sessions:
    - `GET /api/activities?limit=50&offset=0&sport=running&q=text` — paged summaries (newest first)
-   - `GET /api/activities/{id}` — detail with laps and best efforts
+   - `GET /api/activities/{id}` — detail with laps and best efforts. Speeds come
+     with a ready-made pace twin: `avg_pace_s_per_km`, `gap_pace_s_per_km`, and per
+     lap `avg_pace_s_per_km` (seconds per km). **Quote these, not the `*_speed_mps`
+     fields** — divide by 60 for m:ss (267 → 4:27 /km). No need to convert from m/s.
    - `GET /api/activities/{id}/streams` — time/distance/HR/speed/GAP-speed/altitude/
      lat/lng/power/dynamics arrays + HR zones & time-in-zones + pace zones &
      time-in-pace-zones (pace zones are % of threshold speed, classified on GAP)
@@ -83,8 +86,15 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
   `manual_pace_zone_bounds` as s/km, slowest first), and `coaching_tone`
   (harsh|balanced|supportive — see "Coaching tone").
 
-Units are SI everywhere: meters, seconds, m/s. Pace min/km = (1000/speed_mps)/60.
-Timestamps are naive; use `start_time_local` for day/week grouping.
+Units are SI in the database: meters, seconds, m/s. **Never show the athlete a
+speed in m/s** — runners think in pace. The `/api/activities/{id}` response already
+carries pace twins (`avg_pace_s_per_km`, `gap_pace_s_per_km`, lap `avg_pace_s_per_km`);
+quote those and just format the seconds as `m:ss` (267 → **4:27 /km**). Only when you
+query the raw `*_speed_mps` columns directly (e.g. via SQL or the stream arrays) do
+you convert yourself: `sec_per_km = 1000 / speed_mps`. The whole app displays pace as
+min/km; match it (this build has no imperial unit setting, so do not emit min/mile
+unless the athlete explicitly asks). Timestamps are naive; use `start_time_local` for
+day/week grouping.
 
 ## Load metrics — do not mix scales
 

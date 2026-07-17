@@ -590,6 +590,30 @@ def test_activity_detail_has_derived_fields(client):
         assert key in body
 
 
+def test_pace_twins_served_alongside_speed():
+    # Every speed field gets a ready-made pace (s/km) so clients never re-derive
+    # from m/s. 3.745 m/s -> 267.0 s/km -> 4:27 /km.
+    from backend.schemas import ActivityDetail, LapOut, pace_s_per_km
+
+    assert pace_s_per_km(3.745) == 267.0
+    assert pace_s_per_km(None) is None
+    assert pace_s_per_km(0.2) is None  # below walking: no meaningful pace
+
+    lap = LapOut(
+        lap_index=0, start_offset_s=0, elapsed_s=300, distance_m=1000,
+        avg_hr=150, max_hr=160, avg_speed_mps=3.33, intensity="active",
+    )
+    assert lap.model_dump()["avg_pace_s_per_km"] == round(1000 / 3.33, 1)
+
+
+def test_activity_detail_exposes_pace_twins(client):
+    body = client.get("/api/activities/1").json()
+    assert "avg_pace_s_per_km" in body
+    assert "gap_pace_s_per_km" in body
+    for lap in body["laps"]:
+        assert "avg_pace_s_per_km" in lap
+
+
 def test_weekly_zones(client):
     weeks = client.get("/api/trends/zones?weeks=8").json()
     assert len(weeks) == 8

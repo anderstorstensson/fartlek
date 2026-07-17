@@ -1,6 +1,17 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
+
+
+def pace_s_per_km(speed_mps: float | None) -> float | None:
+    """Convert a speed (m/s, how the DB stores it) to running pace (seconds per km).
+
+    Served alongside every speed field so the AI coach and any client read pace
+    directly instead of re-deriving it from m/s. None below ~walking speed, where
+    a pace figure is meaningless (mirrors the frontend's formatPace guard)."""
+    if speed_mps is None or speed_mps <= 0.3:
+        return None
+    return round(1000 / speed_mps, 1)
 
 
 class ActivitySummary(BaseModel):
@@ -25,6 +36,11 @@ class ActivitySummary(BaseModel):
     tag: str | None = None
     has_analysis: bool = False  # a saved analysis note references this activity
 
+    @computed_field
+    @property
+    def avg_pace_s_per_km(self) -> float | None:
+        return pace_s_per_km(self.avg_speed_mps)
+
 
 class ActivityUpdate(BaseModel):
     """PATCH payload — only provided fields change. Empty tag clears it."""
@@ -47,6 +63,11 @@ class LapOut(BaseModel):
     max_hr: float | None
     avg_speed_mps: float | None
     intensity: str | None
+
+    @computed_field
+    @property
+    def avg_pace_s_per_km(self) -> float | None:
+        return pace_s_per_km(self.avg_speed_mps)
 
 
 class BestEffortOut(BaseModel):
@@ -79,6 +100,11 @@ class ActivityDetail(ActivitySummary):
     user_note: str = ""
     laps: list[LapOut]
     best_efforts: list[BestEffortOut]
+
+    @computed_field
+    @property
+    def gap_pace_s_per_km(self) -> float | None:
+        return pace_s_per_km(self.gap_speed_mps)
 
 
 class ActivityList(BaseModel):
