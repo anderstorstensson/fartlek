@@ -214,8 +214,11 @@ def coach_status() -> dict:
 
 @router.get("/messages", response_model=list[CoachMessageOut])
 def list_messages(
-    limit: int = 200, session: Session = Depends(get_session)
+    request: Request, limit: int = 200, session: Session = Depends(get_session)
 ) -> list[CoachMessageOut]:
+    _require_coach_enabled()
+    _require_localhost()
+    _require_local_host(request)
     rows = session.scalars(
         select(CoachMessage).order_by(CoachMessage.id.desc()).limit(limit)
     ).all()

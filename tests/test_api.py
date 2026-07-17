@@ -429,23 +429,29 @@ def test_notes_crud(client):
 
 
 def test_coach_history_and_guards(client, monkeypatch):
-    assert client.get("/api/coach/messages").json() == []
-
-    with session_scope() as session:
-        session.add(CoachMessage(role="user", content="how was my run?"))
-        session.add(CoachMessage(role="assistant", content="## Solid\n…"))
-    history = client.get("/api/coach/messages").json()
-    assert [m["role"] for m in history] == ["user", "assistant"]
-
     from backend.api import coach as coach_module
     loopback = {"host": f"127.0.0.1:{coach_module.config.port}"}
 
-    # off by default: the agent endpoint refuses until explicitly enabled
+    # off by default: the agent endpoint — and the chat history — refuse until enabled
     assert client.get("/api/coach/status").json()["enabled"] is False
+    assert client.get("/api/coach/messages", headers=loopback).status_code == 403
     assert client.post(
         "/api/coach/messages", json={"text": "hi"}, headers=loopback
     ).status_code == 403
     monkeypatch.setattr(coach_module.config, "coach_enabled", True, raising=False)
+
+    assert client.get("/api/coach/messages", headers=loopback).json() == []
+
+    with session_scope() as session:
+        session.add(CoachMessage(role="user", content="how was my run?"))
+        session.add(CoachMessage(role="assistant", content="## Solid\n…"))
+    history = client.get("/api/coach/messages", headers=loopback).json()
+    assert [m["role"] for m in history] == ["user", "assistant"]
+
+    # history is behind the DNS-rebinding guard too
+    assert client.get(
+        "/api/coach/messages", headers={"host": "evil.example.com"}
+    ).status_code == 403
 
     # refuses to run when not bound to localhost
     monkeypatch.setattr(coach_module.config, "host", "0.0.0.0", raising=False)
@@ -466,7 +472,7 @@ def test_coach_history_and_guards(client, monkeypatch):
     ).status_code == 503
 
     assert client.post("/api/coach/reset", headers=loopback).json() == {"reset": True}
-    assert client.get("/api/coach/messages").json() == []
+    assert client.get("/api/coach/messages", headers=loopback).json() == []
 
 
 def test_sync_status(client):

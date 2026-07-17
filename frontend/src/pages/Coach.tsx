@@ -39,11 +39,15 @@ export default function Coach() {
 
   useEffect(() => {
     fetchJson<CoachStatus>('/api/coach/status')
-      .then(setStatus)
+      .then((next) => {
+        setStatus(next)
+        if (next.enabled) {
+          fetchJson<CoachMessage[]>('/api/coach/messages')
+            .then(setMessages)
+            .catch((e: Error) => setError(e.message))
+        }
+      })
       .catch(() => setStatus({ enabled: false, cli_available: false }))
-    fetchJson<CoachMessage[]>('/api/coach/messages')
-      .then(setMessages)
-      .catch((e: Error) => setError(e.message))
   }, [])
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Query CrossRef for exact metadata of target citations. Prints for manual review."""
 import json, time, urllib.parse, urllib.request
+from pathlib import Path
 
 QUERIES = {
     "seiler2010": "Seiler What is Best Practice Training Intensity Duration Distribution Endurance Athletes",
@@ -73,6 +74,6 @@ for key, q in QUERIES.items():
         out[key] = None
     time.sleep(0.4)
 
-with open("bibliography_raw.json", "w") as f:
+with open(Path(__file__).resolve().parent / "bibliography_raw.json", "w") as f:
     json.dump(out, f, indent=2)
 print("\nSaved bibliography_raw.json")
