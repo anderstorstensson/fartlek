@@ -521,6 +521,17 @@ a.btn-ghost:hover {
   white-space: nowrap;
 }
 
+.split-row .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.split-row-header {
+  color: var(--text-muted);
+  font-size: 11px;
+  padding-bottom: 2px;
+}
+
 /* ---------- Logbook ---------- */
 .logbook {
   background: var(--surface);

@@ -1,4 +1,9 @@
-from backend.analysis.splits import elevation_gain, is_autolap, km_splits
+from backend.analysis.splits import (
+    elevation_gain,
+    is_autolap,
+    km_splits,
+    window_gap_means,
+)
 
 
 def _streams(n=700, speed=3.0, dt=1.0):
@@ -44,6 +49,28 @@ def test_pause_gaps_are_excluded_from_split_time():
     splits = km_splits(time_s, dist, altitude_m=None, hr=None)
     assert abs(splits[0].elapsed_s - 400.0) <= 2.0
     assert abs(splits[0].avg_speed_mps - 2.5) < 0.05
+
+
+def test_split_gap_speed_uphill_exceeds_raw_speed():
+    time_s, dist = _streams(n=801, speed=2.5)  # 2 000 m
+    # First km flat; second km climbs at a steady 4 % grade (0.1 m per sample).
+    alt = [100.0] * 400 + [100.0 + (i - 399) * 0.1 for i in range(400, 801)]
+    speed = [2.5] * 801
+    splits = km_splits(time_s, dist, altitude_m=alt, hr=None, speed_mps=speed)
+    assert abs(splits[0].avg_gap_speed_mps - 2.5) < 0.05
+    assert splits[1].avg_gap_speed_mps > splits[1].avg_speed_mps + 0.3
+
+
+def test_split_gap_speed_none_without_speed_stream():
+    time_s, dist = _streams(n=801, speed=2.5)
+    splits = km_splits(time_s, dist, altitude_m=None, hr=None)
+    assert all(s.avg_gap_speed_mps is None for s in splits)
+
+
+def test_window_gap_means_fall_back_to_raw_speed_without_altitude():
+    time_s, dist = _streams(n=400, speed=3.0)
+    means = window_gap_means(time_s, dist, [3.0] * 400, None, [(0.0, 399.0)])
+    assert abs(means[0] - 3.0) < 1e-6
 
 
 def test_split_avg_hr_is_computed_per_split():

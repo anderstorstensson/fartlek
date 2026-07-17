@@ -113,6 +113,7 @@ def test_workout_mode_uses_laps_with_intensity(client):
     assert body["splits"][0]["intensity"] == "warmup"
     assert body["splits"][1]["avg_pace_s_per_km"] == 225.0  # 800 m in 180 s
     assert body["splits"][2]["intensity"] == "rest"
+    assert body["splits"][1]["avg_gap_speed_mps"] is None  # no stream to grade-adjust
 
 
 def test_easy_run_gets_km_splits_from_streams(client):
@@ -123,6 +124,9 @@ def test_easy_run_gets_km_splits_from_streams(client):
     assert abs(body["splits"][0]["elapsed_s"] - 400.0) < 1.0
     assert body["splits"][0]["avg_hr"] == 145.0
     assert body["splits"][2]["distance_m"] < 1000.0
+    # Flat steady stream: grade-adjusted speed equals raw speed.
+    assert abs(body["splits"][0]["avg_gap_speed_mps"] - 2.5) < 0.01
+    assert abs(body["splits"][0]["avg_gap_pace_s_per_km"] - 400.0) < 2.0
 
 
 def test_mile_splits_on_request(client):

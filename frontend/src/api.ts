@@ -40,6 +40,8 @@ export interface Split {
   elapsed_s: number
   avg_speed_mps: number | null
   avg_pace_s_per_km: number | null
+  avg_gap_speed_mps: number | null
+  avg_gap_pace_s_per_km: number | null
   elevation_gain_m: number | null
   avg_hr: number | null
   intensity: string | null

@@ -79,6 +79,7 @@ class SplitOut(BaseModel):
     distance_m: float
     elapsed_s: float
     avg_speed_mps: float | None
+    avg_gap_speed_mps: float | None = None
     elevation_gain_m: float | None = None
     avg_hr: float | None = None
     intensity: str | None = None
@@ -87,6 +88,11 @@ class SplitOut(BaseModel):
     @property
     def avg_pace_s_per_km(self) -> float | None:
         return pace_s_per_km(self.avg_speed_mps)
+
+    @computed_field
+    @property
+    def avg_gap_pace_s_per_km(self) -> float | None:
+        return pace_s_per_km(self.avg_gap_speed_mps)
 
 
 class SplitsOut(BaseModel):

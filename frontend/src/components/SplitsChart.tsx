@@ -53,6 +53,7 @@ function splitTitle(split: Split, label: string): string {
     formatDuration(split.elapsed_s),
     formatPace(split.avg_speed_mps)
   ]
+  if (split.avg_gap_speed_mps !== null) parts.push(`GAP ${formatPace(split.avg_gap_speed_mps)}`)
   if (split.avg_hr !== null) parts.push(`${Math.round(split.avg_hr)} bpm`)
   if (split.elevation_gain_m !== null) parts.push(`+${Math.round(split.elevation_gain_m)} m`)
   return parts.join(' · ')
@@ -76,6 +77,9 @@ function SplitPopup({ split, x, width }: { split: Split; x: number; width: numbe
         {splitName(split)}
       </div>
       <PopupRow name="Pace" value={formatPace(split.avg_speed_mps)} />
+      {split.avg_gap_speed_mps !== null && (
+        <PopupRow name="GAP" value={formatPace(split.avg_gap_speed_mps)} />
+      )}
       {split.avg_hr !== null && (
         <PopupRow name="Heart rate" value={`${Math.round(split.avg_hr)} bpm`} />
       )}
@@ -217,48 +221,87 @@ function WorkoutColumns({ splits }: { splits: Split[] }) {
   )
 }
 
-/** Row per split (km or manual lap): bar length ∝ speed, with pace, climb and
- * average heart rate printed. */
+/** Table per split (km or manual lap): pace, GAP, climb and heart rate in
+ * aligned columns, plus a compact bar of grade-adjusted speed scaled across
+ * this run's split range — so even easy runs show their real variation. */
 function SplitRows({ splits, mode }: { splits: Split[]; mode: 'km' | 'laps' }) {
-  const maxSpeed = Math.max(...splits.map((s) => s.avg_speed_mps ?? 0))
-  if (maxSpeed <= 0) return null
+  if (Math.max(...splits.map((s) => s.avg_speed_mps ?? 0)) <= 0) return null
+  // The GAP column earns its place only where it differs from pace; without
+  // altitude data the server falls back to raw speed and it would duplicate.
+  const showGap = splits.some(
+    (s) =>
+      s.avg_gap_speed_mps !== null &&
+      s.avg_speed_mps !== null &&
+      Math.abs(s.avg_gap_speed_mps - s.avg_speed_mps) > 0.001
+  )
   const showElevation = splits.some((s) => (s.elevation_gain_m ?? 0) > 0)
   const showHr = splits.some((s) => s.avg_hr !== null)
   const labelWidth = mode === 'km' ? 44 : 90
-  const metaWidth = 96 + (showElevation ? 54 : 0) + (showHr ? 70 : 0)
+  const columns = [
+    `${labelWidth}px`,
+    '48px',
+    ...(showGap ? ['48px'] : []),
+    ...(showElevation ? ['56px'] : []),
+    ...(showHr ? ['40px'] : []),
+    '1fr'
+  ].join(' ')
+
+  // Bar = grade-adjusted speed scaled between this run's slowest and fastest
+  // split (12% floor keeps the slowest visible); exact values live in the
+  // columns, the bar carries the shape.
+  const barValues = splits.map((s) => s.avg_gap_speed_mps ?? s.avg_speed_mps ?? 0)
+  const lo = Math.min(...barValues)
+  const hi = Math.max(...barValues)
+  const barPct = (value: number) => (hi > lo ? 12 + 88 * ((value - lo) / (hi - lo)) : 100)
 
   return (
     <div style={{ padding: '0 8px 10px' }}>
-      {splits.map((split) => {
-        const speed = split.avg_speed_mps ?? 0
+      <div className="split-row split-row-header" style={{ gridTemplateColumns: columns }}>
+        <span>{mode === 'km' ? distanceUnitLabel() : 'lap'}</span>
+        <span className="num">pace</span>
+        {showGap && <span className="num">GAP</span>}
+        {showElevation && <span className="num">climb</span>}
+        {showHr && <span className="num">bpm</span>}
+        <span />
+      </div>
+      {splits.map((split, i) => {
         const label =
           mode === 'km'
             ? split.distance_m >= 999
               ? `${split.index + 1}`
               : formatDistance(split.distance_m)
             : `${split.index + 1} · ${formatDistance(split.distance_m)}`
-        const meta = [formatPace(split.avg_speed_mps)]
-        if (showElevation && split.elevation_gain_m !== null)
-          meta.push(`+${Math.round(split.elevation_gain_m)} m`)
-        if (showHr && split.avg_hr !== null) meta.push(`${Math.round(split.avg_hr)} bpm`)
         return (
           <div
             className="split-row"
             key={split.index}
-            style={{ gridTemplateColumns: `${labelWidth}px 1fr ${metaWidth}px` }}
+            style={{ gridTemplateColumns: columns }}
             title={splitTitle(
               split,
               mode === 'km' ? `${distanceUnitLabel()} ${split.index + 1}` : `lap ${split.index + 1}`
             )}
           >
             <span className="muted">{label}</span>
-            <div className="bar-track">
+            <span className="num">{formatPaceValue(split.avg_speed_mps)}</span>
+            {showGap && (
+              <span className="num muted">{formatPaceValue(split.avg_gap_speed_mps)}</span>
+            )}
+            {showElevation && (
+              <span className="num muted">
+                {split.elevation_gain_m !== null ? `+${Math.round(split.elevation_gain_m)} m` : '–'}
+              </span>
+            )}
+            {showHr && (
+              <span className="num muted">
+                {split.avg_hr !== null ? Math.round(split.avg_hr) : '–'}
+              </span>
+            )}
+            <div className="bar-track" style={{ maxWidth: 320 }}>
               <div
                 className="bar-fill"
-                style={{ width: `${(speed / maxSpeed) * 100}%`, background: ACTIVE_COLOR }}
+                style={{ width: `${barPct(barValues[i])}%`, background: ACTIVE_COLOR }}
               />
             </div>
-            <span className="meta">{meta.join(' · ')}</span>
           </div>
         )
       })}

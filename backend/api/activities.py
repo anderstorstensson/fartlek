@@ -7,7 +7,12 @@ from sqlalchemy.orm import Session
 from backend.analysis.gap import gap_speed_series
 from backend.analysis.pace_zones import pace_zones_for_settings, time_in_pace_zones
 from backend.analysis.relative_effort import WINDOW_DAYS, effort_band, effort_percentile
-from backend.analysis.splits import is_autolap, km_splits, window_elevation_gains
+from backend.analysis.splits import (
+    is_autolap,
+    km_splits,
+    window_elevation_gains,
+    window_gap_means,
+)
 from backend.analysis.zones import time_in_zones, zones_for_settings
 from backend.db import get_session
 from backend.models import Activity, AnalysisNote, Lap, Stream
@@ -128,22 +133,26 @@ _WORKOUT_TAGS = {"intervals", "tempo"}
 
 def _lap_splits(laps: list[Lap], stream: Stream | None) -> list[SplitOut]:
     windows = [(lap.start_offset_s, lap.start_offset_s + lap.elapsed_s) for lap in laps]
-    gains = (
-        window_elevation_gains(stream.time_s, stream.altitude_m, windows)
-        if stream is not None
-        else [None] * len(laps)
-    )
+    if stream is not None:
+        gains = window_elevation_gains(stream.time_s, stream.altitude_m, windows)
+        gap_means = window_gap_means(
+            stream.time_s, stream.distance_m, stream.speed_mps, stream.altitude_m, windows
+        )
+    else:
+        gains = [None] * len(laps)
+        gap_means = [None] * len(laps)
     return [
         SplitOut(
             index=lap.lap_index,
             distance_m=lap.distance_m,
             elapsed_s=lap.elapsed_s,
             avg_speed_mps=lap.avg_speed_mps,
+            avg_gap_speed_mps=gap_mean,
             elevation_gain_m=round(gain, 1) if gain is not None else None,
             avg_hr=lap.avg_hr,
             intensity=lap.intensity,
         )
-        for lap, gain in zip(laps, gains)
+        for lap, gain, gap_mean in zip(laps, gains, gap_means)
     ]
 
 
@@ -181,6 +190,7 @@ def get_splits(
             stream.altitude_m,
             stream.hr,
             split_m=_MILE_M if unit == "mile" else 1000.0,
+            speed_mps=stream.speed_mps,
         )
         if splits:
             return SplitsOut(
@@ -191,6 +201,7 @@ def get_splits(
                         distance_m=s.distance_m,
                         elapsed_s=s.elapsed_s,
                         avg_speed_mps=s.avg_speed_mps,
+                        avg_gap_speed_mps=s.avg_gap_speed_mps,
                         elevation_gain_m=s.elevation_gain_m,
                         avg_hr=round(s.avg_hr, 1) if s.avg_hr is not None else None,
                     )

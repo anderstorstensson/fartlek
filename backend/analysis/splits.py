@@ -9,7 +9,7 @@ rationale as the GAP gradient smoothing).
 
 from dataclasses import dataclass
 
-from backend.analysis.gap import _MAX_GAP_DT_S, _smooth
+from backend.analysis.gap import _MAX_GAP_DT_S, _smooth, gap_speed_series
 
 SPLIT_M = 1000.0
 _MILE_M = 1609.34
@@ -25,6 +25,7 @@ class Split:
     distance_m: float
     elapsed_s: float  # moving time within the split (pause gaps excluded)
     avg_speed_mps: float | None
+    avg_gap_speed_mps: float | None
     elevation_gain_m: float | None
     avg_hr: float | None
 
@@ -97,12 +98,47 @@ def _window_mean(
     return sum(window) / len(window) if window else None
 
 
+def window_gap_means(
+    time_s: list[float | None],
+    distance_m: list[float | None] | None,
+    speed_mps: list[float | None] | None,
+    altitude_m: list[float | None] | None,
+    windows: list[tuple[float, float]],
+) -> list[float | None]:
+    """Mean grade-adjusted speed within each (start_s, end_s) time window.
+
+    Without a speed stream every window is None; without altitude the GAP
+    series falls back to raw speed (matching gap_speed_series).
+    """
+    n = len(time_s)
+    if not speed_mps or len(speed_mps) != n:
+        return [None] * len(windows)
+    dists = distance_m if distance_m and len(distance_m) == n else [None] * n
+    alts = altitude_m if altitude_m and len(altitude_m) == n else [None] * n
+    clean = [
+        (t, d, s, a)
+        for t, d, s, a in zip(time_s, dists, speed_mps, alts)
+        if t is not None
+    ]
+    if len(clean) < 2:
+        return [None] * len(windows)
+    times = [t for t, _, _, _ in clean]
+    gap = gap_speed_series(
+        times,
+        [d for _, d, _, _ in clean],
+        [s for _, _, s, _ in clean],
+        [a for _, _, _, a in clean],
+    )
+    return [_window_mean(times, gap, start, end) for start, end in windows]
+
+
 def km_splits(
     time_s: list[float | None],
     distance_m: list[float | None],
     altitude_m: list[float | None] | None,
     hr: list[float | None] | None,
     split_m: float = SPLIT_M,
+    speed_mps: list[float | None] | None = None,
 ) -> list[Split]:
     """Cut the cumulative distance stream into `split_m` pieces.
 
@@ -159,10 +195,10 @@ def km_splits(
     hrs = hr if hr and len(hr) == n else [None] * n
     clean = [(t, a, h) for t, a, h in zip(time_s, alt, hrs) if t is not None]
     times = [t for t, _, _ in clean]
-    gains = window_elevation_gains(
-        times, [a for _, a, _ in clean], list(zip(boundaries[:-1], boundaries[1:]))
-    )
+    windows = list(zip(boundaries[:-1], boundaries[1:]))
+    gains = window_elevation_gains(times, [a for _, a, _ in clean], windows)
     hr_values = [h for _, _, h in clean]
+    gap_means = window_gap_means(time_s, distance_m, speed_mps, altitude_m, windows)
 
     return [
         Split(
@@ -170,6 +206,7 @@ def km_splits(
             distance_m=round(distances[i], 1),
             elapsed_s=round(moving[i], 1),
             avg_speed_mps=distances[i] / moving[i] if moving[i] > 0 else None,
+            avg_gap_speed_mps=gap_means[i],
             elevation_gain_m=round(gains[i], 1) if gains[i] is not None else None,
             avg_hr=_window_mean(times, hr_values, boundaries[i], boundaries[i + 1]),
         )
