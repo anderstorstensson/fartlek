@@ -16,6 +16,7 @@ from backend.models import (  # noqa: E402
     BestEffort,
     CoachMessage,
     DailyWellness,
+    Lap,
     Stream,
 )
 
@@ -541,6 +542,45 @@ def test_activity_edit_title_tag_and_note(client):
         activity.name = "Morning Run"  # restore for other tests
         activity.name_locked = False
         activity.user_note = ""
+
+
+def test_activity_delete_cascades(client):
+    # A throwaway activity with each cascade child, so the shared id=1 fixture
+    # (relied on by other tests) is untouched.
+    with session_scope() as session:
+        session.add(
+            Activity(
+                id=777,
+                name="Scratch run",
+                sport="running",
+                start_time_utc=datetime(2026, 7, 14, 6, 0),
+                start_time_local=datetime(2026, 7, 14, 8, 0),
+            )
+        )
+        session.flush()
+        session.add(Stream(activity_id=777, time_s=[0, 1], hr=[120, 121]))
+        session.add(Lap(activity_id=777, lap_index=0, distance_m=1000))
+        session.add(
+            BestEffort(
+                activity_id=777,
+                label="1K",
+                distance_m=1000,
+                duration_s=240,
+                start_time_utc=datetime(2026, 7, 14, 6, 1),
+            )
+        )
+
+    assert client.delete("/api/activities/777").status_code == 204
+    assert client.get("/api/activities/777").status_code == 404
+
+    with session_scope() as session:
+        assert session.get(Activity, 777) is None
+        assert session.get(Stream, 777) is None
+        assert session.query(Lap).filter_by(activity_id=777).count() == 0
+        assert session.query(BestEffort).filter_by(activity_id=777).count() == 0
+
+    # deleting a missing activity is a clean 404
+    assert client.delete("/api/activities/999").status_code == 404
 
 
 def test_activity_detail_has_derived_fields(client):
