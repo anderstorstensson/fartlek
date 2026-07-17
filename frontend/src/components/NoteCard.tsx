@@ -31,11 +31,11 @@ export default function NoteCard({ note, onDeleted, showActivityLink = true }: N
   return (
     <div className="card note-card">
       <div className="note-head">
-        <div>
+        <div className="note-title">
           <span className="badge">{KIND_LABELS[note.kind]}</span>
-          <strong style={{ marginLeft: 10 }}>{note.title}</strong>
+          <strong>{note.title}</strong>
         </div>
-        <div className="muted" style={{ fontSize: 12, display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div className="note-meta muted">
           {note.period_start && note.period_end && (
             <span>
               {note.period_start} → {note.period_end}

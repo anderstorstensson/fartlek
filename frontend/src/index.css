@@ -806,11 +806,40 @@ a.next-workout .delta {
 
 .note-head {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+  align-items: baseline;
+  gap: 4px 12px;
   flex-wrap: wrap;
   margin-bottom: 8px;
+}
+
+/* The title column flexes and wraps its text; the meta cluster never shrinks.
+   margin-left:auto right-aligns the meta both on a shared row and when it
+   wraps onto its own row (space-between would left-anchor it there). */
+/* Badge and title as a flex pair: wrapped title lines hang under the title's
+   own first line, not back under the badge. */
+.note-head .note-title {
+  flex: 1 1 260px;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.note-head .note-title .badge {
+  flex-shrink: 0;
+}
+
+.note-head .note-title strong {
+  min-width: 0;
+}
+
+.note-head .note-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .markdown {
