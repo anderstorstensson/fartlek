@@ -44,6 +44,13 @@ class GcalError(RuntimeError):
     pass
 
 
+# One sync at a time per process: every plan mutation spawns a background sync,
+# and two concurrent passes can both see the same event as missing and insert
+# it twice. Does not cover a CLI run racing the server — plan_diff's duplicate
+# cleanup and the nightly reconcile remain the backstop for that.
+_sync_lock = threading.Lock()
+
+
 class GcalClient:
     """Thin REST client for the events collection of one calendar."""
 
@@ -144,7 +151,8 @@ def plan_diff(
 
     Returns (bodies to insert, (event_id, body) to patch, event_ids to delete,
     count unchanged). Marker-carrying events with a duplicate or missing key
-    are deleted — they can only come from interrupted earlier syncs.
+    are deleted — leftovers from an interrupted sync or from a CLI run racing
+    the server (in-process concurrency is serialized by _sync_lock).
     """
     keys = stable_keys(workouts)
     desired = {keys[w.id]: event_body(w, keys[w.id]) for w in workouts}
@@ -188,16 +196,17 @@ def sync_plan(client: GcalClient | None = None) -> dict:
     """Mirror all planned workouts into the configured Google calendar."""
     if client is None:
         client = client_from_config()
-    existing_events = client.list_plan_events()
-    with session_scope() as session:
-        workouts = session.scalars(select(PlannedWorkout)).all()
-        to_insert, to_patch, to_delete, unchanged = plan_diff(workouts, existing_events)
-    for body in to_insert:
-        client.insert(body)
-    for event_id, body in to_patch:
-        client.patch(event_id, body)
-    for event_id in to_delete:
-        client.delete(event_id)
+    with _sync_lock:
+        existing_events = client.list_plan_events()
+        with session_scope() as session:
+            workouts = session.scalars(select(PlannedWorkout)).all()
+            to_insert, to_patch, to_delete, unchanged = plan_diff(workouts, existing_events)
+        for body in to_insert:
+            client.insert(body)
+        for event_id, body in to_patch:
+            client.patch(event_id, body)
+        for event_id in to_delete:
+            client.delete(event_id)
     return {
         "status": "ok",
         "created": len(to_insert),

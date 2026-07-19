@@ -1,9 +1,11 @@
+import threading
+import time
 from datetime import date
 
 from backend.ics import plan_to_ics
 from backend.models import PlannedWorkout
 from backend.plan_export import stable_keys
-from backend.sync.gcal import event_body, plan_diff
+from backend.sync.gcal import event_body, plan_diff, sync_plan
 
 
 def _workout(id_, day, title="Easy run", plan="base", **kwargs):
@@ -108,6 +110,38 @@ def test_diff_revised_plan_updates_in_place_without_duplicates():
     ]
     assert to_delete == ["ev3"]
     assert unchanged == 1
+
+
+def test_sync_plan_serializes_concurrent_syncs():
+    """Bursts of plan edits each spawn a background sync; two passes running
+    at once would both insert the "missing" events. _sync_lock must keep at
+    most one pass inside the list→diff→apply section."""
+    from backend.db import init_db
+
+    init_db()
+
+    class TrackingClient:
+        def __init__(self):
+            self._lock = threading.Lock()
+            self._active = 0
+            self.max_active = 0
+
+        def list_plan_events(self):
+            with self._lock:
+                self._active += 1
+                self.max_active = max(self.max_active, self._active)
+            time.sleep(0.05)  # widen the window so an unlocked overlap is caught
+            with self._lock:
+                self._active -= 1
+            return []
+
+    client = TrackingClient()
+    threads = [threading.Thread(target=sync_plan, args=(client,)) for _ in range(4)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    assert client.max_active == 1
 
 
 def test_diff_removes_duplicate_and_unkeyed_marker_events():
