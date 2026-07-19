@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta, timezone
 
 from backend.models import PlannedWorkout
+from backend.plan_export import description_text, stable_keys
 
 
 def _escape(text: str) -> str:
@@ -44,28 +45,19 @@ def plan_to_ics(workouts: list[PlannedWorkout], calendar_name: str = "Fartlek pl
         "CALSCALE:GREGORIAN",
         f"X-WR-CALNAME:{_escape(calendar_name)}",
     ]
+    keys = stable_keys(workouts)
     for workout in workouts:
         start = workout.day.strftime("%Y%m%d")
         end = (workout.day + timedelta(days=1)).strftime("%Y%m%d")
-        description_parts = []
-        if workout.description:
-            description_parts.append(workout.description)
-        if workout.target_distance_m:
-            description_parts.append(f"Target: {workout.target_distance_m / 1000:.1f} km")
-        if workout.target_duration_s:
-            minutes = int(workout.target_duration_s // 60)
-            description_parts.append(f"Duration: {minutes} min")
-        if workout.plan_name:
-            description_parts.append(f"Plan: {workout.plan_name}")
         lines.extend(
             [
                 "BEGIN:VEVENT",
-                f"UID:fartlek-workout-{workout.id}@fartlek.local",
+                f"UID:fartlek-{keys[workout.id]}@fartlek.local",
                 f"DTSTAMP:{stamp}",
                 f"DTSTART;VALUE=DATE:{start}",
                 f"DTEND;VALUE=DATE:{end}",
                 f"SUMMARY:{_escape(workout.title)}",
-                f"DESCRIPTION:{_escape(chr(10).join(description_parts))}",
+                f"DESCRIPTION:{_escape(description_text(workout))}",
                 f"CATEGORIES:{_escape(workout.workout_type.upper())}",
                 "TRANSP:TRANSPARENT",
                 "END:VEVENT",

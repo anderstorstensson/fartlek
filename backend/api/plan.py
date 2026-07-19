@@ -10,6 +10,7 @@ from backend.db import get_session
 from backend.ics import plan_to_ics
 from backend.models import Activity, PlannedWorkout
 from backend.schemas import PlanImport, PlanInfo, PlannedWorkoutIn, PlannedWorkoutOut
+from backend.sync.gcal import sync_in_background as gcal_sync_in_background
 
 router = APIRouter(prefix="/api/plan", tags=["plan"])
 
@@ -102,6 +103,7 @@ def import_plan(payload: PlanImport, session: Session = Depends(get_session)) ->
     for workout in payload.workouts:
         session.add(PlannedWorkout(**workout.model_dump()))
     session.commit()
+    gcal_sync_in_background()
     return {"imported": len(payload.workouts)}
 
 
@@ -154,6 +156,7 @@ def update_workout(
     for field, value in payload.model_dump().items():
         setattr(workout, field, value)
     session.commit()
+    gcal_sync_in_background()
     days = _activity_map(session, workout.day, workout.day)
     completions = _assign_completions([workout], days)
     return PlannedWorkoutOut(
@@ -176,6 +179,7 @@ def delete_workout(workout_id: int, session: Session = Depends(get_session)) -> 
         raise HTTPException(status_code=404, detail="Planned workout not found")
     session.delete(workout)
     session.commit()
+    gcal_sync_in_background()
     return {"deleted": workout_id}
 
 
@@ -185,4 +189,5 @@ def delete_plan(plan_name: str, session: Session = Depends(get_session)) -> dict
         delete(PlannedWorkout).where(PlannedWorkout.plan_name == plan_name)
     )
     session.commit()
+    gcal_sync_in_background()
     return {"deleted": result.rowcount}
