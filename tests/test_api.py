@@ -69,6 +69,23 @@ def test_list_activities(client):
     assert body["items"][0]["name"] == "Morning Run"
 
 
+def test_list_activities_date_range(client):
+    # Fixture activity starts 2026-07-13 (a Monday) local time.
+    body = client.get("/api/activities?start=2026-07-13&end=2026-07-19").json()
+    assert body["total"] == 1
+
+    body = client.get("/api/activities?start=2026-07-06&end=2026-07-12").json()
+    assert body["total"] == 0
+
+    body = client.get("/api/activities?start=2026-07-14").json()
+    assert body["total"] == 0
+
+    body = client.get("/api/activities?end=2026-07-13").json()
+    assert body["total"] == 1
+
+    assert client.get("/api/activities?start=not-a-date").status_code == 422
+
+
 def test_self_evaluation_served(client):
     item = client.get("/api/activities").json()["items"][0]
     assert item["perceived_exertion"] == 7

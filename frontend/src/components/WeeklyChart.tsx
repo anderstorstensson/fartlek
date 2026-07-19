@@ -32,9 +32,17 @@ interface WeeklyChartProps {
   data: WeeklyStat[]
   metric: WeeklyMetric
   height?: number
+  selectedWeek?: string | null
+  onSelectWeek?: (weekStart: string | null) => void
 }
 
-export default function WeeklyChart({ data, metric, height = 260 }: WeeklyChartProps) {
+export default function WeeklyChart({
+  data,
+  metric,
+  height = 260,
+  selectedWeek = null,
+  onSelectWeek
+}: WeeklyChartProps) {
   const config = METRIC_CONFIG[metric]
   const thisWeek = currentWeekKey()
   const rows = data.map((week) => ({
@@ -79,9 +87,27 @@ export default function WeeklyChart({ data, metric, height = 260 }: WeeklyChartP
           fill="var(--series-fitness)"
           radius={[4, 4, 0, 0]}
           isAnimationActive={false}
+          cursor={onSelectWeek ? 'pointer' : undefined}
+          onClick={(row: { week_start?: string; payload?: { week_start?: string } }) => {
+            const weekStart = row.week_start ?? row.payload?.week_start
+            if (onSelectWeek && weekStart) {
+              onSelectWeek(weekStart === selectedWeek ? null : weekStart)
+            }
+          }}
         >
           {rows.map((row) => (
-            <Cell key={row.week_start} fillOpacity={row.week_start === thisWeek ? 0.4 : 1} />
+            <Cell
+              key={row.week_start}
+              fillOpacity={
+                selectedWeek
+                  ? row.week_start === selectedWeek
+                    ? 1
+                    : 0.3
+                  : row.week_start === thisWeek
+                    ? 0.4
+                    : 1
+              }
+            />
           ))}
         </Bar>
       </BarChart>
