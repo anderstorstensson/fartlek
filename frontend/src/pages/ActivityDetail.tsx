@@ -27,6 +27,14 @@ import {
   sportEmoji
 } from '../format'
 
+function formatTempValue(tempC: number, minC: number | null, maxC: number | null): string {
+  // Show the start-to-finish range when it spans more than rounding noise.
+  if (minC !== null && maxC !== null && Math.round(maxC) - Math.round(minC) >= 2) {
+    return `${Math.round(minC)}–${Math.round(maxC)}°C`
+  }
+  return `${Math.round(tempC)}°C`
+}
+
 function formatWeatherSub(windMps: number | null, humidityPct: number | null): string | undefined {
   const parts = []
   if (windMps !== null) parts.push(`${Math.round(windMps)} m/s wind`)
@@ -334,7 +342,11 @@ export default function ActivityDetailPage() {
         {activity.weather_temp_c !== null && (
           <Stat
             label="Weather"
-            value={`${Math.round(activity.weather_temp_c)}°C`}
+            value={formatTempValue(
+              activity.weather_temp_c,
+              activity.weather_temp_min_c,
+              activity.weather_temp_max_c
+            )}
             sub={formatWeatherSub(activity.weather_wind_mps, activity.weather_humidity_pct)}
           />
         )}

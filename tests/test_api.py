@@ -621,7 +621,9 @@ def test_activity_delete_cascades(client):
 def test_activity_detail_has_derived_fields(client):
     body = client.get("/api/activities/1").json()
     for key in ("gap_speed_mps", "decoupling_pct", "efficiency_index",
-                "avg_power_w", "weather_temp_c"):
+                "avg_power_w", "weather_temp_c", "weather_temp_min_c",
+                "weather_temp_max_c", "weather_humidity_min_pct",
+                "weather_humidity_max_pct"):
         assert key in body
 
 

@@ -94,6 +94,10 @@ export interface ActivityDetail extends ActivitySummary {
   weather_humidity_pct: number | null
   weather_wind_mps: number | null
   weather_code: number | null
+  weather_temp_min_c: number | null
+  weather_temp_max_c: number | null
+  weather_humidity_min_pct: number | null
+  weather_humidity_max_pct: number | null
   user_note: string
   laps: Lap[]
   best_efforts: BestEffortItem[]

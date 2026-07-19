@@ -59,11 +59,17 @@ class Activity(Base):
     # GAP meters per minute per heartbeat: (gap_speed_mps * 60) / avg stream HR.
     efficiency_index: Mapped[float | None] = mapped_column(Float, nullable=True)
 
-    # Weather at activity start (enriched from Open-Meteo; outdoor activities only).
+    # Weather enriched from Open-Meteo (outdoor activities only): hourly sample
+    # nearest the activity midpoint, plus a start-to-finish min/max range —
+    # long runs and races can warm up considerably between start and finish.
     weather_temp_c: Mapped[float | None] = mapped_column(Float, nullable=True)
     weather_humidity_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
     weather_wind_mps: Mapped[float | None] = mapped_column(Float, nullable=True)
     weather_code: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    weather_temp_min_c: Mapped[float | None] = mapped_column(Float, nullable=True)
+    weather_temp_max_c: Mapped[float | None] = mapped_column(Float, nullable=True)
+    weather_humidity_min_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    weather_humidity_max_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     has_gps: Mapped[bool] = mapped_column(Boolean, default=False)
     has_fit: Mapped[bool] = mapped_column(Boolean, default=False)

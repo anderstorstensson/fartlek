@@ -55,8 +55,12 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
   (first-vs-second-half GAP:HR drift, runs ≥ 20 min), `efficiency_index` (GAP m/min per
   heartbeat), dynamics averages `avg_power_w, avg_vertical_oscillation_mm,
   avg_vertical_ratio_pct, avg_step_length_mm, avg_stance_time_ms, avg_respiration_brpm`
-  (newer watches only), and weather at start `weather_temp_c, weather_humidity_pct,
-  weather_wind_mps, weather_code` (WMO code; check before blaming a bad day on fitness).
+  (newer watches only), and weather `weather_temp_c, weather_humidity_pct,
+  weather_wind_mps, weather_code` (WMO code; sampled at the activity midpoint — check
+  before blaming a bad day on fitness) plus the start-to-finish range
+  `weather_temp_min_c, weather_temp_max_c, weather_humidity_min_pct,
+  weather_humidity_max_pct` (hourly resolution, so only meaningful for sessions
+  ≳ 1.5 h; NULL on rows not yet re-enriched).
   Sport values are Garmin type keys (`running`, `trail_running`, `treadmill_running`,
   `cycling`, `strength_training`, …); "is a run" = sport LIKE '%running%'.
   User-editable fields (also via `PATCH /api/activities/{id}`): `tag` (the athlete's
@@ -176,7 +180,11 @@ consistently. The coach-advisor's internal review verdicts are unaffected.
    otherwise infer from laps structure, pace variance, and name. Read `user_note`
    — the athlete's own words outrank any inference.
    Check conditions first: `weather_temp_c` / `weather_humidity_pct` / `weather_wind_mps`
-   on the activity. Heat (> ~18–20 °C) raises HR at a given pace and inflates decoupling;
+   on the activity. For long runs and races also read `weather_temp_min_c`–`weather_temp_max_c`
+   (and the humidity range): a marathon that starts at 9 °C and finishes at 21 °C is a
+   different physiological event than a steady 15 °C, and late-race pace/HR drift should be
+   judged against the *finish-end* conditions, not the midpoint average.
+   Heat (> ~18–20 °C) raises HR at a given pace and inflates decoupling;
    strong wind (> ~5 m/s) costs pace without HR change on exposed routes. **Read temperature
    and humidity together, always** — the evidence is indexed to *wet-bulb globe temperature*,
    not dry-bulb air temperature, and the two diverge sharply as humidity rises (review §13).
