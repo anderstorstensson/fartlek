@@ -4,6 +4,28 @@ All notable changes to Fartlek are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Weather range per activity**: enrichment now records min→max temperature and
+  humidity across every hour the activity touches (a morning marathon spanning
+  9→21 °C no longer reads as a single midpoint sample), shown on the activity
+  detail page.
+- **Week drill-down on the dashboard**: click a bar in the weekly
+  mileage/time/load chart to list that week's activities below (Monday-first),
+  with the selected bar highlighted and a "Show recent" reset. Backed by new
+  optional `start`/`end` date filters on `GET /api/activities`.
+- Tiered **sports-nutrition literature review** in `docs/coach/`, wired into the
+  coach's analysis and plan-design instructions.
+
+### Changed
+- **Records** page sections are sorted by distance and show the top 5 efforts
+  per distance (was 3).
+
+### Fixed
+- **Records** page dates now include the year, and columns align across the
+  per-distance tables.
+
 ## [0.1.0] — 2026-07-17
 
 First public release. Fartlek is a local, self-hosted training log — Strava-style
@@ -97,4 +119,5 @@ and all data stays on your machine.
 - All data stays local except optional weather enrichment (rounded coordinates to
   Open-Meteo). `data/` is gitignored.
 
+[Unreleased]: https://github.com/anderstorstensson/fartlek/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/anderstorstensson/fartlek/releases/tag/v0.1.0

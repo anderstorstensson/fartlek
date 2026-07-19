@@ -1,6 +1,6 @@
 [project]
 name = "fartlek"
-version = "0.1.0"
+version = "0.2.0.dev0"
 description = "Fartlek — local training log with Garmin Connect sync, fitness trends and Claude Code integration"
 requires-python = ">=3.11"
 dependencies = [
