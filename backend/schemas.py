@@ -151,6 +151,10 @@ class ActivityDetail(ActivitySummary):
     weather_humidity_pct: float | None = None
     weather_wind_mps: float | None = None
     weather_code: int | None = None
+    weather_temp_min_c: float | None = None
+    weather_temp_max_c: float | None = None
+    weather_humidity_min_pct: float | None = None
+    weather_humidity_max_pct: float | None = None
     user_note: str = ""
     laps: list[LapOut]
     best_efforts: list[BestEffortOut]

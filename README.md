@@ -26,7 +26,8 @@ Named after the Swedish training method: *fart* (speed) + *lek* (play).
 - **Wellness & context**: daily Garmin wellness sync (sleep, overnight HRV, resting HR,
   body battery, stress, VO2 max) with a readiness flag on the dashboard; the watch's
   post-run self-evaluation (RPE + feel) per activity; historical weather per activity
-  (Open-Meteo).
+  (Open-Meteo), including a start-to-finish temperature/humidity range for long
+  sessions.
 - **Views**: dashboard (incl. readiness + race countdown), activity list with route
   thumbnails, activity detail with map, streams, splits chart + table (per-split GAP)
   and relative effort, Strava-style logbook, training-plan calendar, trends, personal
