@@ -63,6 +63,12 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
   ≳ 1.5 h; NULL on rows not yet re-enriched).
   Sport values are Garmin type keys (`running`, `trail_running`, `treadmill_running`,
   `cycling`, `strength_training`, …); "is a run" = sport LIKE '%running%'.
+  `is_workout` — auto-detected at ingest: 1 when the FIT file carried a structured
+  workout (≥2 programmed steps, or a rest lap), i.e. the session was executed from
+  the watch's workout feature. **When searching for quality/interval sessions, filter
+  on `is_workout = 1 OR tag IN ('intervals','tempo','race')` — the manual `tag` alone
+  finds only sessions the athlete labelled by hand and misses most structured
+  workouts.**
   User-editable fields (also via `PATCH /api/activities/{id}`): `tag` (the athlete's
   own session label — easy/recovery/long/intervals/tempo/race/cross; `tag='race'` is
   the authoritative marker that something was raced), `user_note` (the athlete's own
@@ -177,7 +183,8 @@ consistently. The coach-advisor's internal review verdicts are unaffected.
 
 1. Pull the activity detail and streams. Establish context: what was it (easy run,
    intervals, long run, race?) — the athlete's `tag` is authoritative when set;
-   otherwise infer from laps structure, pace variance, and name. Read `user_note`
+   otherwise `is_workout = 1` says the watch ran a structured workout, and beyond
+   that infer from laps structure, pace variance, and name. Read `user_note`
    — the athlete's own words outrank any inference.
    Check conditions first: `weather_temp_c` / `weather_humidity_pct` / `weather_wind_mps`
    on the activity. For long runs and races also read `weather_temp_min_c`–`weather_temp_max_c`
@@ -511,8 +518,10 @@ Plans are built from the athlete's data + profile, never from generic templates.
      relationship legible. The gain is road-specific and can vanish or reverse on
      trail or uphill, so never carry it across surfaces. Using a compromised performance as a
      max-effort anchor systematically *underestimates* fitness — the most common way
-     plans come out too soft. Also check the `laps` table of recent weeks for quality
-     work hidden inside average-pace runs before concluding there was no intensity.
+     plans come out too soft. Also check recent weeks for quality work hidden inside
+     average-pace runs before concluding there was no intensity: `is_workout = 1`
+     flags structured watch workouts regardless of `tag`, and the `laps` table
+     exposes rep structure the averages smooth over.
      If no clean anchor survives verification (or anchors disagree), schedule a
      validation session in the plan's first 1–2 weeks (e.g. a 5K time trial or
      30-min solo max effort), mark the dependent paces as provisional, and
