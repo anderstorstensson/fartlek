@@ -631,6 +631,13 @@ substitute for altitude.[^43][^49]
   athlete would never spot on their own.[^73][^74] Reserve CWI for acute recovery between congested efforts
   (multi-day racing, doubles in the heat), keep it away from strength blocks, and never present hot and cold
   immersion as interchangeable "recovery."
+- **The same trade-off appears in nutrition, and the coach should treat it as one rule.** High-dose
+  antioxidant and anti-inflammatory supplements blunt the *endurance* adaptation signal exactly as CWI blunts
+  the *strength* one — see `docs/sports-nutrition-review.md` §11. The generalisable principle is that **any
+  intervention suppressing the post-session stress signal buys short-term recovery at the cost of adaptation**:
+  legitimate in a competition phase, counterproductive in a training block. Note the asymmetry when advising —
+  cold hits the strength adaptation, antioxidants hit the endurance one — so an athlete doing both strength work
+  and a base block has two different exposures, not one.
 - **Race guidance in heat is pacing guidance.** Since cooling helps self-paced exercise least,[^54] the
   first-line intervention is a **downward goal-pace adjustment** scaled to forecast WBGT and athlete
   ability, set *before* the gun — not a mid-race rescue. Pre-cooling and fluid strategy are adjuncts.

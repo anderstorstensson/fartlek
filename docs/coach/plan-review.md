@@ -53,9 +53,13 @@ training-science §12, post-exercise carbohydrate is nutrition §13.
 - A supplement named **without its evidence tier**, or a Tier-B/Tier-C compound
   (nitrate for a well-trained athlete, tart cherry, sulforaphane, ketones) presented
   with Tier-A confidence — that is a finding (nutrition §2).
-- An **antioxidant or anti-inflammatory aid scheduled inside an adaptation-seeking
-  block** rather than a competition phase (nutrition §11) — a substantive error, not a
-  nitpick.
+- **Adaptation-blunting scheduled inside an adaptation-seeking block** rather than a
+  competition phase — a substantive error, not a nitpick. Two forms, one rule:
+  antioxidant or anti-inflammatory aids (nutrition §11), and habitual post-session
+  cold-water immersion (training-science §13). Check the asymmetry before writing the
+  finding: cold blunts the *strength* adaptation, antioxidants the *endurance* one, so a
+  plan pairing ice baths with 2×/week strength work is a finding even though the same
+  ice baths alongside pure running would not be.
 - A supplement **introduced in race week** or never rehearsed in training.
 - A **dose prescribed for iron or vitamin D** instead of recommending a blood test and
   clinician referral (nutrition §16) — the coach must not prescribe these.

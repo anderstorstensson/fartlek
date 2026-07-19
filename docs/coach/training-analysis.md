@@ -462,9 +462,15 @@ register as caffeine is a defect.
 
 Two standing rules that follow from the review:
 
-- **Antioxidant and anti-inflammatory aids are competition tools, not training tools**
-  (§11). Do not put tart cherry or high-dose vitamin C/E into an adaptation-seeking
-  block — they blunt the signalling the block exists to provoke.
+- **Anything that suppresses the post-session stress signal is a competition tool, not a
+  training tool.** This is one rule with two instances: antioxidant and anti-inflammatory
+  supplements (nutrition §11) and habitual cold-water immersion (training-science §13).
+  Do not put tart cherry, high-dose vitamin C/E, or routine ice baths into an
+  adaptation-seeking block — they blunt the signalling the block exists to provoke.
+  Mind the asymmetry when you advise: **cold blunts the strength adaptation** (SMD −0.60,
+  endurance essentially untouched) while **antioxidants blunt the endurance one**. An
+  athlete doing 2×/week strength work plus a base block has two separate exposures, and
+  the advice differs for each.
 - **Nothing new on race day**, and nothing new in race week. Any supplement that will be
   used in a race must be rehearsed in a long run or key session first — the same rule
   the fuelling protocol already follows.

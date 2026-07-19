@@ -398,6 +398,20 @@ so the risk-reward favours not taking them during adaptation-seeking training.
   tools.** Use them when the goal is to recover fast between efforts (race week, multi-day
   competition, congested racing). Avoid them when the goal is to adapt (base, build, any block
   where the training stimulus is the point).[^24][^25]
+- **This is one principle with two instances, not a nutrition-only quirk.** The training-science
+  review reaches the same conclusion from a completely different literature: habitual
+  post-session **cold-water immersion** blunts the adaptation it is meant to aid, so it too is
+  reserved for congested racing and kept out of adaptation blocks (training-science review §13).
+  The general rule the coach should carry is that **any intervention which suppresses the
+  post-session stress signal trades adaptation for short-term recovery** — which is a good trade
+  in competition and a bad one in a training block.
+- **But the two are not interchangeable, and the difference matters.** Cold-water immersion's
+  blunting is *selective*: it harms strength adaptation (SMD −0.60) while leaving endurance
+  adaptation essentially untouched (SMD ≈ 0.00). High-dose antioxidants blunt the *endurance*
+  side — the mitochondrial signalling running training exists to provoke. So an athlete doing
+  2×/week strength work for economy has a cold-water problem, and the same athlete in a base
+  block has an antioxidant problem. Do not collapse them into a single "avoid recovery
+  modalities" message.
 - This applies directly to tart cherry (§9) and to high-dose vitamin C/E; it does **not** clearly
   apply to Nrf2-pathway compounds like sulforaphane, which upregulate endogenous defences rather
   than swamping the signal — one reason that line of research is interesting.[^22]
