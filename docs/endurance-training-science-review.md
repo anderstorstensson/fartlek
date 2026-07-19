@@ -454,6 +454,11 @@ single "train or back off" judgement, given that the app collects all of them.
 
 ## 12. Fuelling: carbohydrate periodization and race intake
 
+> **Companion review.** This section covers carbohydrate *during* exercise and the periodization of
+> carbohydrate availability. Carbohydrate *after* exercise (glycogen resynthesis), protein, legal
+> ergogenic aids and the rest of recovery nutrition are covered in
+> `docs/sports-nutrition-review.md` — see its §1 for the full boundary between the two documents.
+
 **Concept.** Two distinct questions: (a) **training-diet periodization** — whether deliberately training
 with *low* carbohydrate availability ("train low") boosts adaptation; and (b) **race-day fuelling** —
 how much carbohydrate to ingest during prolonged competition.[^32][^33][^34]

@@ -14,8 +14,14 @@ tone setting. Draft training plans must pass the independent review in
 `docs/coach/plan-review.md` before the athlete sees them (spawn a subagent for
 it if your platform has them; otherwise self-review per that document).
 
-The scientific basis for plan design is `docs/endurance-training-science-review.md`
-— prefer it over general knowledge and cite its sections.
+The scientific basis is carried in two cited literature reviews — prefer them over
+general knowledge and cite their sections:
+
+- `docs/endurance-training-science-review.md` — training design (intensity
+  distribution, intervals, durability, periodization, load, sleep, fuelling during
+  exercise, heat, RED-S).
+- `docs/sports-nutrition-review.md` — legal ergogenic aids and recovery nutrition,
+  every agent tagged with an evidence tier that must be stated when it is named.
 
 ## Development
 

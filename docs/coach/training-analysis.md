@@ -404,12 +404,25 @@ A tailored plan requires knowing the athlete, not just their data. The profile l
 - Keep the file short and factual; date-stamp updates. Record plan-relevant conclusions
   from check-ins there too ("responds badly to back-to-back quality days").
 
-## Scientific basis — consult the literature review
+## Scientific basis — consult the literature reviews
 
-The repo carries a curated, cited evidence synthesis at
-`docs/endurance-training-science-review.md`. It is the authoritative source for the
-principles behind plan design — prefer it over general knowledge, and cite it when
-explaining choices to the athlete.
+The repo carries two curated, cited evidence syntheses. Prefer them over general
+knowledge, and cite them when explaining choices to the athlete.
+
+- **`docs/endurance-training-science-review.md`** — training design: intensity
+  distribution, intervals, durability, economy, periodization, load monitoring, sleep,
+  fuelling *during* exercise, heat, RED-S. The authority for how the plan is built.
+- **`docs/sports-nutrition-review.md`** — what the athlete ingests around the training:
+  legal ergogenic aids (caffeine, nitrate, creatine, bicarbonate, beta-alanine, ketones,
+  tart cherry, sulforaphane) and recovery nutrition (protein, post-exercise carbohydrate,
+  hydration, alcohol, iron/vitamin D, collagen). The authority for supplements and
+  recovery nutrition.
+
+The boundary between them is deliberate: **carbohydrate *during* exercise and
+carbohydrate periodization belong to the training-science review §12**; post-exercise
+carbohydrate for glycogen resynthesis belongs to the nutrition review §13. Heat and
+sweat strategy stay in training-science §13; the general drink-to-thirst rule is
+nutrition §14. Do not answer from the wrong one.
 
 - **Read it (at least the relevant sections) before generating or substantially revising
   a plan.** Section 15 is an "app-element → best-supported principle → refs" map; section
@@ -421,6 +434,43 @@ explaining choices to the athlete.
 - The guidance below reflects the review's current conclusions; where a specific number
   or distribution matters, verify against the review rather than this summary, since the
   review is versioned and may be updated.
+
+### When to consult the nutrition review
+
+Read `docs/sports-nutrition-review.md` (grep its headings the same way) when:
+
+- building or revising the **race-week and race-day plan** for a goal race — caffeine
+  protocol (§3), and the fuelling protocol from training-science §12;
+- prescribing a **key session** the athlete wants to hit hard, where caffeine timing and
+  its sleep cost are in play (§3);
+- the athlete **asks about a supplement** — answer from the review's tier, never from
+  general knowledge;
+- a **recovery problem** is the finding: sessions not being absorbed, back-to-back
+  quality failing, protein or post-exercise carbohydrate plausibly short (§12, §13),
+  or alcohol showing up in check-ins (§15);
+- a pattern suggests **iron or vitamin D** is worth testing (§16) — recommend the test,
+  never a dose;
+- a **multi-day or congested race block** makes post-exercise carbohydrate timing
+  genuinely matter (§13).
+
+**Tier discipline — this is not optional.** Every agent in that review carries an
+evidence tier (§2). State it whenever you name one, and match your confidence to it:
+Tier A may be prescribed with a protocol; Tier B must be offered as explicitly
+experimental and never built into a race plan the athlete depends on; Tier C must be
+declined with the reason. Presenting a Tier-B or Tier-C compound in the same confident
+register as caffeine is a defect.
+
+Two standing rules that follow from the review:
+
+- **Antioxidant and anti-inflammatory aids are competition tools, not training tools**
+  (§11). Do not put tart cherry or high-dose vitamin C/E into an adaptation-seeking
+  block — they blunt the signalling the block exists to provoke.
+- **Nothing new on race day**, and nothing new in race week. Any supplement that will be
+  used in a race must be rehearsed in a long run or key session first — the same rule
+  the fuelling protocol already follows.
+
+Food first: if daily protein, fuelling, sleep or energy availability are unaddressed,
+fix those before discussing any supplement. The effect sizes are not comparable.
 
 ## Suggesting a training plan
 
