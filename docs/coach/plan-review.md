@@ -31,15 +31,47 @@ yourself (read-only):
 
 Do not trust the drafting session's stated baseline — spot-check it against the data.
 
-## Scientific authority — the literature review
+## Scientific authority — the literature reviews
 
-`docs/endurance-training-science-review.md` is the evidence base for this review. **Read
-the sections relevant to the plan** (§15 is the app-element→principle map; grep the
-headings to jump). Judge the plan against the review's conclusions, not against generic
-lore, and cite section numbers in your findings. Where the plan contradicts the review
-(e.g. defaulting to polarized distribution when the review calls pyramidal at least as
-good for most phases; treating ACWR as a hard rail; omitting durability work or 2×/week
-strength), that is a finding.
+Two documents form the evidence base for this review:
+
+- **`docs/endurance-training-science-review.md`** — training design. **Read the sections
+  relevant to the plan** (§15 is the app-element→principle map; grep the headings to
+  jump). Where the plan contradicts the review (e.g. defaulting to polarized distribution
+  when the review calls pyramidal at least as good for most phases; treating ACWR as a
+  hard rail; omitting durability work or 2×/week strength), that is a finding.
+- **`docs/sports-nutrition-review.md`** — ergogenic aids and recovery nutrition. Consult
+  it whenever the plan names a supplement, a caffeine protocol, a recovery-nutrition
+  target, or a race-week ingestion strategy.
+
+Judge the plan against these conclusions, not against generic lore, and cite section
+numbers in your findings. Note the boundary: carbohydrate *during* exercise is
+training-science §12, post-exercise carbohydrate is nutrition §13.
+
+**Nutrition findings to raise when they apply:**
+
+- A supplement named **without its evidence tier**, or a Tier-B/Tier-C compound
+  (nitrate for a well-trained athlete, tart cherry, sulforaphane, ketones) presented
+  with Tier-A confidence — that is a finding (nutrition §2).
+- **Adaptation-blunting scheduled inside an adaptation-seeking block** rather than a
+  competition phase — a substantive error, not a nitpick. Two forms, one rule:
+  antioxidant or anti-inflammatory aids (nutrition §11), and habitual post-session
+  cold-water immersion (training-science §13). Check the asymmetry before writing the
+  finding: cold blunts the *strength* adaptation, antioxidants the *endurance* one, so a
+  plan pairing ice baths with 2×/week strength work is a finding even though the same
+  ice baths alongside pure running would not be.
+- A supplement **introduced in race week** or never rehearsed in training.
+- A **dose prescribed for iron or vitamin D** instead of recommending a blood test and
+  clinician referral (nutrition §16) — the coach must not prescribe these.
+- A **fixed hourly fluid volume** the athlete is told to hit regardless of thirst
+  (nutrition §14) — the consensus is drink-to-thirst, and forced volume is the actual
+  danger.
+- A supplement discussion at all when **energy availability, daily protein or sleep are
+  visibly unaddressed** — wrong priority ordering.
+- **Silence is not automatically a finding.** A plan need not mention supplements to be
+  sound; only flag the omission where the review supports a real gain the plan is
+  leaving on the table (e.g. a goal race with no caffeine protocol and no reason given,
+  or closely-spaced sessions with no post-exercise carbohydrate guidance).
 
 ## Review rubric (evaluate every item)
 

@@ -1,0 +1,358 @@
+{
+  "total_dois": 35,
+  "verified": [
+    "10.1016/j.jand.2015.12.006",
+    "10.1136/bjsports-2018-099027",
+    "10.3389/fspor.2022.868228",
+    "10.1186/s12970-020-00383-4",
+    "10.1136/bjsports-2018-100278",
+    "10.3390/nu15010148",
+    "10.1007/s00394-020-02427-6",
+    "10.1016/j.smrv.2023.101764",
+    "10.1093/sleep/zsae230",
+    "10.3390/sports13090317",
+    "10.3390/nu17121958",
+    "10.1016/j.jesf.2022.06.004",
+    "10.1186/s12970-017-0173-z",
+    "10.1080/15502783.2023.2204071",
+    "10.1186/s12970-021-00458-w",
+    "10.1186/s12970-015-0090-y",
+    "10.1123/ijsnem.2021-0280",
+    "10.1123/ijsnem.2020-0145",
+    "10.1186/s40798-026-00993-3",
+    "10.1111/sms.14141",
+    "10.3390/ijerph191610272",
+    "10.1016/j.redox.2023.102873",
+    "10.3390/antiox15030379",
+    "10.1113/jphysiol.2013.267419",
+    "10.1113/JP270654",
+    "10.1186/s12970-017-0177-8",
+    "10.1371/journal.pone.0157406",
+    "10.1007/s40279-025-02203-8",
+    "10.1186/s40798-020-00297-0",
+    "10.1007/s40279-025-02213-6",
+    "10.1097/JSM.0000000000000221",
+    "10.1371/journal.pone.0088384",
+    "10.1016/j.jshs.2024.101009",
+    "10.20463/pan.2021.0011",
+    "10.3945/ajcn.116.138594"
+  ],
+  "failed": [],
+  "metadata": {
+    "10.1016/j.jand.2015.12.006": {
+      "title": "Position of the Academy of Nutrition and Dietetics, Dietitians of Canada, and the American College of Sports Medicine: Nutrition and Athletic Performance",
+      "authors": "Thomas, D., Erdman, K., Burke, L.",
+      "year": "2016",
+      "journal": "Journal of the Academy of Nutrition and Dietetics",
+      "volume": "116",
+      "pages": "501-528",
+      "doi": "10.1016/j.jand.2015.12.006"
+    },
+    "10.1136/bjsports-2018-099027": {
+      "title": "IOC consensus statement: dietary supplements and the high-performance athlete",
+      "authors": "Maughan, R., Burke, L., Dvorak, J., et al.",
+      "year": "2018",
+      "journal": "British Journal of Sports Medicine",
+      "volume": "52",
+      "pages": "439-455",
+      "doi": "10.1136/bjsports-2018-099027"
+    },
+    "10.3389/fspor.2022.868228": {
+      "title": "Dietary Supplements as a Major Cause of Anti-doping Rule Violations",
+      "authors": "Lauritzen, F.",
+      "year": "2022",
+      "journal": "Frontiers in Sports and Active Living",
+      "volume": "4",
+      "pages": "",
+      "doi": "10.3389/fspor.2022.868228"
+    },
+    "10.1186/s12970-020-00383-4": {
+      "title": "International society of sports nutrition position stand: caffeine and exercise performance",
+      "authors": "Guest, N., VanDusseldorp, T., Nelson, M., et al.",
+      "year": "2021",
+      "journal": "Journal of the International Society of Sports Nutrition",
+      "volume": "18",
+      "pages": "",
+      "doi": "10.1186/s12970-020-00383-4"
+    },
+    "10.1136/bjsports-2018-100278": {
+      "title": "Wake up and smell the coffee: caffeine supplementation and exercise performance\u2014an umbrella review of 21 published meta-analyses",
+      "authors": "Grgic, J., Grgic, I., Pickering, C., et al.",
+      "year": "2020",
+      "journal": "British Journal of Sports Medicine",
+      "volume": "54",
+      "pages": "681-688",
+      "doi": "10.1136/bjsports-2018-100278"
+    },
+    "10.3390/nu15010148": {
+      "title": "Effects of Caffeine Intake on Endurance Running Performance and Time to Exhaustion: A Systematic Review and Meta-Analysis",
+      "authors": "Wang, Z., Qiu, B., Gao, J., et al.",
+      "year": "2022",
+      "journal": "Nutrients",
+      "volume": "15",
+      "pages": "148",
+      "doi": "10.3390/nu15010148"
+    },
+    "10.1007/s00394-020-02427-6": {
+      "title": "CYP1A2 genotype and acute ergogenic effects of caffeine intake on exercise performance: a systematic review",
+      "authors": "Grgic, J., Pickering, C., Del Coso, J., et al.",
+      "year": "2021",
+      "journal": "European Journal of Nutrition",
+      "volume": "60",
+      "pages": "1181-1195",
+      "doi": "10.1007/s00394-020-02427-6"
+    },
+    "10.1016/j.smrv.2023.101764": {
+      "title": "The effect of caffeine on subsequent sleep: A systematic review and meta-analysis",
+      "authors": "Gardiner, C., Weakley, J., Burke, L., et al.",
+      "year": "2023",
+      "journal": "Sleep Medicine Reviews",
+      "volume": "69",
+      "pages": "101764",
+      "doi": "10.1016/j.smrv.2023.101764"
+    },
+    "10.1093/sleep/zsae230": {
+      "title": "Dose and timing effects of caffeine on subsequent sleep: a randomized clinical crossover trial",
+      "authors": "Gardiner, C., Weakley, J., Burke, L., et al.",
+      "year": "2025",
+      "journal": "SLEEP",
+      "volume": "48",
+      "pages": "",
+      "doi": "10.1093/sleep/zsae230"
+    },
+    "10.3390/sports13090317": {
+      "title": "The Effect of Consuming Caffeine Before Late Afternoon/Evening Training or Competition on Sleep: A Systematic Review with Meta-Analysis",
+      "authors": "Kocak, A., Georgousopoulou, E., Knight-Agarwal, C., et al.",
+      "year": "2025",
+      "journal": "Sports",
+      "volume": "13",
+      "pages": "317",
+      "doi": "10.3390/sports13090317"
+    },
+    "10.3390/nu17121958": {
+      "title": "Effects of Beetroot Juice on Physical Performance in Professional Athletes and Healthy Individuals: An Umbrella Review",
+      "authors": "Tian, C., Jiang, Q., Han, M., et al.",
+      "year": "2025",
+      "journal": "Nutrients",
+      "volume": "17",
+      "pages": "1958",
+      "doi": "10.3390/nu17121958"
+    },
+    "10.1016/j.jesf.2022.06.004": {
+      "title": "The effects of nitrate ingestion on high-intensity endurance time-trial performance: A systematic review and meta-analysis",
+      "authors": "Wong, T., Sim, A., Burns, S.",
+      "year": "2022",
+      "journal": "Journal of Exercise Science &amp; Fitness",
+      "volume": "20",
+      "pages": "305-316",
+      "doi": "10.1016/j.jesf.2022.06.004"
+    },
+    "10.1186/s12970-017-0173-z": {
+      "title": "International Society of Sports Nutrition position stand: safety and efficacy of creatine supplementation in exercise, sport, and medicine",
+      "authors": "Kreider, R., Kalman, D., Antonio, J., et al.",
+      "year": "2017",
+      "journal": "Journal of the International Society of Sports Nutrition",
+      "volume": "14",
+      "pages": "",
+      "doi": "10.1186/s12970-017-0173-z"
+    },
+    "10.1080/15502783.2023.2204071": {
+      "title": "Creatine supplementation and endurance performance: surges and sprints to win the race",
+      "authors": "Forbes, S., Candow, D., Neto, J., et al.",
+      "year": "2023",
+      "journal": "Journal of the International Society of Sports Nutrition",
+      "volume": "20",
+      "pages": "",
+      "doi": "10.1080/15502783.2023.2204071"
+    },
+    "10.1186/s12970-021-00458-w": {
+      "title": "International Society of Sports Nutrition position stand: sodium bicarbonate and exercise performance",
+      "authors": "Grgic, J., Pedisic, Z., Saunders, B., et al.",
+      "year": "2021",
+      "journal": "Journal of the International Society of Sports Nutrition",
+      "volume": "18",
+      "pages": "",
+      "doi": "10.1186/s12970-021-00458-w"
+    },
+    "10.1186/s12970-015-0090-y": {
+      "title": "International society of sports nutrition position stand: Beta-Alanine",
+      "authors": "Trexler, E., Smith-Ryan, A., Stout, J., et al.",
+      "year": "2015",
+      "journal": "Journal of the International Society of Sports Nutrition",
+      "volume": "12",
+      "pages": "",
+      "doi": "10.1186/s12970-015-0090-y"
+    },
+    "10.1123/ijsnem.2021-0280": {
+      "title": "Acute Ingestion of Ketone Monoesters and Precursors Do Not Enhance Endurance Exercise Performance: A Systematic Review and Meta-Analysis",
+      "authors": "Brooks, E., Lamothe, G., Nagpal, T., et al.",
+      "year": "2022",
+      "journal": "International Journal of Sport Nutrition and Exercise Metabolism",
+      "volume": "32",
+      "pages": "214-225",
+      "doi": "10.1123/ijsnem.2021-0280"
+    },
+    "10.1123/ijsnem.2020-0145": {
+      "title": "Tart Cherry Supplementation and Recovery From Strenuous Exercise: A Systematic Review and Meta-Analysis",
+      "authors": "Hill, J., Keane, K., Quinlan, R., et al.",
+      "year": "2021",
+      "journal": "International Journal of Sport Nutrition and Exercise Metabolism",
+      "volume": "31",
+      "pages": "154-167",
+      "doi": "10.1123/ijsnem.2020-0145"
+    },
+    "10.1186/s40798-026-00993-3": {
+      "title": "Effects of Tart Cherry Juice Supplementation on Recovery from Exercise-Induced Muscle Damage in Athletes: A Systematic Review and Meta-Analysis",
+      "authors": "Daab, W., Bouzid, M., Nassis, G., et al.",
+      "year": "2026",
+      "journal": "Sports Medicine - Open",
+      "volume": "12",
+      "pages": "",
+      "doi": "10.1186/s40798-026-00993-3"
+    },
+    "10.1111/sms.14141": {
+      "title": "\u201cPrecovery\u201d versus recovery: Understanding the role of cherry juice in exercise recovery",
+      "authors": "McHugh, M.",
+      "year": "2022",
+      "journal": "Scandinavian Journal of Medicine &amp; Science in Sports",
+      "volume": "32",
+      "pages": "940-950",
+      "doi": "10.1111/sms.14141"
+    },
+    "10.3390/ijerph191610272": {
+      "title": "Effects of Short-Term Intake of Montmorency Tart Cherry Juice on Sleep Quality after Intermittent Exercise in Elite Female Field Hockey Players: A Randomized Controlled Trial",
+      "authors": "Chung, J., Choi, M., Lee, K.",
+      "year": "2022",
+      "journal": "International Journal of Environmental Research and Public Health",
+      "volume": "19",
+      "pages": "10272",
+      "doi": "10.3390/ijerph191610272"
+    },
+    "10.1016/j.redox.2023.102873": {
+      "title": "Glucosinolate-rich broccoli sprouts protect against oxidative stress and improve adaptations to intense exercise training",
+      "authors": "Flockhart, M., Nilsson, L., Tillqvist, E., et al.",
+      "year": "2023",
+      "journal": "Redox Biology",
+      "volume": "67",
+      "pages": "102873",
+      "doi": "10.1016/j.redox.2023.102873"
+    },
+    "10.3390/antiox15030379": {
+      "title": "Effects of Short-Term Broccoli Powder Supplementation on Acute Oxidative Stress and Recovery Following a Metabolically Demanding Exercise Session",
+      "authors": "Cesanelli, L., Venckunas, T., Minderis, P., et al.",
+      "year": "2026",
+      "journal": "Antioxidants",
+      "volume": "15",
+      "pages": "379",
+      "doi": "10.3390/antiox15030379"
+    },
+    "10.1113/jphysiol.2013.267419": {
+      "title": "Vitamin C and E supplementation hampers cellular adaptation to endurance training in humans: a double\u2010blind, randomised, controlled trial",
+      "authors": "Paulsen, G., Cumming, K., Holden, G., et al.",
+      "year": "2014",
+      "journal": "The Journal of Physiology",
+      "volume": "592",
+      "pages": "1887-1901",
+      "doi": "10.1113/jphysiol.2013.267419"
+    },
+    "10.1113/JP270654": {
+      "title": "Do antioxidant supplements interfere with skeletal muscle adaptation to exercise training?",
+      "authors": "Merry, T., Ristow, M.",
+      "year": "2016",
+      "journal": "The Journal of Physiology",
+      "volume": "594",
+      "pages": "5135-5147",
+      "doi": "10.1113/JP270654"
+    },
+    "10.1186/s12970-017-0177-8": {
+      "title": "International Society of Sports Nutrition Position Stand: protein and exercise",
+      "authors": "J\u00e4ger, R., Kerksick, C., Campbell, B., et al.",
+      "year": "2017",
+      "journal": "Journal of the International Society of Sports Nutrition",
+      "volume": "14",
+      "pages": "",
+      "doi": "10.1186/s12970-017-0177-8"
+    },
+    "10.1371/journal.pone.0157406": {
+      "title": "Protein Requirements Are Elevated in Endurance Athletes after Exercise as Determined by the Indicator Amino Acid Oxidation Method",
+      "authors": "Kato, H., Suzuki, K., Bannai, M., et al.",
+      "year": "2016",
+      "journal": "PLOS ONE",
+      "volume": "11",
+      "pages": "e0157406",
+      "doi": "10.1371/journal.pone.0157406"
+    },
+    "10.1007/s40279-025-02203-8": {
+      "title": "Protein Nutrition for Endurance Athletes: A Metabolic Focus on Promoting Recovery and Training Adaptation",
+      "authors": "Witard, O., Hearris, M., Morgan, P.",
+      "year": "2025",
+      "journal": "Sports Medicine",
+      "volume": "55",
+      "pages": "1361-1376",
+      "doi": "10.1007/s40279-025-02203-8"
+    },
+    "10.1186/s40798-020-00297-0": {
+      "title": "The Effect of Consuming Carbohydrate With and Without Protein on the Rate of Muscle Glycogen Re-synthesis During Short-Term Post-exercise Recovery: a Systematic Review and Meta-analysis",
+      "authors": "Craven, J., Desbrow, B., Sabapathy, S., et al.",
+      "year": "2021",
+      "journal": "Sports Medicine - Open",
+      "volume": "7",
+      "pages": "",
+      "doi": "10.1186/s40798-020-00297-0"
+    },
+    "10.1007/s40279-025-02213-6": {
+      "title": "Nutritional Strategies to Improve Post-exercise Recovery and Subsequent Exercise Performance: A Narrative Review",
+      "authors": "Naderi, A., Rothschild, J., Santos, H., et al.",
+      "year": "2025",
+      "journal": "Sports Medicine",
+      "volume": "55",
+      "pages": "1559-1577",
+      "doi": "10.1007/s40279-025-02213-6"
+    },
+    "10.1097/JSM.0000000000000221": {
+      "title": "Statement of the Third International Exercise-Associated Hyponatremia Consensus Development Conference, Carlsbad, California, 2015",
+      "authors": "Hew-Butler, T., Rosner, M., Fowkes-Godek, S., et al.",
+      "year": "2015",
+      "journal": "Clinical Journal of Sport Medicine",
+      "volume": "25",
+      "pages": "303-320",
+      "doi": "10.1097/JSM.0000000000000221"
+    },
+    "10.1371/journal.pone.0088384": {
+      "title": "Alcohol Ingestion Impairs Maximal Post-Exercise Rates of Myofibrillar Protein Synthesis following a Single Bout of Concurrent Training",
+      "authors": "Parr, E., Camera, D., Areta, J., et al.",
+      "year": "2014",
+      "journal": "PLoS ONE",
+      "volume": "9",
+      "pages": "e88384",
+      "doi": "10.1371/journal.pone.0088384"
+    },
+    "10.1016/j.jshs.2024.101009": {
+      "title": "Iron deficiency, supplementation, and sports performance in female athletes: A systematic review",
+      "authors": "Pengelly, M., Pumpa, K., Pyne, D., et al.",
+      "year": "2025",
+      "journal": "Journal of Sport and Health Science",
+      "volume": "14",
+      "pages": "101009",
+      "doi": "10.1016/j.jshs.2024.101009"
+    },
+    "10.20463/pan.2021.0011": {
+      "title": "Vitamin D in athletes: focus on physical performance and musculoskeletal injuries",
+      "authors": "Yoon, S., Kwon, O., Kim, J.",
+      "year": "2021",
+      "journal": "Physical Activity and Nutrition",
+      "volume": "25",
+      "pages": "20-25",
+      "doi": "10.20463/pan.2021.0011"
+    },
+    "10.3945/ajcn.116.138594": {
+      "title": "Vitamin C\u2013enriched gelatin supplementation before intermittent activity augments collagen synthesis",
+      "authors": "Shaw, G., Lee-Barthel, A., Ross, M., et al.",
+      "year": "2017",
+      "journal": "The American Journal of Clinical Nutrition",
+      "volume": "105",
+      "pages": "136-143",
+      "doi": "10.3945/ajcn.116.138594"
+    }
+  }
+}
