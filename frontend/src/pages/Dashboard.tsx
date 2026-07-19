@@ -18,6 +18,7 @@ import {
   formatDistance,
   formatDuration,
   formatPace,
+  formatShortDate,
   formatSportName,
   locale,
   sportEmoji
@@ -29,6 +30,12 @@ function isoToday(offsetDays = 0): string {
   const d = new Date()
   d.setDate(d.getDate() + offsetDays)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function isoAddDays(iso: string, days: number): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const dt = new Date(y, m - 1, d + days)
+  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
 }
 
 const READINESS_LABEL: Record<Readiness['status'], string> = {
@@ -114,6 +121,12 @@ export default function Dashboard() {
   const weekly = useApi<WeeklyStat[]>('/api/trends/weekly?weeks=26')
   const recent = useApi<ActivityList>('/api/activities?limit=6')
   const [weeklyMetric, setWeeklyMetric] = useState<WeeklyMetric>('distance')
+  const [selectedWeek, setSelectedWeek] = useState<string | null>(null)
+  const weekActivities = useApi<ActivityList>(
+    selectedWeek
+      ? `/api/activities?start=${selectedWeek}&end=${isoAddDays(selectedWeek, 6)}&limit=50`
+      : null
+  )
   const plan = useApi<PlannedWorkout[]>(`/api/plan?start=${isoToday()}&end=${isoToday(28)}`)
   const nextKey = plan.data?.find(
     (w) => KEY_TYPES.includes(w.workout_type) && !w.completed_activity_id
@@ -133,6 +146,10 @@ export default function Dashboard() {
   if (stats.error) return <div className="error-box">Failed to load stats: {stats.error}</div>
 
   const summary = stats.data
+  // Recent list is newest-first; a selected week reads Monday-first.
+  const shownActivities = selectedWeek
+    ? weekActivities.data?.items.slice().reverse()
+    : recent.data?.items
   const week = summary?.this_week
   const last = summary?.last_week
   const form = summary?.form_trimp
@@ -224,10 +241,29 @@ export default function Dashboard() {
             </button>
           </span>
         </div>
-        {weekly.data && <WeeklyChart data={weekly.data} metric={weeklyMetric} height={200} />}
+        {weekly.data && (
+          <WeeklyChart
+            data={weekly.data}
+            metric={weeklyMetric}
+            height={200}
+            selectedWeek={selectedWeek}
+            onSelectWeek={setSelectedWeek}
+          />
+        )}
       </div>
 
-      <h2>Recent activities</h2>
+      <h2 style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {selectedWeek ? `Activities · week of ${formatShortDate(selectedWeek)}` : 'Recent activities'}
+        {selectedWeek && (
+          <button
+            className="ghost"
+            style={{ padding: '3px 10px', fontSize: 13 }}
+            onClick={() => setSelectedWeek(null)}
+          >
+            ✕ Show recent
+          </button>
+        )}
+      </h2>
       <div className="card table-wrap" style={{ padding: 0 }}>
         <table>
           <thead>
@@ -241,7 +277,7 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {recent.data?.items.map((activity) => (
+            {shownActivities?.map((activity) => (
               <tr key={activity.id}>
                 <td>{formatDate(activity.start_time_local)}</td>
                 <td className="strong">
@@ -259,8 +295,10 @@ export default function Dashboard() {
             ))}
           </tbody>
         </table>
-        {recent.data && recent.data.items.length === 0 && (
-          <div className="empty-state">Nothing here yet</div>
+        {shownActivities?.length === 0 && (
+          <div className="empty-state">
+            {selectedWeek ? 'No activities this week' : 'Nothing here yet'}
+          </div>
         )}
       </div>
     </>

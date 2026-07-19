@@ -119,6 +119,14 @@ export function formatShortDate(iso: string): string {
   return new Date(iso).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })
 }
 
+export function formatMediumDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(locale(), {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
 export function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })
 }

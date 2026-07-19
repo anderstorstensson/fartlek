@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, datetime, time, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import func, or_, select
@@ -40,9 +40,15 @@ def list_activities(
     offset: int = 0,
     sport: str | None = None,
     q: str | None = None,
+    start: date | None = None,
+    end: date | None = None,
     session: Session = Depends(get_session),
 ) -> ActivityList:
     query = select(Activity)
+    if start:
+        query = query.where(Activity.start_time_local >= datetime.combine(start, time.min))
+    if end:
+        query = query.where(Activity.start_time_local < datetime.combine(end + timedelta(days=1), time.min))
     if sport:
         if sport == "running":
             query = query.where(Activity.sport.contains("running"))
