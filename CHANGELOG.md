@@ -27,6 +27,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 - **Records** page sections are sorted by distance and show the top 5 efforts
   per distance (was 3).
+- Coach instructions (`docs/coach/training-analysis.md`) now document the
+  `is_workout` flag (auto-set at FIT ingest for structured watch workouts) and
+  direct the coach to filter `is_workout = 1 OR tag IN (...)` when searching
+  for quality sessions — the manual `tag` alone misses auto-detected workouts.
 - `.ics` export UIDs are now stable across plan re-imports (derived from
   plan/day instead of database row ids), so re-importing a revised plan into a
   calendar app no longer creates all-new events.
