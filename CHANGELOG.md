@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **Google Calendar sync of the training plan** (opt-in): the plan mirrors
+  itself into a dedicated Google calendar via a service account — after every
+  plan change, nightly, and on demand (`make gcal-sync`). Events are keyed by a
+  stable id so plan revisions update/remove events in place instead of
+  duplicating them. Configure with `FARTLEK_GCAL_CALENDAR_ID` +
+  `FARTLEK_GCAL_KEY_FILE` (see README → Training plans).
 - **Weather range per activity**: enrichment now records min→max temperature and
   humidity across every hour the activity touches (a morning marathon spanning
   9→21 °C no longer reads as a single midpoint sample), shown on the activity
@@ -21,6 +27,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 - **Records** page sections are sorted by distance and show the top 5 efforts
   per distance (was 3).
+- `.ics` export UIDs are now stable across plan re-imports (derived from
+  plan/day instead of database row ids), so re-importing a revised plan into a
+  calendar app no longer creates all-new events.
 
 ### Fixed
 - **Records** page dates now include the year, and columns align across the

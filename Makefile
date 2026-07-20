@@ -5,7 +5,7 @@ VENV ?= $(if $(wildcard .venv),.venv,$(HOME)/.venvs/fartlek)
 PY = $(VENV)/bin/python
 NODE_BIN = node
 
-.PHONY: help login sync backfill recompute serve dev test typecheck build-frontend install-service
+.PHONY: help login sync backfill recompute serve dev test typecheck build-frontend install-service gcal-sync
 
 help:
 	@echo "Fartlek targets:"
@@ -49,6 +49,9 @@ vo2max:
 
 backup:
 	$(PY) -m backend.cli backup
+
+gcal-sync:
+	$(PY) -m backend.cli gcal-sync
 
 serve:
 	$(PY) -m backend.cli serve

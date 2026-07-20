@@ -14,6 +14,7 @@ dependencies = [
     "fitdecode>=0.10",
     "apscheduler>=3.10,<4",
     "requests>=2.31",
+    "google-auth>=2.30",
 ]
 
 [dependency-groups]
