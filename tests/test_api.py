@@ -1,11 +1,9 @@
-import os
-import tempfile
 from datetime import datetime
 
 import pytest
 
-os.environ["FARTLEK_SCHEDULER_ENABLED"] = "0"
-os.environ["FARTLEK_DATA_DIR"] = tempfile.mkdtemp(prefix="fartlek-test-")
+# DB/env isolation lives in conftest.py — it must run before any backend
+# import, regardless of which test module pytest loads first.
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -382,8 +380,10 @@ def test_plan_ics_export(client):
 
 
 def test_plan_ics_export_non_ascii_plan_name(client):
-    # Em-dash and colon in the plan name must not break the download headers.
-    name = "sub-2:45 Valencia — Dec 6"
+    # Em-dash, colon and non-ASCII in the plan name must not break the download
+    # headers. Deliberately NOT a plausible real plan name: plan tests delete by
+    # name, so a name collision with production data must stay impossible.
+    name = "tëst-plan: ics — häders"
     client.post("/api/plan", json={"workouts": [
         {"day": "2026-08-10", "title": "Easy 10K", "workout_type": "easy",
          "target_distance_m": 10000, "plan_name": name},
@@ -393,8 +393,8 @@ def test_plan_ics_export_non_ascii_plan_name(client):
     assert response.status_code == 200
     disposition = response.headers["content-disposition"]
     assert disposition.encode("latin-1")  # header must be encodable
-    assert 'filename="sub-2-45-Valencia-Dec-6.ics"' in disposition
-    assert "X-WR-CALNAME:sub-2:45 Valencia — Dec 6" in response.text
+    assert 'filename="t-st-plan-ics-h-ders.ics"' in disposition
+    assert "X-WR-CALNAME:tëst-plan: ics — häders" in response.text
     client.delete(f"/api/plan?plan_name={quote(name)}")
 
 

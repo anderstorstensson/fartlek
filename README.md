@@ -140,6 +140,7 @@ copy the FIT files back to `data/fit/`, restore `athlete-profile.md`, run
 | `make vo2max` | Backfill daily VO2 max history from Garmin |
 | `make weather` | Backfill historical weather for activities missing it |
 | `make backup` | DB snapshot + rclone upload (see Backups) |
+| `make gcal-sync` | Push the training plan to Google Calendar (see Training plans) |
 | `make test` | Backend test suite |
 | `make dev` | Frontend dev server with hot reload (proxies API to :8077) |
 | `make typecheck` | Frontend type checking |
@@ -195,6 +196,31 @@ sick or missed a session, approve its proposal, and it edits the calendar throug
 plan API (`GET/POST/PUT/DELETE /api/plan…`). Plans can also be deleted from the
 Calendar page directly.
 
+### Google Calendar sync (optional)
+
+The plan can mirror itself into a Google calendar automatically — no `.ics`
+re-imports, no duplicates. Events are keyed by a stable id, so plan revisions
+update or remove existing events in place; only events created by the sync are
+ever touched. Sync runs after every plan change, nightly at 04:15 as a
+reconcile pass, and on demand via `make gcal-sync`.
+
+One-time setup (uses a service account, so no OAuth browser flow and nothing
+exposed to the internet):
+
+1. In the [Google Cloud console](https://console.cloud.google.com/): create a
+   project, enable the **Google Calendar API**, create a **service account**
+   (no roles needed), and download a JSON key for it to
+   `data/gcal-service-account.json` (or set `FARTLEK_GCAL_KEY_FILE`).
+2. In Google Calendar: create a **dedicated calendar** (e.g. "Training") and
+   share it with the service account's email address (the `client_email` in the
+   JSON key) with **"Make changes to events"** permission.
+3. Set `FARTLEK_GCAL_CALENDAR_ID` to the calendar's id (calendar settings →
+   "Integrate calendar"; looks like `…@group.calendar.google.com`) and restart
+   the app. Run `make gcal-sync` once to verify and do the first push.
+
+The one-shot `.ics` export remains available on the Calendar page for other
+calendar apps.
+
 ## Configuration
 
 Environment variables (prefix `FARTLEK_`): `FARTLEK_PORT` (8077), `FARTLEK_HOST`,
@@ -203,7 +229,9 @@ Environment variables (prefix `FARTLEK_`): `FARTLEK_PORT` (8077), `FARTLEK_HOST`
 `FARTLEK_RCLONE_REMOTE` (backup destination, empty = off), `FARTLEK_BACKUP_KEEP` (7),
 `FARTLEK_BACKUP_HOUR` (3), `FARTLEK_BACKUP_INCLUDE_FIT` (1),
 `FARTLEK_BACKUP_INCLUDE_TOKENS` (0), `FARTLEK_COACH_ENABLED` (0 — the in-app Coach
-agent, off by default; see [The Coach tab](#the-coach-tab-in-app-claude-code)).
+agent, off by default; see [The Coach tab](#the-coach-tab-in-app-claude-code)),
+`FARTLEK_GCAL_CALENDAR_ID` and `FARTLEK_GCAL_KEY_FILE` (Google Calendar plan sync,
+empty = off; see [Training plans](#training-plans)).
 Athlete parameters (max/resting HR, LTHR, threshold pace) are edited in the web UI
 under Settings; saving triggers a metric recompute. Display preferences — metric or
 imperial units and date/time format — live there too.

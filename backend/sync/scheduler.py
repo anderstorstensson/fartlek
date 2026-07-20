@@ -40,6 +40,21 @@ def start_scheduler() -> None:
             id="nightly_backup",
         )
         logger.info("Nightly backup scheduled at %02d:30", config.backup_hour)
+    if config.gcal_enabled:
+        from backend.sync.gcal import sync_quietly
+
+        # Plan mutations already trigger a sync; this nightly pass reconciles
+        # anything missed (app restarts, transient Google API failures).
+        _scheduler.add_job(
+            sync_quietly,
+            "cron",
+            hour=4,
+            minute=15,
+            max_instances=1,
+            coalesce=True,
+            id="gcal_plan_sync",
+        )
+        logger.info("Nightly Google Calendar plan sync scheduled at 04:15")
     _scheduler.start()
     logger.info("Auto-sync scheduled every %d minutes", config.sync_interval_minutes)
 

@@ -145,6 +145,23 @@ def cmd_backup() -> int:
     return 0
 
 
+def cmd_gcal_sync() -> int:
+    from backend.db import init_db
+    from backend.sync.gcal import GcalError, sync_plan
+
+    init_db()
+    try:
+        result = sync_plan()
+    except GcalError as exc:
+        print(f"Google Calendar sync failed: {exc}", file=sys.stderr)
+        return 1
+    print(
+        f"Google Calendar: {result['created']} created, {result['updated']} updated, "
+        f"{result['deleted']} deleted, {result['unchanged']} unchanged."
+    )
+    return 0
+
+
 def cmd_serve() -> int:
     import uvicorn
 
@@ -176,6 +193,7 @@ def main() -> int:
     vo2max_parser = sub.add_parser("vo2max", help="Backfill daily VO2 max history")
     vo2max_parser.add_argument("--days", type=int, default=3650, help="Days back to fetch")
     sub.add_parser("backup", help="Snapshot the DB and upload via rclone (if configured)")
+    sub.add_parser("gcal-sync", help="Push the training plan to Google Calendar")
     sub.add_parser("serve", help="Run the web application")
 
     args = parser.parse_args()
@@ -199,6 +217,8 @@ def main() -> int:
         return cmd_vo2max(args.days)
     if args.command == "backup":
         return cmd_backup()
+    if args.command == "gcal-sync":
+        return cmd_gcal_sync()
     return cmd_serve()
 
 
