@@ -754,6 +754,18 @@ Rules:
   volume or placement differ in *trajectory and ceiling*, and the Feel line must say
   so: a 4×5K peak long run does not read like the 3×5K three weeks earlier, and the
   plan's hardest day should be identifiable from its Feel line alone.
+  **This split is deliberate and distance-agnostic.** The plan's *scaffolding* — easy,
+  recovery, plain long runs, and sub-threshold work — keeps a **flat effort contract**
+  for the whole block: those sessions progress through more volume and density at the
+  *same* feel (that is the sub-threshold design), never through a quietly rising RPE —
+  inflating their Feel to signal an important week is a defect. The *race-specific
+  strand* is where trajectory and ceiling **escalate toward the peak key session(s)**:
+  as reps stack, recoveries shrink, or quality moves deeper into fatigue, the
+  final-rep ceiling may rise a point (a 5K block's densest goal-pace session drifting
+  8→9; the marathon's peak MP long run touching 8). When it does, the Feel line states
+  it explicitly, and the session's **objective criterion (pace, HR) stays the
+  downgrade verdict** — the raised ceiling is permission to hurt at the prescribed
+  pace, never license to push past it.
 - `target_distance_m` is mandatory for every running session and must be the **total
   session volume including warmup/cooldown/recovery jogs** — the calendar sums it into
   weekly planned totals, so per-session totals must add up to the week's stated km.
