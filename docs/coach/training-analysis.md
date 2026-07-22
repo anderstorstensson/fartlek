@@ -209,7 +209,12 @@ consistently. The coach-advisor's internal review verdicts are unaffected.
      vs `target_distance_m`. Then the verdict that matters: **did the session
      achieve its stated physiological purpose?** A sub-threshold session run 5%
      too fast trained the wrong system even if it felt great; classify deviations
-     as conscious decision vs drift.
+     as conscious decision vs drift. When the description carries a `Feel:` RPE,
+     compare it against the athlete's reported `perceived_exertion` — same 1–10
+     scale by design. A match is evidence the right system was trained even when
+     pace missed (wind, heat, trails corrupt pace, not effort); a divergence is a
+     finding in itself: reported ≫ prescribed → fatigue, illness, or a stale
+     anchor; reported ≪ prescribed → fitness may have moved past the plan's paces.
    - If the plan expected something else that day (a rest day, an easy run), say
      so — unplanned quality on a rest day is itself the finding.
    - If no plan covers the date, analyze on the session's inferred purpose as below.
@@ -719,6 +724,27 @@ Rules:
   (markdown supported), so it must stand alone: warmup, the work (reps × distance/time
   @ pace or HR), **recovery between reps** (duration and jog/stand), cooldown, and
   execution cues. A session a coach couldn't hand to a stranger is underspecified.
+- **Every running session's description also carries a `**Feel:**` element** — the
+  prescribed effort as RPE on the **same 1–10 scale the watch prompts for**
+  (`perceived_exertion`), stated for the *work* (not warmup), plus a plain-words
+  talk-test anchor and the correction cue for when it feels wrong. A system name
+  ("sub-threshold") tells the athlete nothing about how hard to run without a recent
+  lactate test or race — the RPE + talk test is the effort contract, and it holds up
+  in heat, wind and on trails where pace targets go wrong. Guide values:
+  - *recovery* 2/10 — full conversation, nose-breathing possible;
+  - *easy/endurance* 3–4/10 — conversational in full sentences;
+  - *long run* 3–4/10, ≤5 late — still-comfortable sentences at the end;
+  - *sub-threshold* 6/10, at most 7 on the final rep — short sentences possible,
+    finish certain there were ≥2 more reps in the tank; 8/10 = crossed threshold;
+  - *marathon pace* 5–6/10 fresh ("suspiciously manageable"), 6→7 inside long runs —
+    the drift on tired legs is the training;
+  - *VO2max* first rep ≈7/10 building to 8–9 — single words only, never sprint-desperate;
+  - *race-pace reps* 7–8/10 — one notch easier than racing, HR settling between reps.
+  Interval sessions state the **trajectory** (first rep vs last) — a first rep that
+  already feels like the last one is the too-fast alarm. Strides and `[speed]`
+  neuromuscular work get a relaxation cue ("fast and relaxed, finish springy"), never
+  an RPE — 20 s efforts aren't effort-regulated. Races carry their effort prescription
+  inside the pacing/contingency plan instead of a separate Feel line.
 - `target_distance_m` is mandatory for every running session and must be the **total
   session volume including warmup/cooldown/recovery jogs** — the calendar sums it into
   weekly planned totals, so per-session totals must add up to the week's stated km.
