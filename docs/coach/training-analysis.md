@@ -737,7 +737,10 @@ Rules:
   - *sub-threshold* 6/10, at most 7 on the final rep — short sentences possible,
     finish certain there were ≥2 more reps in the tank; 8/10 = crossed threshold;
   - *marathon pace* 5–6/10 fresh ("suspiciously manageable"), 6→7 inside long runs —
-    the drift on tired legs is the training;
+    the drift on tired legs is the training. A **peak** MP long run's final rep may
+    legitimately touch 8 while pace and HR hold — there the session's pace+HR
+    criterion, not feel, is the downgrade verdict, and the Feel line must say so
+    rather than letting a generic "8 = too hard" cue contradict it;
   - *VO2max* first rep ≈7/10 building to 8–9 — single words only, never sprint-desperate;
   - *race-pace reps* 7–8/10 — one notch easier than racing, HR settling between reps.
   Interval sessions state the **trajectory** (first rep vs last) — a first rep that
@@ -745,6 +748,12 @@ Rules:
   neuromuscular work get a relaxation cue ("fast and relaxed, finish springy"), never
   an RPE — 20 s efforts aren't effort-regulated. Races carry their effort prescription
   inside the pacing/contingency plan instead of a separate Feel line.
+  Keep the **numbers and anchors** consistent — same contract, same RPE — but **vary
+  the wording naturally** across sessions: a calendar of copy-pasted sentences reads
+  like a mail merge and gets skimmed. And sessions that share a pace but differ in
+  volume or placement differ in *trajectory and ceiling*, and the Feel line must say
+  so: a 4×5K peak long run does not read like the 3×5K three weeks earlier, and the
+  plan's hardest day should be identifiable from its Feel line alone.
 - `target_distance_m` is mandatory for every running session and must be the **total
   session volume including warmup/cooldown/recovery jogs** — the calendar sums it into
   weekly planned totals, so per-session totals must add up to the week's stated km.
