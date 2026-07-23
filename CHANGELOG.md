@@ -4,7 +4,7 @@ All notable changes to Fartlek are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] — 2026-07-23
 
 ### Added
 - **Google Calendar sync of the training plan** (opt-in): the plan mirrors
@@ -139,5 +139,5 @@ and all data stays on your machine.
 - All data stays local except optional weather enrichment (rounded coordinates to
   Open-Meteo). `data/` is gitignored.
 
-[Unreleased]: https://github.com/anderstorstensson/fartlek/compare/v0.1.0...HEAD
+[0.2.0]: https://github.com/anderstorstensson/fartlek/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/anderstorstensson/fartlek/releases/tag/v0.1.0
