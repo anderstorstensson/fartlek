@@ -31,6 +31,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `is_workout` flag (auto-set at FIT ingest for structured watch workouts) and
   direct the coach to filter `is_workout = 1 OR tag IN (...)` when searching
   for quality sessions — the manual `tag` alone misses auto-detected workouts.
+- Coach instructions now prescribe a **`Feel:` effort element** in every running
+  workout description — target RPE on the watch's 1–10 scale plus a talk-test
+  anchor and correction cue — so the effort contract holds when heat, wind or
+  trails corrupt pace targets. Session analysis compares the athlete's reported
+  `perceived_exertion` against the prescribed Feel (a divergence is itself a
+  finding). Scaffolding sessions keep a flat effort contract; only the
+  race-specific strand escalates its ceiling toward the peak key session.
 - `.ics` export UIDs are now stable across plan re-imports (derived from
   plan/day instead of database row ids), so re-importing a revised plan into a
   calendar app no longer creates all-new events.
