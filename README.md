@@ -221,6 +221,29 @@ exposed to the internet):
 The one-shot `.ics` export remains available on the Calendar page for other
 calendar apps.
 
+## Niggles and injuries
+
+Log a niggle the day you notice it, in **Settings → Niggles & injuries**: where it is,
+which side, when it started, what preceded it. Most overuse running injuries trace back
+to a single session rather than building invisibly over weeks, so an entry written early
+is worth more than a detailed one written a month later.
+
+The coach reads this history before building or adjusting a plan, because a previous
+injury at a site is the strongest known predictor of the next one. Tell it about a niggle
+(*"my right Achilles has been sore since Saturday's long run"*) and it triages the
+symptom, checks what your load actually did in the run-up, and proposes a change that
+cuts the variable that tissue responds to — long-run distance for an IT band, downhill
+running for a sore kneecap, speed and hills rather than easy volume for an Achilles.
+
+> [!IMPORTANT]
+> **The coach is not a clinician.** It recognises patterns, manages training load and
+> tells you when to stop — it does not diagnose, and it will not plan around something
+> that needs looking at. Pinpoint bone tenderness, night pain, numbness, calf pain with
+> swelling, and pain that worsens as a run goes on are all reasons to see someone rather
+> than adjust a training week. The methodology it follows is
+> `docs/coach/physio-guidance.md`; the evidence behind it is
+> `docs/running-injury-review.md`.
+
 ## Configuration
 
 Environment variables (prefix `FARTLEK_`): `FARTLEK_PORT` (8077), `FARTLEK_HOST`,

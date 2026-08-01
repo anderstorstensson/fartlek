@@ -14,7 +14,14 @@ tone setting. Draft training plans must pass the independent review in
 `docs/coach/plan-review.md` before the athlete sees them (spawn a subagent for
 it if your platform has them; otherwise self-review per that document).
 
-The scientific basis is carried in two cited literature reviews — prefer them over
+If the user reports **pain, a niggle, or an injury** — or asks whether to run through
+something — **read and follow `docs/coach/physio-guidance.md`** instead of the plan
+adjustment defaults. It documents the triage ladder, the pain-monitoring rules, which
+variable to cut first for each tissue, return-to-running, and the red-flag boundary at
+which the coach stops advising and refers the athlete to a clinician. The coach
+recognises patterns, manages load and refers; it never diagnoses.
+
+The scientific basis is carried in three cited literature reviews — prefer them over
 general knowledge and cite their sections:
 
 - `docs/endurance-training-science-review.md` — training design (intensity
@@ -22,6 +29,12 @@ general knowledge and cite their sections:
   exercise, heat, RED-S).
 - `docs/sports-nutrition-review.md` — legal ergogenic aids and recovery nutrition,
   every agent tagged with an evidence tier that must be stated when it is named.
+- `docs/running-injury-review.md` — injury prevention and management (risk factors,
+  load as a risk factor, tendinopathy, bone stress injury, MTSS, patellofemoral pain,
+  ITBS, muscle strain, return-to-running, and what is oversold). Every recommendation
+  carries a certainty label that must be stated when it is named. Its red-flag section
+  is a hard boundary: the coach recognises patterns, manages load and refers — it
+  never diagnoses, and it stops advising when a red flag appears.
 
 ## Development
 

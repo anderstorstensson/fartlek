@@ -11,6 +11,7 @@ import {
 } from '../api'
 import { analyzePrompt, coachUrl } from '../coachLink'
 import ActivityMap from '../components/ActivityMap'
+import LogNiggleForm from '../components/LogNiggleForm'
 import NoteCard from '../components/NoteCard'
 import PaceZoneChart from '../components/PaceZoneChart'
 import RelativeEffortCard from '../components/RelativeEffortCard'
@@ -183,6 +184,7 @@ export default function ActivityDetailPage() {
   const navigate = useNavigate()
   const [version, setVersion] = useState(0)
   const [editing, setEditing] = useState(false)
+  const [loggingNiggle, setLoggingNiggle] = useState(false)
   const detail = useApi<ActivityDetail>(id ? `/api/activities/${id}?v=${version}` : null)
   const streams = useApi<Streams>(id ? `/api/activities/${id}/streams` : null)
   const notes = useApi<AnalysisNote[]>(id ? `/api/notes?activity_id=${id}` : null)
@@ -246,6 +248,15 @@ export default function ActivityDetailPage() {
         >
           Edit
         </button>
+        {' '}
+        <button
+          className="ghost"
+          style={{ padding: '2px 10px', fontSize: 12 }}
+          onClick={() => setLoggingNiggle(!loggingNiggle)}
+          title="Log a niggle that started in this run"
+        >
+          🩹 Something hurt
+        </button>
         {coachReady && (
           <>
             {' '}
@@ -259,6 +270,14 @@ export default function ActivityDetailPage() {
           </>
         )}
       </p>
+
+      {loggingNiggle && (
+        <LogNiggleForm
+          activity={activity}
+          onSaved={() => setLoggingNiggle(false)}
+          onCancel={() => setLoggingNiggle(false)}
+        />
+      )}
 
       {editing && (
         <EditForm

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   ActivityList,
   FitnessPoint,
+  Niggle,
   PlannedWorkout,
   Race,
   Readiness,
@@ -13,6 +14,7 @@ import {
 import FitnessChart from '../components/FitnessChart'
 import StatCard from '../components/StatCard'
 import WeeklyChart, { WeeklyMetric } from '../components/WeeklyChart'
+import { describe } from '../niggles'
 import {
   formatDate,
   formatDistance,
@@ -133,6 +135,8 @@ export default function Dashboard() {
   )
   const readiness = useApi<Readiness | null>('/api/wellness/readiness')
   const races = useApi<Race[]>('/api/races?upcoming=true')
+  const niggles = useApi<Niggle[]>('/api/niggles?active_only=true')
+  const activeNiggles = niggles.data ?? []
   const nextRace = races.data?.[0]
   // Project the fitness curve through the next race (or 4 weeks of plan);
   // wait for the races call so the chart doesn't fetch twice.
@@ -157,6 +161,16 @@ export default function Dashboard() {
   return (
     <>
       <h1>Dashboard</h1>
+      {activeNiggles.length > 0 && (
+        <div className="notice-box" style={{ marginBottom: 16 }}>
+          <strong>Carrying {activeNiggles.length === 1 ? 'a niggle' : 'niggles'}:</strong>{' '}
+          {activeNiggles.map((n) => describe(n)).join(', ')}
+          {activeNiggles.some((n) => n.tier === 3) && (
+            <> — one is flagged for referral, which is a clinician's call, not a training one.</>
+          )}{' '}
+          <Link to="/settings">Manage</Link>
+        </div>
+      )}
       {summary && summary.total_activities === 0 && (
         <div className="card">
           <p>No activities yet. To get started:</p>

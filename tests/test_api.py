@@ -445,6 +445,83 @@ def test_notes_crud(client):
     assert client.delete("/api/notes/99999").status_code == 404
 
 
+def test_niggles_crud(client):
+    created = client.post(
+        "/api/niggles",
+        json={"site": "achilles", "side": "right", "onset_date": "2026-07-26",
+              "onset_activity_id": 1, "tier": 1,
+              "trigger": "31 km long run, +48% vs 4-week average",
+              "note": "mid-portion, morning stiffness"},
+    ).json()
+    assert created["id"] > 0
+    # active/duration are derived from resolved_date, never stored.
+    assert created["active"] is True
+    assert created["duration_days"] is None
+
+    by_site = client.get("/api/niggles?site=achilles").json()
+    assert len(by_site) == 1
+    assert by_site[0]["trigger"].startswith("31 km long run")
+    assert client.get("/api/niggles?site=calf").json() == []
+
+    resolved = client.put(
+        f"/api/niggles/{created['id']}",
+        json={"site": "achilles", "side": "right", "onset_date": "2026-07-26",
+              "tier": 1, "response": "cut speed and hills 2 wks, kept easy volume",
+              "resolved_date": "2026-08-24"},
+    ).json()
+    assert resolved["active"] is False
+    assert resolved["duration_days"] == 29
+
+    active = client.post(
+        "/api/niggles",
+        json={"site": "shin", "onset_date": "2026-08-01", "tier": 2},
+    ).json()
+    assert active["side"] == "na"
+    only_active = client.get("/api/niggles?active_only=true").json()
+    assert [n["id"] for n in only_active] == [active["id"]]
+
+    # Anatomical vocabulary is enforced — a diagnosis is not a site.
+    assert client.post(
+        "/api/niggles", json={"site": "tendinitis", "onset_date": "2026-08-01"}
+    ).status_code == 422
+    assert client.post(
+        "/api/niggles", json={"site": "shin", "onset_date": "2026-08-01", "tier": 4}
+    ).status_code == 422
+    # Resolution cannot precede onset.
+    assert client.post(
+        "/api/niggles",
+        json={"site": "shin", "onset_date": "2026-08-01", "resolved_date": "2026-07-01"},
+    ).status_code == 422
+
+    for niggle_id in (created["id"], active["id"]):
+        assert client.delete(f"/api/niggles/{niggle_id}").json() == {"deleted": niggle_id}
+    assert client.delete("/api/niggles/99999").status_code == 404
+
+
+def test_niggles_survive_activity_reimport(client):
+    """onset_activity_id is not a FK: a Garmin re-import deletes and recreates
+    activity rows, and injury history must outlive that."""
+    from backend.db import session_scope
+    from backend.models import Activity
+
+    niggle = client.post(
+        "/api/niggles",
+        json={"site": "calf", "onset_date": "2026-07-26", "onset_activity_id": 4242},
+    ).json()
+
+    with session_scope() as session:
+        session.add(Activity(id=4242, name="Long Run", sport="running",
+                             start_time_utc=datetime(2026, 7, 26, 6, 0),
+                             start_time_local=datetime(2026, 7, 26, 8, 0),
+                             elapsed_s=9000, moving_s=9000, distance_m=31000))
+    with session_scope() as session:
+        session.delete(session.get(Activity, 4242))
+
+    survivor = client.get(f"/api/niggles/{niggle['id']}").json()
+    assert survivor["onset_activity_id"] == 4242
+    client.delete(f"/api/niggles/{niggle['id']}")
+
+
 def test_coach_history_and_guards(client, monkeypatch):
     from backend.api import coach as coach_module
     loopback = {"host": f"127.0.0.1:{coach_module.config.port}"}
