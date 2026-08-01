@@ -492,6 +492,10 @@ def test_niggles_crud(client):
         "/api/niggles",
         json={"site": "shin", "onset_date": "2026-08-01", "resolved_date": "2026-07-01"},
     ).status_code == 422
+    # Pagination bounds are enforced, not silently clamped.
+    assert client.get("/api/niggles?limit=0").status_code == 422
+    assert client.get("/api/niggles?limit=201").status_code == 422
+    assert client.get("/api/niggles?offset=-1").status_code == 422
 
     for niggle_id in (created["id"], active["id"]):
         assert client.delete(f"/api/niggles/{niggle_id}").json() == {"deleted": niggle_id}

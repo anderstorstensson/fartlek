@@ -6,7 +6,7 @@ is only useful if it can be queried against training load. Methodology lives in
 docs/coach/physio-guidance.md; the evidence in docs/running-injury-review.md.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -21,8 +21,8 @@ router = APIRouter(prefix="/api/niggles", tags=["niggles"])
 def list_niggles(
     active_only: bool = False,
     site: str | None = None,
-    limit: int = 50,
-    offset: int = 0,
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     session: Session = Depends(get_session),
 ) -> list[NiggleOut]:
     query = select(Niggle)
@@ -31,7 +31,7 @@ def list_niggles(
     if site:
         query = query.where(Niggle.site == site)
     return session.scalars(
-        query.order_by(Niggle.onset_date.desc()).limit(min(limit, 200)).offset(offset)
+        query.order_by(Niggle.onset_date.desc()).limit(limit).offset(offset)
     ).all()
 
 

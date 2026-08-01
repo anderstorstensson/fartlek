@@ -137,6 +137,7 @@ export default function Dashboard() {
   const races = useApi<Race[]>('/api/races?upcoming=true')
   const niggles = useApi<Niggle[]>('/api/niggles?active_only=true')
   const activeNiggles = niggles.data ?? []
+  const referredCount = activeNiggles.filter((n) => n.tier === 3).length
   const nextRace = races.data?.[0]
   // Project the fitness curve through the next race (or 4 weeks of plan);
   // wait for the races call so the chart doesn't fetch twice.
@@ -165,8 +166,11 @@ export default function Dashboard() {
         <div className="notice-box" style={{ marginBottom: 16 }}>
           <strong>Carrying {activeNiggles.length === 1 ? 'a niggle' : 'niggles'}:</strong>{' '}
           {activeNiggles.map((n) => describe(n)).join(', ')}
-          {activeNiggles.some((n) => n.tier === 3) && (
-            <> — one is flagged for referral, which is a clinician's call, not a training one.</>
+          {referredCount > 0 && (
+            <>
+              {' '}— {referredCount === 1 ? 'one is' : `${referredCount} are`} flagged for
+              referral, which is a clinician's call, not a training one.
+            </>
           )}{' '}
           <Link to="/settings">Manage</Link>
         </div>

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -13,8 +13,8 @@ router = APIRouter(prefix="/api/notes", tags=["notes"])
 def list_notes(
     activity_id: int | None = None,
     kind: str | None = None,
-    limit: int = 50,
-    offset: int = 0,
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     session: Session = Depends(get_session),
 ) -> list[NoteOut]:
     query = select(AnalysisNote)
@@ -23,7 +23,7 @@ def list_notes(
     if kind:
         query = query.where(AnalysisNote.kind == kind)
     return session.scalars(
-        query.order_by(AnalysisNote.created_at.desc()).limit(min(limit, 200)).offset(offset)
+        query.order_by(AnalysisNote.created_at.desc()).limit(limit).offset(offset)
     ).all()
 
 

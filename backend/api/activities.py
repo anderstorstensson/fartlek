@@ -36,8 +36,8 @@ router = APIRouter(prefix="/api/activities", tags=["activities"])
 
 @router.get("", response_model=ActivityList)
 def list_activities(
-    limit: int = 50,
-    offset: int = 0,
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     sport: str | None = None,
     q: str | None = None,
     start: date | None = None,
@@ -59,7 +59,7 @@ def list_activities(
 
     total = session.scalar(select(func.count()).select_from(query.subquery())) or 0
     items = session.scalars(
-        query.order_by(Activity.start_time_utc.desc()).limit(min(limit, 500)).offset(offset)
+        query.order_by(Activity.start_time_utc.desc()).limit(limit).offset(offset)
     ).all()
     analyzed = _analyzed_ids(session, [a.id for a in items])
     summaries = []
