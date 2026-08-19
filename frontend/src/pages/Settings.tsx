@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { fetchJson, Settings, SyncStatus } from '../api'
+import NigglesSection from '../components/NigglesSection'
 import RacesSection from '../components/RacesSection'
 import {
   formatPaceFromSeconds,
@@ -118,6 +119,8 @@ export default function SettingsPage() {
       </div>
 
       <RacesSection />
+
+      <NigglesSection />
 
       <h2>Athlete</h2>
       {settings && (

@@ -19,7 +19,9 @@ The draft plan (week-by-week with sessions), the athlete's baseline numbers, and
 goal. If any of these are missing, or you want to verify claims, gather ground truth
 yourself (read-only):
 
-- Athlete profile: `data/athlete-profile.md` (constraints, injury history, availability)
+- Athlete profile: `data/athlete-profile.md` (constraints, availability, training history)
+- Injury history: `scripts/api GET /api/niggles` (episodes, active and resolved) — the
+  authority, not the profile
 - Database: `scripts/db "<query>"` (read-only, tab-separated output) — verify recent
   weekly volume (activities table), best efforts, current training frequency
 - API when running: `scripts/api GET "/api/trends/fitness?model=trimp&days=90"`
@@ -33,7 +35,7 @@ Do not trust the drafting session's stated baseline — spot-check it against th
 
 ## Scientific authority — the literature reviews
 
-Two documents form the evidence base for this review:
+Three documents form the evidence base for this review:
 
 - **`docs/endurance-training-science-review.md`** — training design. **Read the sections
   relevant to the plan** (§15 is the app-element→principle map; grep the headings to
@@ -43,6 +45,12 @@ Two documents form the evidence base for this review:
 - **`docs/sports-nutrition-review.md`** — ergogenic aids and recovery nutrition. Consult
   it whenever the plan names a supplement, a caffeine protocol, a recovery-nutrition
   target, or a race-week ingestion strategy.
+- **`docs/running-injury-review.md`** — injury prevention and management. Consult it
+  whenever the inputs show a current niggle or injury, or the plan itself references one
+  (rubric item 11). Note its load conclusions differ from lore: the 10% rule failed its
+  RCT (§5), the alarm line is a >30% weekly-distance jump over 2 weeks (§5), and ACWR is
+  not a validated injury threshold (§5) — a plan defended on any of those grounds is a
+  finding.
 
 Judge the plan against these conclusions, not against generic lore, and cite section
 numbers in your findings. Note the boundary: carbohydrate *during* exercise is
@@ -96,7 +104,9 @@ training-science §12, post-exercise carbohydrate is nutrition §13.
    confidence against the athlete's multi-year history (query weekly km over 3+ years):
    volumes the athlete has repeatedly sustained without injury are proven capacity, and
    capping a proven 130 km/wk athlete at recent-weeks math is a finding just as
-   overreaching a fragile one is. Cross-check against the profile's injury history.
+   overreaching a fragile one is. Cross-check against the injury history
+   (`GET /api/niggles`) — a site with repeat episodes constrains how fast that tissue's
+   loading is progressed.
 4. **Intensity distribution**: ~80/20 easy/hard by time (firm); the arrangement of the
    hard 20% should be phase/level-appropriate — pyramidal is at least as good as
    polarized for most athletes/phases, polarization is a peaking tool (review §2). ≤2
@@ -127,8 +137,8 @@ training-science §12, post-exercise carbohydrate is nutrition §13.
    the course, fueling as rehearsed in the long runs, contingency paces) — a plan
    whose goal splits assume a flat course on a hilly one, or whose fueling was never
    practiced in training, is a finding.
-8. **Athlete fit**: respects profile constraints (available days, long-run day, injury
-   history, stated preferences). A plan the athlete won't adhere to is a bad plan —
+8. **Athlete fit**: respects profile constraints (available days, long-run day, stated
+   preferences) and the injury history in `/api/niggles`. A plan the athlete won't adhere to is a bad plan —
    flag adherence risks.
 9. **Recovery logic**: down weeks and TSB trajectory allow adaptation; the plan doesn't
    start deep in fatigue (check current TSB).
@@ -140,6 +150,29 @@ training-science §12, post-exercise carbohydrate is nutrition §13.
     performance and health in both sexes and cannot be out-trained; the correct response
     is to hold/reduce load and refer to professional support, not to build a bigger
     block. Absent any such signal, no finding is needed here.
+
+11. **Active injury or unresolved niggle** (injury review §2, §5, §7; methodology in
+    `docs/coach/physio-guidance.md`): **check `scripts/api GET "/api/niggles?active_only=true"`
+    yourself** — do not rely on the drafting session having mentioned it, and check
+    `?site=` history for the sites the plan loads hardest. If there is a current niggle or
+    injury, check what the plan does with it. A plan
+    that *adds* load into an active injury, or that leaves an unresolved symptom
+    unmentioned, is a CRITICAL finding. Check three things specifically:
+    - **Did the plan cut the provoking variable, or just trim uniformly?** Tissue matters:
+      ITBS is distance-sensitive (cut the long run), patellofemoral pain is
+      flexed-knee-load sensitive (cut downhill and stairs), tendinopathy tolerates
+      continued easy running under the pain-monitoring model (cutting it all is an error
+      in the *other* direction), and suspected bone stress injury means running stops
+      entirely rather than being reduced.
+    - **Does a comeback stack on the original ramp?** If a >30% weekly-distance jump
+      preceded the symptom, a plan that repeats that jump is a CRITICAL finding — the 10%
+      rule is not the standard here (injury review §5), >30% over 2 weeks is.
+    - **Any red flag treated as a training problem?** Focal pinpoint bone tenderness,
+      night pain, neurological symptoms, or pain worsening through a run should have
+      stopped the plan and produced a referral. A plan built over one of these is
+      CRITICAL regardless of how well-constructed it otherwise is.
+    Absent any active episode in `/api/niggles` and any injury signal in the inputs, no
+    finding is needed here.
 
 ## Output format (and nothing else)
 

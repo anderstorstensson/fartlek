@@ -485,6 +485,73 @@ class RaceIn(BaseModel):
     notes: str = ""
 
 
+# Anatomical sites, deliberately not diagnoses (physio-guidance.md §1). They map
+# onto the injury review's sections without the app asserting a condition:
+# shin → MTSS or tibial bone stress, knee_lateral → ITBS, knee_anterior →
+# patellofemoral or patellar tendon, foot_plantar → plantar fasciopathy.
+NIGGLE_SITES = (
+    "achilles",
+    "calf",
+    "shin",
+    "knee_anterior",
+    "knee_lateral",
+    "knee_other",
+    "hamstring",
+    "quad",
+    "hip",
+    "glute",
+    "groin",
+    "ankle",
+    "foot_plantar",
+    "foot_other",
+    "back",
+    "other",
+)
+_SITE_PATTERN = f"^({'|'.join(NIGGLE_SITES)})$"
+
+
+class NiggleIn(BaseModel):
+    """An injury/niggle episode. Sites are anatomical, not diagnostic — see
+    docs/coach/physio-guidance.md §1."""
+
+    site: str = Field(pattern=_SITE_PATTERN)
+    side: str = Field(default="na", pattern="^(left|right|both|na)$")
+    onset_date: date
+    onset_activity_id: int | None = None
+    tier: int = Field(default=1, ge=1, le=3)
+    trigger: str = Field(default="", max_length=2000)
+    response: str = Field(default="", max_length=2000)
+    resolved_date: date | None = None
+    note: str = Field(default="", max_length=5000)
+
+    @model_validator(mode="after")
+    def _resolution_after_onset(self) -> "NiggleIn":
+        if self.resolved_date is not None and self.resolved_date < self.onset_date:
+            raise ValueError("resolved_date cannot precede onset_date")
+        return self
+
+
+class NiggleOut(NiggleIn):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def active(self) -> bool:
+        """Derived, never stored — an episode is active until it is resolved."""
+        return self.resolved_date is None
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def duration_days(self) -> int | None:
+        if self.resolved_date is None:
+            return None
+        return (self.resolved_date - self.onset_date).days
+
+
 class CoachMessageOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

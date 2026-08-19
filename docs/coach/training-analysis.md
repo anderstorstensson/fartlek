@@ -40,6 +40,12 @@ Two options, prefer the API when the app is running (it reuses the app's own mat
    - `GET/POST/PUT/DELETE /api/races` — goal races (name, day, distance_m,
      target_time_s); responses include `days_until` and a Riegel `predicted_time_s`
      from the last 120 days of best efforts
+   - `GET/POST/PUT/DELETE /api/niggles` — injury and niggle episodes (site, side,
+     onset_date, onset_activity_id, tier, trigger, response, resolved_date, note);
+     filters `?active_only=true` and `?site=<site>`, and responses add derived
+     `active` + `duration_days`. **Read this before building or adjusting a plan** —
+     previous injury is the strongest known risk factor (injury review §4). Writing to
+     it is governed by `docs/coach/physio-guidance.md` §11
 
 2. **SQLite directly** (works even when the app is down) via the repo's read-only
    query client: `scripts/db "<query>"` from the project root (SQL of `-` reads
@@ -396,7 +402,12 @@ A tailored plan requires knowing the athlete, not just their data. The profile l
   1. Goal: race, distance, date, target time — and a secondary goal if any.
   2. Training availability: days/week, time per day, which day fits the long run,
      access to track/hills/treadmill.
-  3. Injury history and current niggles; what has broken them before.
+  3. Injury history and current niggles; what has broken them before. Previous injury is
+     the strongest known risk factor for a new one (injury review §4). **Do not record it
+     here** — it belongs in the database via `GET/POST/PUT/DELETE /api/niggles`, one row
+     per episode, per `docs/coach/physio-guidance.md` §11. Ask the questions in the
+     interview, then write the answers to the API. If this profile section still holds
+     injury prose from before the table existed, migrate it (§11) and leave a pointer.
   4. Training history: years of consistent running, what type of training they've
      responded well/poorly to. (Highest sustained volume comes from the database —
      see the multi-year capacity analysis below — but ask how those peak blocks
@@ -426,7 +437,7 @@ A tailored plan requires knowing the athlete, not just their data. The profile l
 
 ## Scientific basis — consult the literature reviews
 
-The repo carries two curated, cited evidence syntheses. Prefer them over general
+The repo carries three curated, cited evidence syntheses. Prefer them over general
 knowledge, and cite them when explaining choices to the athlete.
 
 - **`docs/endurance-training-science-review.md`** — training design: intensity
@@ -437,6 +448,10 @@ knowledge, and cite them when explaining choices to the athlete.
   tart cherry, sulforaphane) and recovery nutrition (protein, post-exercise carbohydrate,
   hydration, alcohol, iron/vitamin D, collagen). The authority for supplements and
   recovery nutrition.
+- **`docs/running-injury-review.md`** — injury prevention and management: risk factors,
+  load as a risk factor, tendinopathy, bone stress injury, MTSS, patellofemoral pain,
+  ITBS, muscle strain, return-to-running, and what is oversold. The authority whenever
+  something hurts. Its operational instruction set is `docs/coach/physio-guidance.md`.
 
 The boundary between them is deliberate: **carbohydrate *during* exercise and
 carbohydrate periodization belong to the training-science review §12**; post-exercise
@@ -791,6 +806,13 @@ Rules:
 
 The plan is a living document. When the user reports a missed session, illness,
 unusual fatigue, or a schedule conflict:
+
+**If the report involves pain, a niggle, or an injury, follow
+`docs/coach/physio-guidance.md` instead of the defaults below** — it owns triage, the
+red-flag boundary (where you stop coaching and refer), the pain-monitoring rules, and
+the tissue-specific question of which variable to cut first. Injury adjustment is a
+sibling of the illness adjustment below and uses the same mechanics and approval flow,
+but a uniform volume cut is the wrong move for most injuries.
 
 1. Read the current state: `GET /api/plan?start=<a week ago>&end=<plan end>` plus the
    recent fitness trend (`/api/trends/fitness`) — check TSB before prescribing more load.

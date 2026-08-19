@@ -1,0 +1,1559 @@
+{
+  "by_doi": {
+    "yamato2015def": {
+      "doi": "10.2519/jospt.2015.5741",
+      "title": "A Consensus Definition of Running-Related Injury in Recreational Runners: A Modified Delphi Approach",
+      "authors": [
+        "Yamato",
+        "Saragiotto",
+        "Lopes"
+      ],
+      "n_authors": 3,
+      "year": 2015,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "45",
+      "issue": "5",
+      "page": "375-380",
+      "cited_by": 228,
+      "type": "journal-article"
+    },
+    "videbaek2015inc": {
+      "doi": "10.1007/s40279-015-0333-8",
+      "title": "Incidence of Running-Related Injuries Per 1000 h of running in Different Types of Runners: A Systematic Review and Meta-Analysis",
+      "authors": [
+        "Videbæk",
+        "Bueno",
+        "Nielsen",
+        "Rasmussen"
+      ],
+      "n_authors": 4,
+      "year": 2015,
+      "journal": "Sports Medicine",
+      "volume": "45",
+      "issue": "7",
+      "page": "1017-1026",
+      "cited_by": 327,
+      "type": "journal-article"
+    },
+    "vangent2007": {
+      "doi": "10.1136/bjsm.2006.033548",
+      "title": "Incidence and determinants of lower extremity running injuries in long distance runners: a systematic review",
+      "authors": [
+        "van Gent",
+        "Siem",
+        "van Middelkoop",
+        "van Os",
+        "Bierma-Zeinstra",
+        "Koes"
+      ],
+      "n_authors": 6,
+      "year": 2007,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "41",
+      "issue": "8",
+      "page": "469-480",
+      "cited_by": 1076,
+      "type": "journal-article"
+    },
+    "lopes2012main": {
+      "doi": "10.1007/bf03262301",
+      "title": "What are the Main Running-Related Musculoskeletal Injuries?",
+      "authors": [
+        "Lopes",
+        "Hespanhol",
+        "Yeung",
+        "Costa"
+      ],
+      "n_authors": 4,
+      "year": 2012,
+      "journal": "Sports Medicine",
+      "volume": "42",
+      "issue": "10",
+      "page": "891-905",
+      "cited_by": 593,
+      "type": "journal-article"
+    },
+    "desai2021history": {
+      "doi": "10.2519/jospt.2021.9673",
+      "title": "Recreational Runners With a History of Injury Are Twice as Likely to Sustain a Running-Related Injury as Runners With No History of Injury: A 1-Year Prospective Cohort Study",
+      "authors": [
+        "Desai",
+        "Jungmalm",
+        "Börjesson",
+        "Karlsson",
+        "Grau"
+      ],
+      "n_authors": 5,
+      "year": 2021,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "51",
+      "issue": "3",
+      "page": "144-150",
+      "cited_by": 23,
+      "type": "journal-article"
+    },
+    "correia2024umbrella": {
+      "doi": "10.1016/j.jshs.2024.04.011",
+      "title": "Risk factors for running-related injuries: An umbrella systematic review",
+      "authors": [
+        "Correia",
+        "Machado",
+        "Dominski",
+        "de Castro",
+        "de Brito Fontana",
+        "Ruschel"
+      ],
+      "n_authors": 6,
+      "year": 2024,
+      "journal": "Journal of Sport and Health Science",
+      "volume": "13",
+      "issue": "6",
+      "page": "793-804",
+      "cited_by": 26,
+      "type": "journal-article"
+    },
+    "vanderworp2015sex": {
+      "doi": "10.1371/journal.pone.0114937",
+      "title": "Injuries in Runners; A Systematic Review on Risk Factors and Sex Differences",
+      "authors": [
+        "van der Worp",
+        "ten Haaf",
+        "van Cingel",
+        "de Wijer",
+        "Nijhuis-van der Sanden",
+        "Staal"
+      ],
+      "n_authors": 6,
+      "year": 2015,
+      "journal": "PLOS ONE",
+      "volume": "10",
+      "issue": "2",
+      "page": "e0114937",
+      "cited_by": 300,
+      "type": "journal-article"
+    },
+    "nielsen2013novice": {
+      "doi": "10.1177/2325967113487316",
+      "title": "Predictors of Running-Related Injuries Among 930 Novice Runners",
+      "authors": [
+        "Nielsen",
+        "Buist",
+        "Parner",
+        "Nohr",
+        "Sørensen",
+        "Lind"
+      ],
+      "n_authors": 7,
+      "year": 2013,
+      "journal": "Orthopaedic Journal of Sports Medicine",
+      "volume": "1",
+      "issue": "1",
+      "page": null,
+      "cited_by": 73,
+      "type": "journal-article"
+    },
+    "nielsen2014progression": {
+      "doi": "10.2519/jospt.2014.5164",
+      "title": "Excessive Progression in Weekly Running Distance and Risk of Running-Related Injuries: An Association Which Varies According to Type of Injury",
+      "authors": [
+        "Nielsen",
+        "Parner",
+        "Nohr",
+        "Sørensen",
+        "Lind",
+        "Rasmussen"
+      ],
+      "n_authors": 6,
+      "year": 2014,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "44",
+      "issue": "10",
+      "page": "739-747",
+      "cited_by": 137,
+      "type": "journal-article"
+    },
+    "buist2008gronorun": {
+      "doi": "10.1177/0363546507307505",
+      "title": "No Effect of a Graded Training Program on the Number of Running-Related Injuries in Novice Runners",
+      "authors": [
+        "Buist",
+        "Bredeweg",
+        "van Mechelen",
+        "Lemmink",
+        "Pepping",
+        "Diercks"
+      ],
+      "n_authors": 6,
+      "year": 2007,
+      "journal": "The American Journal of Sports Medicine",
+      "volume": "36",
+      "issue": "1",
+      "page": "33-39",
+      "cited_by": 135,
+      "type": "journal-article"
+    },
+    "ramskov2018runclever": {
+      "doi": "10.1136/bmjsem-2017-000333",
+      "title": "Run Clever – No difference in risk of injury when comparing progression in running volume and running intensity in recreational runners: A randomised trial",
+      "authors": [
+        "Ramskov",
+        "Rasmussen",
+        "Sørensen",
+        "Parner",
+        "Lind",
+        "Nielsen"
+      ],
+      "n_authors": 6,
+      "year": 2018,
+      "journal": "BMJ Open Sport &amp; Exercise Medicine",
+      "volume": "4",
+      "issue": "1",
+      "page": "e000333",
+      "cited_by": 22,
+      "type": "journal-article"
+    },
+    "soligard2016ioc": {
+      "doi": "10.1136/bjsports-2016-096581",
+      "title": "How much is too much? (Part 1) International Olympic Committee consensus statement on load in sport and risk of injury",
+      "authors": [
+        "Soligard",
+        "Schwellnus",
+        "Alonso",
+        "Bahr",
+        "Clarsen",
+        "Dijkstra"
+      ],
+      "n_authors": 18,
+      "year": 2016,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "50",
+      "issue": "17",
+      "page": "1030-1041",
+      "cited_by": 872,
+      "type": "journal-article"
+    },
+    "impellizzeri2020part2": {
+      "doi": "10.4085/1062-6050-501-19",
+      "title": "Training Load and Its Role in Injury Prevention, Part 2: Conceptual and Methodologic Pitfalls",
+      "authors": [
+        "Impellizzeri",
+        "McCall",
+        "Ward",
+        "Bornn",
+        "Coutts"
+      ],
+      "n_authors": 5,
+      "year": 2020,
+      "journal": "Journal of Athletic Training",
+      "volume": "55",
+      "issue": "9",
+      "page": "893-901",
+      "cited_by": 53,
+      "type": "journal-article"
+    },
+    "wang2020acwrlessons": {
+      "doi": "10.1007/s40279-020-01280-1",
+      "title": "Analyzing Activity and Injury: Lessons Learned from the Acute:Chronic Workload Ratio",
+      "authors": [
+        "Wang",
+        "Vargas",
+        "Stokes",
+        "Steele",
+        "Shrier"
+      ],
+      "n_authors": 5,
+      "year": 2020,
+      "journal": "Sports Medicine",
+      "volume": "50",
+      "issue": "7",
+      "page": "1243-1254",
+      "cited_by": 76,
+      "type": "journal-article"
+    },
+    "zouhal2021acwred": {
+      "doi": "10.3389/fphys.2021.669687",
+      "title": "Editorial: Acute: Chronic Workload Ratio: Is There Scientific Evidence?",
+      "authors": [
+        "Zouhal",
+        "Boullosa",
+        "Ramirez-Campillo",
+        "Ali",
+        "Granacher"
+      ],
+      "n_authors": 5,
+      "year": 2021,
+      "journal": "Frontiers in Physiology",
+      "volume": "12",
+      "issue": null,
+      "page": null,
+      "cited_by": 11,
+      "type": "journal-article"
+    },
+    "nakaoka2021dutch": {
+      "doi": "10.1007/s40279-021-01483-0",
+      "title": "The Association Between the Acute:Chronic Workload Ratio and Running-Related Injuries in Dutch Runners: A Prospective Cohort Study",
+      "authors": [
+        "Nakaoka",
+        "Barboza",
+        "Verhagen",
+        "van Mechelen",
+        "Hespanhol"
+      ],
+      "n_authors": 5,
+      "year": 2021,
+      "journal": "Sports Medicine",
+      "volume": "51",
+      "issue": "11",
+      "page": "2437-2447",
+      "cited_by": 15,
+      "type": "journal-article"
+    },
+    "frandsen2025runsafe": {
+      "doi": "10.2519/josptopen.2024.0075",
+      "title": "A Paradigm Shift in Understanding Overuse Running-Related Injuries: Findings From the Garmin-RUNSAFE Study Point to a Sudden Not Gradual Onset",
+      "authors": [
+        "Frandsen",
+        "Simonsen",
+        "Hulme",
+        "Jacobsen",
+        "Nielsen"
+      ],
+      "n_authors": 5,
+      "year": 2025,
+      "journal": "JOSPT Open",
+      "volume": "3",
+      "issue": "1",
+      "page": "85-92",
+      "cited_by": 3,
+      "type": "journal-article"
+    },
+    "bahr2016screening": {
+      "doi": "10.1136/bjsports-2016-096256",
+      "title": "Why screening tests to predict injury do not work—and probably never will…: a critical review",
+      "authors": [
+        "Bahr"
+      ],
+      "n_authors": 1,
+      "year": 2016,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "50",
+      "issue": "13",
+      "page": "776-780",
+      "cited_by": 464,
+      "type": "journal-article"
+    },
+    "warden2014bsi": {
+      "doi": "10.2519/jospt.2014.5334",
+      "title": "Management and Prevention of Bone Stress Injuries in Long-Distance Runners",
+      "authors": [
+        "Warden",
+        "Davis",
+        "Fredericson"
+      ],
+      "n_authors": 3,
+      "year": 2014,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "44",
+      "issue": "10",
+      "page": "749-765",
+      "cited_by": 219,
+      "type": "journal-article"
+    },
+    "fredericson1995mri": {
+      "doi": "10.1177/036354659502300418",
+      "title": "Tibial Stress Reaction in Runners",
+      "authors": [
+        "Fredericson",
+        "Bergman",
+        "Hoffman",
+        "Dillingham"
+      ],
+      "n_authors": 4,
+      "year": 1995,
+      "journal": "The American Journal of Sports Medicine",
+      "volume": "23",
+      "issue": "4",
+      "page": "472-481",
+      "cited_by": 557,
+      "type": "journal-article"
+    },
+    "kijowski2012validation": {
+      "doi": "10.2214/ajr.11.6826",
+      "title": "Validation of MRI Classification System for Tibial Stress Injuries",
+      "authors": [
+        "Kijowski",
+        "Choi",
+        "Shinki",
+        "Del Rio",
+        "De Smet"
+      ],
+      "n_authors": 5,
+      "year": 2012,
+      "journal": "American Journal of Roentgenology",
+      "volume": "198",
+      "issue": "4",
+      "page": "878-884",
+      "cited_by": 111,
+      "type": "journal-article"
+    },
+    "ditmars2020recovery": {
+      "doi": "10.1007/s00247-020-04760-8",
+      "title": "MRI of tibial stress fractures: relationship between Fredericson classification and time to recovery in pediatric athletes",
+      "authors": [
+        "Ditmars",
+        "Ruess",
+        "Young",
+        "Hu",
+        "MacDonald",
+        "Ravindran"
+      ],
+      "n_authors": 7,
+      "year": 2020,
+      "journal": "Pediatric Radiology",
+      "volume": "50",
+      "issue": "12",
+      "page": "1735-1741",
+      "cited_by": 5,
+      "type": "journal-article"
+    },
+    "george2024rtr": {
+      "doi": "10.1007/s40279-024-02051-y",
+      "title": "Criteria and Guidelines for Returning to Running Following a Tibial Bone Stress Injury: A Scoping Review",
+      "authors": [
+        "George",
+        "Sheerin",
+        "Reid"
+      ],
+      "n_authors": 3,
+      "year": 2024,
+      "journal": "Sports Medicine",
+      "volume": "54",
+      "issue": "9",
+      "page": "2247-2265",
+      "cited_by": 11,
+      "type": "journal-article"
+    },
+    "warden2021optimalload": {
+      "doi": "10.2519/jospt.2021.9982",
+      "title": "Optimal Load for Managing Low-Risk Tibial and Metatarsal Bone Stress Injuries in Runners: The Science Behind the Clinical Reasoning",
+      "authors": [
+        "Warden",
+        "Edwards",
+        "Willy"
+      ],
+      "n_authors": 3,
+      "year": 2021,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "51",
+      "issue": "7",
+      "page": "322-330",
+      "cited_by": 25,
+      "type": "journal-article"
+    },
+    "mcinnis2016highrisk": {
+      "doi": "10.1016/j.pmrj.2015.09.019",
+      "title": "High‐Risk Stress Fractures: Diagnosis and Management",
+      "authors": [
+        "McInnis",
+        "Ramey"
+      ],
+      "n_authors": 2,
+      "year": 2016,
+      "journal": "PM&amp;R",
+      "volume": "8",
+      "issue": "3S",
+      "page": null,
+      "cited_by": 92,
+      "type": "journal-article"
+    },
+    "aljanabi2023blackline": {
+      "doi": "10.5334/jbsr.3050",
+      "title": "The Dreaded Black Line",
+      "authors": [
+        "Al-Janabi",
+        "Gupta",
+        "Döring"
+      ],
+      "n_authors": 3,
+      "year": 2023,
+      "journal": "Journal of the Belgian Society of Radiology",
+      "volume": "107",
+      "issue": "1",
+      "page": null,
+      "cited_by": 2,
+      "type": "journal-article"
+    },
+    "mountjoy2023reds": {
+      "doi": "10.1136/bjsports-2023-106994",
+      "title": "2023 International Olympic Committee’s (IOC) consensus statement on Relative Energy Deficiency in Sport (REDs)",
+      "authors": [
+        "Mountjoy",
+        "Ackerman",
+        "Bailey",
+        "Burke",
+        "Constantini",
+        "Hackney"
+      ],
+      "n_authors": 17,
+      "year": 2023,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "57",
+      "issue": "17",
+      "page": "1073-1098",
+      "cited_by": 608,
+      "type": "journal-article"
+    },
+    "joy2014triad": {
+      "doi": "10.1249/jsr.0000000000000077",
+      "title": "2014 Female Athlete Triad Coalition Consensus Statement on Treatment and Return to Play of the Female Athlete Triad",
+      "authors": [
+        "Joy",
+        "De Souza",
+        "Nattiv",
+        "Misra",
+        "Williams",
+        "Mallinson"
+      ],
+      "n_authors": 18,
+      "year": 2014,
+      "journal": "Current Sports Medicine Reports",
+      "volume": "13",
+      "issue": "4",
+      "page": "219-232",
+      "cited_by": 116,
+      "type": "journal-article"
+    },
+    "lappe2008calcium": {
+      "doi": "10.1359/jbmr.080102",
+      "title": "Calcium and Vitamin D Supplementation Decreases Incidence of Stress Fractures in Female Navy Recruits",
+      "authors": [
+        "Lappe",
+        "Cullen",
+        "Haynatzki",
+        "Recker",
+        "Ahlf",
+        "Thompson"
+      ],
+      "n_authors": 6,
+      "year": 2008,
+      "journal": "Journal of Bone and Mineral Research",
+      "volume": "23",
+      "issue": "5",
+      "page": "741-749",
+      "cited_by": 383,
+      "type": "journal-article"
+    },
+    "reinking2016mtss": {
+      "doi": "10.1177/1941738116673299",
+      "title": "Medial Tibial Stress Syndrome in Active Individuals: A Systematic Review and Meta-analysis of Risk Factors",
+      "authors": [
+        "Reinking",
+        "Austin",
+        "Richter",
+        "Krieger"
+      ],
+      "n_authors": 4,
+      "year": 2016,
+      "journal": "Sports Health: A Multidisciplinary Approach",
+      "volume": "9",
+      "issue": "3",
+      "page": "252-261",
+      "cited_by": 68,
+      "type": "journal-article"
+    },
+    "newman2013mtss": {
+      "doi": "10.2147/oajsm.s39331",
+      "title": "Risk factors associated with medial tibial stress syndrome in runners: a systematic review and meta-analysis",
+      "authors": [
+        "Newman",
+        "Witchalls",
+        "Waddington",
+        "Adams"
+      ],
+      "n_authors": 4,
+      "year": 2013,
+      "journal": "Open Access Journal of Sports Medicine",
+      "volume": null,
+      "issue": null,
+      "page": "229",
+      "cited_by": 127,
+      "type": "journal-article"
+    },
+    "winters2013mtsstx": {
+      "doi": "10.1007/s40279-013-0087-0",
+      "title": "Treatment of Medial Tibial Stress Syndrome: A Systematic Review",
+      "authors": [
+        "Winters",
+        "Eskes",
+        "Weir",
+        "Moen",
+        "Backx",
+        "Bakker"
+      ],
+      "n_authors": 6,
+      "year": 2013,
+      "journal": "Sports Medicine",
+      "volume": "43",
+      "issue": "12",
+      "page": "1315-1333",
+      "cited_by": 85,
+      "type": "journal-article"
+    },
+    "marques2025mtssprev": {
+      "doi": "10.1016/j.gaitpost.2025.07.312",
+      "title": "Preventive interventions for medial tibial stress syndrome: Systematic review and meta-analysis",
+      "authors": [
+        "Marques",
+        "Rangel",
+        "Martins",
+        "Vidal"
+      ],
+      "n_authors": 4,
+      "year": 2025,
+      "journal": "Gait &amp; Posture",
+      "volume": "122",
+      "issue": null,
+      "page": "92-98",
+      "cited_by": 3,
+      "type": "journal-article"
+    },
+    "withnall2006insoles": {
+      "doi": "10.1177/014107680609900113",
+      "title": "Do shock absorbing insoles in recruits undertaking high levels of physical activity reduce lower limb injury? A randomized controlled trial",
+      "authors": [
+        "Withnall",
+        "Eastaugh",
+        "Freemantle"
+      ],
+      "n_authors": 3,
+      "year": 2006,
+      "journal": "Journal of the Royal Society of Medicine",
+      "volume": "99",
+      "issue": "1",
+      "page": "32-37",
+      "cited_by": 50,
+      "type": "journal-article"
+    },
+    "saad2025mtssscope": {
+      "doi": "10.7759/cureus.81463",
+      "title": "Medial Tibial Stress Syndrome: A Scoping Review of Epidemiology, Biomechanics, and Risk Factors",
+      "authors": [
+        "Saad",
+        "Jamal",
+        "Aldhafiri",
+        "Alkandari"
+      ],
+      "n_authors": 4,
+      "year": 2025,
+      "journal": "Cureus",
+      "volume": null,
+      "issue": null,
+      "page": null,
+      "cited_by": 4,
+      "type": "journal-article"
+    },
+    "cook2009continuum": {
+      "doi": "10.1136/bjsm.2008.051193",
+      "title": "Is tendon pathology a continuum? A pathology model to explain the clinical presentation of load-induced tendinopathy",
+      "authors": [
+        "Cook",
+        "Purdam"
+      ],
+      "n_authors": 2,
+      "year": 2008,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "43",
+      "issue": "6",
+      "page": "409-416",
+      "cited_by": 845,
+      "type": "journal-article"
+    },
+    "scott2020icon": {
+      "doi": "10.1136/bjsports-2019-100885",
+      "title": "ICON 2019: International Scientific Tendinopathy Symposium Consensus: Clinical Terminology",
+      "authors": [
+        "Scott",
+        "Squier",
+        "Alfredson",
+        "Bahr",
+        "Cook",
+        "Coombes"
+      ],
+      "n_authors": 25,
+      "year": 2019,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "54",
+      "issue": "5",
+      "page": "260-262",
+      "cited_by": 234,
+      "type": "journal-article"
+    },
+    "alfredson1998ecc": {
+      "doi": "10.1177/03635465980260030301",
+      "title": "Heavy-Load Eccentric Calf Muscle Training For the Treatment of                     Chronic Achilles Tendinosis",
+      "authors": [
+        "Alfredson",
+        "Pietilä",
+        "Jonsson",
+        "Lorentzon"
+      ],
+      "n_authors": 4,
+      "year": 1998,
+      "journal": "The American Journal of Sports Medicine",
+      "volume": "26",
+      "issue": "3",
+      "page": "360-366",
+      "cited_by": 952,
+      "type": "journal-article"
+    },
+    "jonsson2008insertional": {
+      "doi": "10.1136/bjsm.2007.039545",
+      "title": "New regimen for eccentric calf-muscle training in patients with chronic insertional Achilles tendinopathy: results of a pilot study",
+      "authors": [
+        "Jonsson",
+        "Alfredson",
+        "Sunding",
+        "Fahlström",
+        "Cook"
+      ],
+      "n_authors": 5,
+      "year": 2008,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "42",
+      "issue": "9",
+      "page": "746-749",
+      "cited_by": 159,
+      "type": "journal-article"
+    },
+    "kongsgaard2009hsr": {
+      "doi": "10.1111/j.1600-0838.2009.00949.x",
+      "title": "Corticosteroid injections, eccentric decline squat training and heavy slow resistance training in patellar tendinopathy",
+      "authors": [
+        "Kongsgaard",
+        "Kovanen",
+        "Aagaard",
+        "Doessing",
+        "Hansen",
+        "Laursen"
+      ],
+      "n_authors": 9,
+      "year": 2009,
+      "journal": "Scandinavian Journal of Medicine &amp; Science in Sports",
+      "volume": "19",
+      "issue": "6",
+      "page": "790-802",
+      "cited_by": 375,
+      "type": "journal-article"
+    },
+    "beyer2015hsrvsecc": {
+      "doi": "10.1177/0363546515584760",
+      "title": "Heavy Slow Resistance Versus Eccentric Training as Treatment for Achilles Tendinopathy",
+      "authors": [
+        "Beyer",
+        "Kongsgaard",
+        "Hougs Kjær",
+        "Øhlenschlæger",
+        "Kjær",
+        "Magnusson"
+      ],
+      "n_authors": 6,
+      "year": 2015,
+      "journal": "The American Journal of Sports Medicine",
+      "volume": "43",
+      "issue": "7",
+      "page": "1704-1711",
+      "cited_by": 327,
+      "type": "journal-article"
+    },
+    "rio2015isometric": {
+      "doi": "10.1136/bjsports-2014-094386",
+      "title": "Isometric exercise induces analgesia and reduces inhibition in patellar tendinopathy",
+      "authors": [
+        "Rio",
+        "Kidgell",
+        "Purdam",
+        "Gaida",
+        "Moseley",
+        "Pearce"
+      ],
+      "n_authors": 7,
+      "year": 2015,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "49",
+      "issue": "19",
+      "page": "1277-1283",
+      "cited_by": 269,
+      "type": "journal-article"
+    },
+    "silbernagel2007painmonitor": {
+      "doi": "10.1177/0363546506298279",
+      "title": "Continued Sports Activity, Using a Pain-Monitoring Model, during Rehabilitation in Patients with Achilles Tendinopathy",
+      "authors": [
+        "Silbernagel",
+        "Thomeé",
+        "Eriksson",
+        "Karlsson"
+      ],
+      "n_authors": 4,
+      "year": 2007,
+      "journal": "The American Journal of Sports Medicine",
+      "volume": "35",
+      "issue": "6",
+      "page": "897-906",
+      "cited_by": 347,
+      "type": "journal-article"
+    },
+    "vandervlist2020nma": {
+      "doi": "10.1136/bjsports-2019-101872",
+      "title": "Which treatment is most effective for patients with Achilles tendinopathy? A living systematic review with network meta-analysis of 29 randomised controlled trials",
+      "authors": [
+        "van der Vlist",
+        "Winters",
+        "Weir",
+        "Ardern",
+        "Welton",
+        "Caldwell"
+      ],
+      "n_authors": 8,
+      "year": 2020,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "55",
+      "issue": "5",
+      "page": "249-256",
+      "cited_by": 167,
+      "type": "journal-article"
+    },
+    "challoumas2021patellar": {
+      "doi": "10.1136/bmjsem-2021-001110",
+      "title": "Management of patellar tendinopathy: a systematic review and network meta-analysis of randomised studies",
+      "authors": [
+        "Challoumas",
+        "Pedret",
+        "Biddle",
+        "Ng",
+        "Kirwan",
+        "Cooper"
+      ],
+      "n_authors": 10,
+      "year": 2021,
+      "journal": "BMJ Open Sport &amp; Exercise Medicine",
+      "volume": "7",
+      "issue": "4",
+      "page": "e001110",
+      "cited_by": 66,
+      "type": "journal-article"
+    },
+    "challoumas2023living": {
+      "doi": "10.1186/s40798-023-00616-1",
+      "title": "Effectiveness of Exercise Treatments with or without Adjuncts for Common Lower Limb Tendinopathies: A Living Systematic Review and Network Meta-analysis",
+      "authors": [
+        "Challoumas",
+        "Crosbie",
+        "O’Neill",
+        "Pedret",
+        "Millar"
+      ],
+      "n_authors": 5,
+      "year": 2023,
+      "journal": "Sports Medicine - Open",
+      "volume": "9",
+      "issue": "1",
+      "page": null,
+      "cited_by": 17,
+      "type": "journal-article"
+    },
+    "korakakis2026shockwave": {
+      "doi": "10.2519/jospt.2026.13985",
+      "title": "Shockwave Therapy for Midportion and Insertional Achilles Tendinopathy: A Nail in the Coffin? A Systematic Review With Meta-Analysis",
+      "authors": [
+        "Korakakis",
+        "Kotsifaki",
+        "Sotiralis",
+        "Malliaras"
+      ],
+      "n_authors": 4,
+      "year": 2026,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "56",
+      "issue": "5",
+      "page": "282-299",
+      "cited_by": 0,
+      "type": "journal-article"
+    },
+    "silbernagel2015rts": {
+      "doi": "10.2519/jospt.2015.5885",
+      "title": "A Proposed Return-to-Sport Program for Patients With Midportion Achilles Tendinopathy: Rationale and Implementation",
+      "authors": [
+        "Grävare Silbernagel",
+        "Crossley"
+      ],
+      "n_authors": 2,
+      "year": 2015,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "45",
+      "issue": "11",
+      "page": "876-886",
+      "cited_by": 119,
+      "type": "journal-article"
+    },
+    "chimenti2024cpg": {
+      "doi": "10.2519/jospt.2024.0302",
+      "title": "Achilles Pain, Stiffness, and Muscle Power Deficits: Midportion Achilles Tendinopathy Revision – 2024",
+      "authors": [
+        "Chimenti",
+        "Neville",
+        "Houck",
+        "Cuddeford",
+        "Carreira",
+        "Martin"
+      ],
+      "n_authors": 6,
+      "year": 2024,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "54",
+      "issue": "12",
+      "page": "CPG1-CPG32",
+      "cited_by": 21,
+      "type": "journal-article"
+    },
+    "prudencio2023ecc": {
+      "doi": "10.1186/s13102-023-00618-2",
+      "title": "Eccentric exercise is more effective than other exercises in the treatment of mid-portion Achilles tendinopathy: systematic review and meta-analysis",
+      "authors": [
+        "Prudêncio",
+        "Maffulli",
+        "Migliorini",
+        "Serafim",
+        "Nunes",
+        "Sanada"
+      ],
+      "n_authors": 7,
+      "year": 2023,
+      "journal": "BMC Sports Science, Medicine and Rehabilitation",
+      "volume": "15",
+      "issue": "1",
+      "page": null,
+      "cited_by": 31,
+      "type": "journal-article"
+    },
+    "rathleff2015highload": {
+      "doi": "10.1111/sms.12313",
+      "title": "High‐load strength training improves outcome in patients with plantar fasciitis: A randomized controlled trial with 12‐month follow‐up",
+      "authors": [
+        "Rathleff",
+        "Mølgaard",
+        "Fredberg",
+        "Kaalund",
+        "Andersen",
+        "Jensen"
+      ],
+      "n_authors": 8,
+      "year": 2014,
+      "journal": "Scandinavian Journal of Medicine &amp; Science in Sports",
+      "volume": "25",
+      "issue": "3",
+      "page": null,
+      "cited_by": 110,
+      "type": "journal-article"
+    },
+    "koc2023heelcpg": {
+      "doi": "10.2519/jospt.2023.0303",
+      "title": "Heel Pain – Plantar Fasciitis: Revision 2023",
+      "authors": [
+        "Koc",
+        "Bise",
+        "Neville",
+        "Carreira",
+        "Martin",
+        "McDonough"
+      ],
+      "n_authors": 6,
+      "year": 2023,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "53",
+      "issue": "12",
+      "page": "CPG1-CPG39",
+      "cited_by": 69,
+      "type": "journal-article"
+    },
+    "willy2019pfpcpg": {
+      "doi": "10.2519/jospt.2019.0302",
+      "title": "Patellofemoral Pain",
+      "authors": [
+        "Willy",
+        "Hoglund",
+        "Barton",
+        "Bolgla",
+        "Scalzitti",
+        "Logerstedt"
+      ],
+      "n_authors": 9,
+      "year": 2019,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "49",
+      "issue": "9",
+      "page": "CPG1-CPG95",
+      "cited_by": 375,
+      "type": "journal-article"
+    },
+    "collins2018pfpconsensus": {
+      "doi": "10.1136/bjsports-2018-099397",
+      "title": "2018 Consensus statement on exercise therapy and physical interventions (orthoses, taping and manual therapy) to treat patellofemoral pain: recommendations from the 5th International Patellofemoral Pain Research Retreat, Gold Coast, Australia, 2017",
+      "authors": [
+        "Collins",
+        "Barton",
+        "van Middelkoop",
+        "Callaghan",
+        "Rathleff",
+        "Vicenzino"
+      ],
+      "n_authors": 12,
+      "year": 2018,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "52",
+      "issue": "18",
+      "page": "1170-1178",
+      "cited_by": 294,
+      "type": "journal-article"
+    },
+    "nascimento2018hipknee": {
+      "doi": "10.2519/jospt.2018.7365",
+      "title": "Hip and Knee Strengthening Is More Effective Than Knee Strengthening Alone for Reducing Pain and Improving Activity in Individuals With Patellofemoral Pain: A Systematic Review With Meta-analysis",
+      "authors": [
+        "Nascimento",
+        "Teixeira-Salmela",
+        "Souza",
+        "Resende"
+      ],
+      "n_authors": 4,
+      "year": 2018,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "48",
+      "issue": "1",
+      "page": "19-31",
+      "cited_by": 83,
+      "type": "journal-article"
+    },
+    "lankhorst2016prognosis": {
+      "doi": "10.1136/bjsports-2015-094664",
+      "title": "Factors that predict a poor outcome 5–8 years after the diagnosis of patellofemoral pain: a multicentre observational analysis",
+      "authors": [
+        "Lankhorst",
+        "van Middelkoop",
+        "Crossley",
+        "Bierma-Zeinstra",
+        "Oei",
+        "Vicenzino"
+      ],
+      "n_authors": 7,
+      "year": 2015,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "50",
+      "issue": "14",
+      "page": "881-886",
+      "cited_by": 229,
+      "type": "journal-article"
+    },
+    "fairclough2007itbs": {
+      "doi": "10.1016/j.jsams.2006.05.017",
+      "title": "Is iliotibial band syndrome really a friction syndrome?",
+      "authors": [
+        "Fairclough",
+        "Hayashi",
+        "Toumi",
+        "Lyons",
+        "Bydder",
+        "Phillips"
+      ],
+      "n_authors": 8,
+      "year": 2007,
+      "journal": "Journal of Science and Medicine in Sport",
+      "volume": "10",
+      "issue": "2",
+      "page": "74-76",
+      "cited_by": 106,
+      "type": "journal-article"
+    },
+    "sanchezalvarado2024itbs": {
+      "doi": "10.3389/fspor.2024.1386456",
+      "title": "Effects of conservative treatment strategies for iliotibial band syndrome on pain and function in runners: a systematic review",
+      "authors": [
+        "Sanchez-Alvarado",
+        "Bokil",
+        "Cassel",
+        "Engel"
+      ],
+      "n_authors": 4,
+      "year": 2024,
+      "journal": "Frontiers in Sports and Active Living",
+      "volume": "6",
+      "issue": null,
+      "page": null,
+      "cited_by": 6,
+      "type": "journal-article"
+    },
+    "aderem2015itbsbiomech": {
+      "doi": "10.1186/s12891-015-0808-7",
+      "title": "Biomechanical risk factors associated with iliotibial band syndrome in runners: a systematic review",
+      "authors": [
+        "Aderem",
+        "Louw"
+      ],
+      "n_authors": 2,
+      "year": 2015,
+      "journal": "BMC Musculoskeletal Disorders",
+      "volume": "16",
+      "issue": "1",
+      "page": null,
+      "cited_by": 94,
+      "type": "journal-article"
+    },
+    "green2025recurrence": {
+      "doi": "10.1136/bmjsem-2025-002865",
+      "title": "What is a recurrence? The onset, frequency and time loss impact of recurrent calf muscle strain injuries in elite male Australian football players over a decade",
+      "authors": [
+        "Green",
+        "Schache",
+        "Pizzari"
+      ],
+      "n_authors": 3,
+      "year": 2025,
+      "journal": "BMJ Open Sport &amp; Exercise Medicine",
+      "volume": "11",
+      "issue": "3",
+      "page": "e002865",
+      "cited_by": 1,
+      "type": "journal-article"
+    },
+    "visser2025calfraise": {
+      "doi": "10.1016/j.bjpt.2025.101188",
+      "title": "Normative values for calf muscle strength-endurance in the general population assessed with the Calf Raise Application: A large international cross-sectional study",
+      "authors": [
+        "Visser",
+        "Neill",
+        "Hébert-Losier",
+        "Eygendaal",
+        "de Vos"
+      ],
+      "n_authors": 5,
+      "year": 2025,
+      "journal": "Brazilian Journal of Physical Therapy",
+      "volume": "29",
+      "issue": "3",
+      "page": "101188",
+      "cited_by": 7,
+      "type": "journal-article"
+    },
+    "vandyk2019nordic": {
+      "doi": "10.1136/bjsports-2018-100045",
+      "title": "Including the Nordic hamstring exercise in injury prevention programmes halves the rate of hamstring injuries: a systematic review and meta-analysis of 8459 athletes",
+      "authors": [
+        "van Dyk",
+        "Behan",
+        "Whiteley"
+      ],
+      "n_authors": 3,
+      "year": 2019,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "53",
+      "issue": "21",
+      "page": "1362-1370",
+      "cited_by": 286,
+      "type": "journal-article"
+    },
+    "impellizzeri2021nordicreappraisal": {
+      "doi": "10.1016/j.jclinepi.2021.09.007",
+      "title": "Why methods matter in a meta-analysis: a reappraisal showed inconclusive injury preventive effect of Nordic hamstring exercise",
+      "authors": [
+        "Impellizzeri",
+        "McCall",
+        "van Smeden"
+      ],
+      "n_authors": 3,
+      "year": 2021,
+      "journal": "Journal of Clinical Epidemiology",
+      "volume": "140",
+      "issue": null,
+      "page": "111-124",
+      "cited_by": 56,
+      "type": "journal-article"
+    },
+    "ripley2021compliance": {
+      "doi": "10.3390/ijerph182111260",
+      "title": "The Effect of Exercise Compliance on Risk Reduction for Hamstring Strain Injury: A Systematic Review and Meta-Analyses",
+      "authors": [
+        "Ripley",
+        "Cuthbert",
+        "Ross",
+        "Comfort",
+        "McMahon"
+      ],
+      "n_authors": 5,
+      "year": 2021,
+      "journal": "International Journal of Environmental Research and Public Health",
+      "volume": "18",
+      "issue": "21",
+      "page": "11260",
+      "cited_by": 20,
+      "type": "journal-article"
+    },
+    "paton2023london3": {
+      "doi": "10.1136/bjsports-2021-105384",
+      "title": "London International Consensus and Delphi study on hamstring injuries part 3: rehabilitation, running and return to sport",
+      "authors": [
+        "Paton",
+        "Read",
+        "van Dyk",
+        "Wilson",
+        "Pollock",
+        "Court"
+      ],
+      "n_authors": 19,
+      "year": 2023,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "57",
+      "issue": "5",
+      "page": "278-291",
+      "cited_by": 49,
+      "type": "journal-article"
+    },
+    "hopkins2022ncaa": {
+      "doi": "10.1177/23259671211068079",
+      "title": "Epidemiology of NCAA Track and Field Injuries From 2010 to 2014",
+      "authors": [
+        "Hopkins",
+        "Williams",
+        "Rauh",
+        "Zhang"
+      ],
+      "n_authors": 4,
+      "year": 2022,
+      "journal": "Orthopaedic Journal of Sports Medicine",
+      "volume": "10",
+      "issue": "1",
+      "page": null,
+      "cited_by": 14,
+      "type": "journal-article"
+    },
+    "paganrosado2025calf": {
+      "doi": "10.1186/s40798-025-00960-4",
+      "title": "Calf Strains in Athletes: A Narrative Review of Management, Injury Grading, and Return to Sport",
+      "authors": [
+        "Pagan-Rosado",
+        "Troyer",
+        "Rosario-Concepcion",
+        "Feaster",
+        "Encalada",
+        "Kindle"
+      ],
+      "n_authors": 7,
+      "year": 2025,
+      "journal": "Sports Medicine - Open",
+      "volume": "11",
+      "issue": "1",
+      "page": null,
+      "cited_by": 2,
+      "type": "journal-article"
+    },
+    "lauersen2014prevention": {
+      "doi": "10.1136/bjsports-2013-092538",
+      "title": "The effectiveness of exercise interventions to prevent sports injuries: a systematic review and meta-analysis of randomised controlled trials",
+      "authors": [
+        "Lauersen",
+        "Bertelsen",
+        "Andersen"
+      ],
+      "n_authors": 3,
+      "year": 2013,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "48",
+      "issue": "11",
+      "page": "871-877",
+      "cited_by": 447,
+      "type": "journal-article"
+    },
+    "lauersen2018strength": {
+      "doi": "10.1136/bjsports-2018-099078",
+      "title": "Strength training as superior, dose-dependent and safe prevention of acute and overuse sports injuries: a systematic review, qualitative analysis and meta-analysis",
+      "authors": [
+        "Lauersen",
+        "Andersen",
+        "Andersen"
+      ],
+      "n_authors": 3,
+      "year": 2018,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "52",
+      "issue": "24",
+      "page": "1557-1563",
+      "cited_by": 214,
+      "type": "journal-article"
+    },
+    "wu2024runnerprev": {
+      "doi": "10.1007/s40279-024-01993-7",
+      "title": "Do Exercise-Based Prevention Programs Reduce Injury in Endurance Runners? A Systematic Review and Meta-Analysis",
+      "authors": [
+        "Wu",
+        "Brooke-Wavell",
+        "Fong",
+        "Paquette",
+        "Blagrove"
+      ],
+      "n_authors": 5,
+      "year": 2024,
+      "journal": "Sports Medicine",
+      "volume": "54",
+      "issue": "5",
+      "page": "1249-1267",
+      "cited_by": 10,
+      "type": "journal-article"
+    },
+    "fokkema2019inspire": {
+      "doi": "10.1136/bjsports-2018-099744",
+      "title": "Online multifactorial prevention programme has no effect on the number of running-related injuries: a randomised controlled trial",
+      "authors": [
+        "Fokkema",
+        "de Vos",
+        "van Ochten",
+        "Verhaar",
+        "Davis",
+        "Bindels"
+      ],
+      "n_authors": 8,
+      "year": 2019,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "53",
+      "issue": "23",
+      "page": "1479-1485",
+      "cited_by": 30,
+      "type": "journal-article"
+    },
+    "vanreijen2016compliance": {
+      "doi": "10.1007/s40279-016-0470-8",
+      "title": "Compliance with Sport Injury Prevention Interventions in Randomised Controlled Trials: A Systematic Review",
+      "authors": [
+        "van Reijen",
+        "Vriend",
+        "van Mechelen",
+        "Finch",
+        "Verhagen"
+      ],
+      "n_authors": 5,
+      "year": 2016,
+      "journal": "Sports Medicine",
+      "volume": "46",
+      "issue": "8",
+      "page": "1125-1139",
+      "cited_by": 65,
+      "type": "journal-article"
+    },
+    "patel2025fifa11": {
+      "doi": "10.7759/cureus.100463",
+      "title": "The Impact of the FIFA 11+ Injury Prevention Program on Injury Incidence in Football Athletes: A Systematic Review of Randomized Controlled Trials",
+      "authors": [
+        "Patel",
+        "Shah"
+      ],
+      "n_authors": 2,
+      "year": 2025,
+      "journal": "Cureus",
+      "volume": null,
+      "issue": null,
+      "page": null,
+      "cited_by": 0,
+      "type": "journal-article"
+    },
+    "small2008stretching": {
+      "doi": "10.1080/15438620802310784",
+      "title": "A Systematic Review into the Efficacy of Static Stretching as Part of a Warm-Up for the Prevention of Exercise-Related Injury",
+      "authors": [
+        "Small",
+        "Mc Naughton",
+        "Matthews"
+      ],
+      "n_authors": 3,
+      "year": 2008,
+      "journal": "Research in Sports Medicine",
+      "volume": "16",
+      "issue": "3",
+      "page": "213-231",
+      "cited_by": 99,
+      "type": "journal-article"
+    },
+    "anderson2022steprate": {
+      "doi": "10.1186/s40798-022-00504-0",
+      "title": "What is the Effect of Changing Running Step Rate on Injury, Performance and Biomechanics? A Systematic Review and Meta-analysis",
+      "authors": [
+        "Anderson",
+        "Martin",
+        "Barton",
+        "Bonanno"
+      ],
+      "n_authors": 4,
+      "year": 2022,
+      "journal": "Sports Medicine - Open",
+      "volume": "8",
+      "issue": "1",
+      "page": null,
+      "cited_by": 54,
+      "type": "journal-article"
+    },
+    "knapik2014archheight": {
+      "doi": "10.2519/jospt.2014.5342",
+      "title": "Injury-Reduction Effectiveness of Prescribing Running Shoes on the Basis of Foot Arch Height: Summary of Military Investigations",
+      "authors": [
+        "Knapik",
+        "Trone",
+        "Tchandja",
+        "Jones"
+      ],
+      "n_authors": 4,
+      "year": 2014,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "44",
+      "issue": "10",
+      "page": "805-812",
+      "cited_by": 49,
+      "type": "journal-article"
+    },
+    "malisoux2016motioncontrol": {
+      "doi": "10.1136/bjsports-2015-095031",
+      "title": "Injury risk in runners using standard or motion control shoes: a randomised controlled trial with participant and assessor blinding",
+      "authors": [
+        "Malisoux",
+        "Chambon",
+        "Delattre",
+        "Gueguen",
+        "Urhausen",
+        "Theisen"
+      ],
+      "n_authors": 6,
+      "year": 2016,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "50",
+      "issue": "8",
+      "page": "481-487",
+      "cited_by": 83,
+      "type": "journal-article"
+    },
+    "willems2021pronation": {
+      "doi": "10.2519/jospt.2021.9710",
+      "title": "Motion-Control Shoes Reduce the Risk of Pronation-Related Pathologies in Recreational Runners: A Secondary Analysis of a Randomized Controlled Trial",
+      "authors": [
+        "Willems",
+        "Ley",
+        "Goetghebeur",
+        "Theisen",
+        "Malisoux"
+      ],
+      "n_authors": 5,
+      "year": 2021,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "51",
+      "issue": "3",
+      "page": "135-143",
+      "cited_by": 14,
+      "type": "journal-article"
+    },
+    "malisoux2020cushioning": {
+      "doi": "10.1177/0363546519892578",
+      "title": "Shoe Cushioning Influences the Running Injury Risk According to Body Mass: A Randomized Controlled Trial Involving 848 Recreational Runners",
+      "authors": [
+        "Malisoux",
+        "Delattre",
+        "Urhausen",
+        "Theisen"
+      ],
+      "n_authors": 4,
+      "year": 2019,
+      "journal": "The American Journal of Sports Medicine",
+      "volume": "48",
+      "issue": "2",
+      "page": "473-480",
+      "cited_by": 53,
+      "type": "journal-article"
+    },
+    "ryan2014minimalist": {
+      "doi": "10.1136/bjsports-2012-092061",
+      "title": "Examining injury risk and pain perception in runners using minimalist footwear",
+      "authors": [
+        "Ryan",
+        "Elashi",
+        "Newsham-West",
+        "Taunton"
+      ],
+      "n_authors": 4,
+      "year": 2013,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "48",
+      "issue": "16",
+      "page": "1257-1262",
+      "cited_by": 81,
+      "type": "journal-article"
+    },
+    "bonanno2017orthoses": {
+      "doi": "10.1136/bjsports-2016-096671",
+      "title": "Effectiveness of foot orthoses and shock-absorbing insoles for the prevention of injury: a systematic review and meta-analysis",
+      "authors": [
+        "Bonanno",
+        "Landorf",
+        "Munteanu",
+        "Murley",
+        "Menz"
+      ],
+      "n_authors": 5,
+      "year": 2016,
+      "journal": "British Journal of Sports Medicine",
+      "volume": "51",
+      "issue": "2",
+      "page": "86-96",
+      "cited_by": 74,
+      "type": "journal-article"
+    },
+    "finucane2020redflags": {
+      "doi": "10.2519/jospt.2020.9971",
+      "title": "International Framework for Red Flags for Potential Serious Spinal Pathologies",
+      "authors": [
+        "Finucane",
+        "Downie",
+        "Mercer",
+        "Greenhalgh",
+        "Boissonnault",
+        "Pool-Goudzwaard"
+      ],
+      "n_authors": 9,
+      "year": 2020,
+      "journal": "Journal of Orthopaedic &amp; Sports Physical Therapy",
+      "volume": "50",
+      "issue": "7",
+      "page": "350-372",
+      "cited_by": 254,
+      "type": "journal-article"
+    },
+    "tarabishi2023cecs": {
+      "doi": "10.7759/cureus.47797",
+      "title": "Chronic Exertional Compartment Syndrome in Athletes: An Overview of the Current Literature",
+      "authors": [
+        "Tarabishi",
+        "Almigdad",
+        "Almonaie",
+        "Farr",
+        "Mansfield"
+      ],
+      "n_authors": 5,
+      "year": 2023,
+      "journal": "Cureus",
+      "volume": null,
+      "issue": null,
+      "page": null,
+      "cited_by": 6,
+      "type": "journal-article"
+    }
+  },
+  "failed": [],
+  "summary": {
+    "requested": 83,
+    "resolved": 83,
+    "failed": 0
+  }
+}

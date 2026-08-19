@@ -210,6 +210,26 @@ export interface Race {
   predicted_from: string | null
 }
 
+/** An injury/niggle episode. `site` is anatomical, never a diagnosis — the coach
+ *  recognises patterns and manages load, it does not diagnose. */
+export interface Niggle {
+  id: number
+  site: string
+  side: 'left' | 'right' | 'both' | 'na'
+  onset_date: string
+  onset_activity_id: number | null
+  /** 1 = niggle (train with modification), 2 = injury (restructure), 3 = referred. */
+  tier: 1 | 2 | 3
+  trigger: string
+  response: string
+  resolved_date: string | null
+  note: string
+  active: boolean
+  duration_days: number | null
+  created_at: string
+  updated_at: string
+}
+
 export interface WeeklyStat {
   week_start: string
   run_distance_m: number

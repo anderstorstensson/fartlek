@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from backend.api import (
     activities,
     coach,
+    niggles,
     notes,
     plan,
     races,
@@ -45,6 +46,7 @@ app.include_router(settings.router)
 app.include_router(sync.router)
 app.include_router(wellness.router)
 app.include_router(races.router)
+app.include_router(niggles.router)
 app.include_router(coach.router)
 
 

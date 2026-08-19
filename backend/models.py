@@ -265,6 +265,39 @@ class Race(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
 
+class Niggle(Base):
+    """One injury or niggle episode, per docs/coach/physio-guidance.md §11.
+
+    onset_activity_id is intentionally NOT a foreign key: re-imports delete and
+    recreate activity rows, and injury history must survive that (same reasoning
+    as AnalysisNote).
+
+    `site` is anatomical, never diagnostic — the coach recognises patterns and
+    manages load, it does not diagnose (physio-guidance.md §1). "Consistent with
+    Achilles tendinopathy" belongs in `note`, not in a diagnosis column.
+
+    There is deliberately no status column: an episode is active exactly when
+    resolved_date is NULL, so the two can never disagree.
+    """
+
+    __tablename__ = "niggles"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    site: Mapped[str] = mapped_column(String, index=True)
+    side: Mapped[str] = mapped_column(String, default="na")  # left|right|both|na
+    onset_date: Mapped[date] = mapped_column(Date, index=True)
+    onset_activity_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True, index=True)
+    # 1 = niggle (train with modification), 2 = injury (restructure),
+    # 3 = red flag (referred) — physio-guidance.md §6.
+    tier: Mapped[int] = mapped_column(Integer, default=1, index=True)
+    trigger: Mapped[str] = mapped_column(String, default="")  # what preceded it
+    response: Mapped[str] = mapped_column(String, default="")  # what changed, what helped
+    resolved_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    note: Mapped[str] = mapped_column(String, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+
 class CoachMessage(Base):
     """Chat history for the in-app coach (a headless Claude Code session)."""
 

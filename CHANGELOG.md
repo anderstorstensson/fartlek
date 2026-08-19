@@ -4,6 +4,24 @@ All notable changes to Fartlek are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Physio guidance for the AI coach**: a cited literature review
+  (`docs/running-injury-review.md`, 83 references) plus a methodology doc
+  (`docs/coach/physio-guidance.md`) covering triage, the pain-monitoring rules,
+  which variable to cut first for each tissue, return-to-running, and a red-flag
+  boundary at which the coach stops advising and refers to a clinician. The coach
+  recognises patterns, manages load and refers — it never diagnoses.
+- **Structured injury history**: a `niggles` table with
+  `GET/POST/PUT/DELETE /api/niggles` (filters `?active_only=` and `?site=`), and a
+  **Niggles & injuries** section on the Settings page to log, resolve and reopen
+  episodes. Injury history moves out of free-text prose in the athlete profile and
+  into rows the coach can query against training load — previous injury is the
+  strongest known risk factor for the next one. Sites are anatomical rather than
+  diagnostic by design, and `onset_activity_id` is deliberately not a foreign key so
+  history survives a Garmin re-import.
+
 ## [0.2.0] — 2026-07-23
 
 ### Added
