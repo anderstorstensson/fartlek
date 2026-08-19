@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime, time, timedelta
 
 import pytest
 
@@ -18,6 +18,21 @@ from backend.models import (  # noqa: E402
     Stream,
 )
 
+# The seeded activity is anchored to the Monday of *last* week instead of a
+# literal date. The logbook and trend endpoints query windows relative to
+# today ("last 4 weeks", "last 30 days"), so a hardcoded seed date silently
+# falls out of range as the calendar moves on and the suite starts failing on
+# a date that has nothing to do with the code under test. Last week's Monday
+# is always 7-13 days back: inside every window these tests use, always in the
+# past, and always day_index 0 (the backend starts weeks on Monday).
+TODAY = date.today()
+SEED_DAY = TODAY - timedelta(days=TODAY.weekday() + 7)
+
+
+def seed_day(offset: int = 0) -> str:
+    """ISO date `offset` days from the seeded activity's day."""
+    return (SEED_DAY + timedelta(days=offset)).isoformat()
+
 
 @pytest.fixture(scope="module")
 def client():
@@ -28,8 +43,8 @@ def client():
                     id=1,
                     name="Morning Run",
                     sport="running",
-                    start_time_utc=datetime(2026, 7, 13, 6, 0),
-                    start_time_local=datetime(2026, 7, 13, 8, 0),
+                    start_time_utc=datetime.combine(SEED_DAY, time(6, 0)),
+                    start_time_local=datetime.combine(SEED_DAY, time(8, 0)),
                     elapsed_s=3600,
                     moving_s=3500,
                     distance_m=12000,
@@ -68,17 +83,17 @@ def test_list_activities(client):
 
 
 def test_list_activities_date_range(client):
-    # Fixture activity starts 2026-07-13 (a Monday) local time.
-    body = client.get("/api/activities?start=2026-07-13&end=2026-07-19").json()
+    # Fixture activity starts on SEED_DAY (a Monday) local time.
+    body = client.get(f"/api/activities?start={seed_day()}&end={seed_day(6)}").json()
     assert body["total"] == 1
 
-    body = client.get("/api/activities?start=2026-07-06&end=2026-07-12").json()
+    body = client.get(f"/api/activities?start={seed_day(-7)}&end={seed_day(-1)}").json()
     assert body["total"] == 0
 
-    body = client.get("/api/activities?start=2026-07-14").json()
+    body = client.get(f"/api/activities?start={seed_day(1)}").json()
     assert body["total"] == 0
 
-    body = client.get("/api/activities?end=2026-07-13").json()
+    body = client.get(f"/api/activities?end={seed_day()}").json()
     assert body["total"] == 1
 
     assert client.get("/api/activities?start=not-a-date").status_code == 422
@@ -103,7 +118,7 @@ def test_has_analysis_marker(client):
     assert client.get("/api/activities").json()["items"][0]["has_analysis"] is True
     assert client.get("/api/activities/1").json()["has_analysis"] is True
     week = next(w for w in client.get("/api/logbook?weeks=4").json()
-                if w["week_start"] == "2026-07-13")
+                if w["week_start"] == seed_day())
     assert week["activities"][0]["has_analysis"] is True
 
     client.delete(f"/api/notes/{note['id']}")
@@ -236,9 +251,9 @@ def test_partial_settings_update_preserves_other_fields(client):
 def test_logbook(client):
     weeks = client.get("/api/logbook?weeks=4").json()
     assert len(weeks) == 4
-    # Weeks come newest first; 2026-07-13 is a Monday in the current week.
+    # Weeks come newest first; SEED_DAY is the Monday of last week.
     assert weeks[0]["week_start"] > weeks[1]["week_start"]
-    week = next(w for w in weeks if w["week_start"] == "2026-07-13")
+    week = next(w for w in weeks if w["week_start"] == seed_day())
     assert week["runs"] == 1
     assert week["run_distance_m"] == 12000
     assert week["activities"][0]["day_index"] == 0
@@ -264,15 +279,15 @@ def test_plan_import_and_completion(client):
         "replace_plan": True,
         "workouts": [
             # Same date as the seeded run -> should be marked completed.
-            {"day": "2026-07-13", "title": "Easy 10K", "workout_type": "easy",
+            {"day": seed_day(), "title": "Easy 10K", "workout_type": "easy",
              "target_distance_m": 10000, "plan_name": "test-plan"},
-            {"day": "2026-07-14", "title": "Rest", "workout_type": "rest",
+            {"day": seed_day(1), "title": "Rest", "workout_type": "rest",
              "plan_name": "test-plan"},
         ],
     }
     assert client.post("/api/plan", json=payload).json() == {"imported": 2}
 
-    workouts = client.get("/api/plan?start=2026-07-13&end=2026-07-14").json()
+    workouts = client.get(f"/api/plan?start={seed_day()}&end={seed_day(1)}").json()
     assert len(workouts) == 2
     assert workouts[0]["completed_activity_id"] == 1
     assert workouts[1]["completed_activity_id"] is None  # rest days never "complete"
@@ -293,11 +308,11 @@ def test_plan_typed_completion_and_doubles(client):
     payload = {
         "workouts": [
             # Three sessions on the seeded run's date: a double (two runs) + strength.
-            {"day": "2026-07-13", "title": "AM Easy 10K", "workout_type": "easy",
+            {"day": seed_day(), "title": "AM Easy 10K", "workout_type": "easy",
              "target_distance_m": 10000, "plan_name": "typed-test"},
-            {"day": "2026-07-13", "title": "PM Easy 6K", "workout_type": "easy",
+            {"day": seed_day(), "title": "PM Easy 6K", "workout_type": "easy",
              "target_distance_m": 6000, "plan_name": "typed-test"},
-            {"day": "2026-07-13", "title": "Strength A", "workout_type": "cross",
+            {"day": seed_day(), "title": "Strength A", "workout_type": "cross",
              "target_duration_s": 2700, "plan_name": "typed-test"},
         ],
     }
@@ -306,7 +321,7 @@ def test_plan_typed_completion_and_doubles(client):
     # One run exists that day: it completes the first run workout only — never the
     # second half of the double, and never the strength session.
     by_title = {w["title"]: w for w in
-                client.get("/api/plan?start=2026-07-13&end=2026-07-13").json()}
+                client.get(f"/api/plan?start={seed_day()}&end={seed_day()}").json()}
     assert by_title["AM Easy 10K"]["completed_activity_id"] == 1
     assert by_title["PM Easy 6K"]["completed_activity_id"] is None
     assert by_title["Strength A"]["completed_activity_id"] is None
@@ -314,11 +329,11 @@ def test_plan_typed_completion_and_doubles(client):
     # A strength activity completes the cross workout.
     with session_scope() as session:
         session.add(Activity(id=2, name="Gym", sport="strength_training",
-                             start_time_utc=datetime(2026, 7, 13, 16, 0),
-                             start_time_local=datetime(2026, 7, 13, 18, 0),
+                             start_time_utc=datetime.combine(SEED_DAY, time(16, 0)),
+                             start_time_local=datetime.combine(SEED_DAY, time(18, 0)),
                              elapsed_s=2700, moving_s=2700, distance_m=0))
     by_title = {w["title"]: w for w in
-                client.get("/api/plan?start=2026-07-13&end=2026-07-13").json()}
+                client.get(f"/api/plan?start={seed_day()}&end={seed_day()}").json()}
     assert by_title["Strength A"]["completed_activity_id"] == 2
     assert by_title["PM Easy 6K"]["completed_activity_id"] is None
 
@@ -399,7 +414,7 @@ def test_plan_ics_export_non_ascii_plan_name(client):
 
 
 def test_plan_validates_workout_type(client):
-    bad = {"workouts": [{"day": "2026-07-13", "title": "X", "workout_type": "fartlek"}]}
+    bad = {"workouts": [{"day": seed_day(), "title": "X", "workout_type": "fartlek"}]}
     assert client.post("/api/plan", json=bad).status_code == 422
 
 
