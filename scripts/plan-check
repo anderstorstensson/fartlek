@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+"""Deterministic distance check for a training-plan payload.
+
+Exists because drafting sessions have published workout cards whose
+`target_distance_m` contradicted their own descriptions (off by up to 2.3 km) —
+the athlete executes the number, so the mismatch silently rewrites the session.
+Every running workout's description must end with an itemized total line, e.g.
+
+    Total: 3 wu + 3×4 MP + 2×1 float + 2 cd = 19 km
+
+This script re-does that arithmetic and compares it with target_distance_m.
+Run it on the exact JSON you are about to POST (or on GET /api/plan output):
+
+    scripts/plan-check < plan.json
+    scripts/api GET "/api/plan?start=...&end=..." | scripts/plan-check
+
+Accepts {"workouts": [...]} or a bare JSON array of workouts.
+Exit 0 = consistent; 1 = findings (listed on stderr); 2 = unreadable input.
+"""
+
+import json
+import re
+import sys
+
+RUNNING_TYPES = {"easy", "long", "intervals", "tempo", "race"}
+
+TOTAL_LINE = re.compile(
+    r"\*{0,2}total:?\*{0,2}:?\s*(?P<terms>[^=\n]+?)=\s*"
+    r"(?P<total>\d+(?:\.\d+)?)\s*(?:km\b|k\b)",
+    re.IGNORECASE,
+)
+TERM = re.compile(
+    r"^(?:(?P<count>\d+)\s*[x×*]\s*)?(?P<km>\d+(?:\.\d+)?)\s*(?:km\b|k\b)?"
+    r"\s*(?P<label>[^\d].*)?$",
+    re.IGNORECASE,
+)
+
+
+def parse_terms(expression: str) -> float:
+    """Sum an itemized expression like '3 wu + 3×4 MP + 2×1 float + 2 cd' (km)."""
+    total = 0.0
+    for raw_term in expression.split("+"):
+        term = raw_term.strip()
+        match = TERM.match(term) if term else None
+        if match is None:
+            raise ValueError(f"unparseable term {term!r}")
+        count = int(match.group("count") or 1)
+        total += count * float(match.group("km"))
+    return total
+
+
+def check_workout(workout: dict) -> list[str]:
+    """Return findings for one workout (empty list = consistent)."""
+    if workout.get("workout_type") not in RUNNING_TYPES:
+        return []
+    findings = []
+    target = workout.get("target_distance_m")
+    if target is None:
+        findings.append("missing target_distance_m (mandatory for running sessions)")
+
+    match = TOTAL_LINE.search(workout.get("description") or "")
+    if match is None:
+        # A race card's description is the execution plan; its distance is the race's.
+        if workout.get("workout_type") != "race":
+            findings.append("description has no 'Total: ... = N km' line")
+        return findings
+
+    try:
+        summed = parse_terms(match.group("terms"))
+    except ValueError as error:
+        return [*findings, f"total line: {error}"]
+
+    stated = float(match.group("total"))
+    if abs(summed - stated) > 0.05:
+        findings.append(
+            f"total line says {stated:g} km but its components sum to {summed:g} km"
+        )
+    if target is not None and abs(stated * 1000 - float(target)) > 50:
+        findings.append(
+            f"target_distance_m={target:g} contradicts the description total "
+            f"of {stated:g} km — the description wins; fix the target (or the "
+            f"components) and re-check the whole plan"
+        )
+    return findings
+
+
+def main() -> int:
+    try:
+        payload = json.load(sys.stdin)
+    except json.JSONDecodeError as error:
+        print(f"error: stdin is not valid JSON ({error})", file=sys.stderr)
+        return 2
+
+    workouts = payload.get("workouts") if isinstance(payload, dict) else payload
+    if not isinstance(workouts, list):
+        print('error: expected {"workouts": [...]} or a JSON array', file=sys.stderr)
+        return 2
+
+    checked = 0
+    failed = 0
+    for workout in workouts:
+        if workout.get("workout_type") in RUNNING_TYPES:
+            checked += 1
+        findings = check_workout(workout)
+        if findings:
+            failed += 1
+            name = f"{workout.get('day', '?')} {workout.get('title', '(untitled)')}"
+            for finding in findings:
+                print(f"FAIL {name}: {finding}", file=sys.stderr)
+
+    plural = "" if checked == 1 else "s"
+    print(f"{checked} running workout{plural} checked, {failed} with findings")
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
