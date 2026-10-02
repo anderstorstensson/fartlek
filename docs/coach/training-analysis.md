@@ -786,6 +786,32 @@ Rules:
   weekly planned totals, so per-session totals must add up to the week's stated km.
   For `cross`/strength sessions set `target_duration_s` instead, and list the exercises
   (movements, sets × reps, loads) in the description.
+- **Distance arithmetic is derived, never estimated.** Published cards have carried
+  targets up to 2.3 km off their own descriptions; the athlete executes the number, so
+  a mismatch silently rewrites the session — worst in taper/race week, where padding
+  to an inflated target adds junk volume. The protocol:
+  1. **Recoveries multiply with the reps — write the count explicitly.** "3×4K with
+     2×1K float between reps", never a bare "1K float" beside "3×4K": does that float
+     run once, twice, or three times? Each reading gives a different total, and this
+     exact ambiguity has produced 1–2 km target errors. Between N reps there are N−1
+     recoveries unless the session genuinely jogs after the final rep — say which.
+  2. Timed jog recoveries convert to distance at recovery-jog pace:
+     ~150 m per 60 s, ~200 m per 75 s, ~450 m per 3:00.
+  3. **End every running description with an itemized total line** in this exact
+     shape (labels free, arithmetic fixed):
+     `Total: 3 wu + 3×4 MP + 2×1 float + 2 cd = 19 km` — terms in km joined by `+`,
+     rep terms as `count×km`. Set `target_distance_m` to that sum × 1000. Race cards
+     may skip the line (the certified distance is the distance).
+  4. Do the sum with an actual calculator, not in your head — mental arithmetic is
+     where every one of these errors came from. The read-only DB client doubles as
+     one and needs no extra permissions: `scripts/db "SELECT 3 + 3*4 + 2*1 + 2"`.
+  5. **Verify before POSTing**: pipe the exact payload through `scripts/plan-check`
+     (`scripts/plan-check < plan.json`; it also reads `GET /api/plan` output) — it
+     re-derives every total line deterministically and exits non-zero on any
+     mismatch. Fix findings and re-run until clean.
+  6. If a published card's target and description ever disagree, **the description's
+     components win** — recompute, fix the card, tell the athlete, and audit the rest
+     of the plan (these errors historically arrive in batches).
 - Use one consistent `plan_name` (include the goal + race date) for the whole plan;
   `replace_plan: true` replaces any previous version of that plan atomically.
 - Put paces and structure in `description` — it shows in the calendar tooltip.

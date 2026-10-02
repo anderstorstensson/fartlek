@@ -174,6 +174,20 @@ training-science §12, post-exercise carbohydrate is nutrition §13.
     Absent any active episode in `/api/niggles` and any injury signal in the inputs, no
     finding is needed here.
 
+12. **Distance arithmetic**: for every running session, re-derive the total from the
+    description's components (warmup + reps × distance + recoveries × their count +
+    cooldown; timed jogs at ~150 m/60 s, ~200 m/75 s, ~450 m/3:00) and compare with
+    `target_distance_m`. The fast path: pipe the plan JSON through `scripts/plan-check`
+    (accepts the POST payload or `GET /api/plan` output), then spot-check a couple of
+    total lines by hand — the script only verifies the stated components, not whether
+    the prose matches them. Any mismatch is HIGH (the athlete executes the number, so
+    a wrong target silently rewrites the session), and CRITICAL in taper/race week,
+    where padding toward an inflated target adds junk volume. A recovery float written
+    without an explicit count next to a rep scheme ("3×4K … 1K float") is a finding on
+    its own even when the sum happens to work — the athlete cannot tell how many
+    floats to run. A missing `Total:` line on a non-race running session is likewise a
+    finding.
+
 ## Output format (and nothing else)
 
 - **Verdict**: `APPROVE` or `REVISE`
