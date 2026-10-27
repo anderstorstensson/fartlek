@@ -342,6 +342,46 @@ def test_plan_typed_completion_and_doubles(client):
     client.delete("/api/plan?plan_name=typed-test")
 
 
+def test_strength_workout_is_completed_only_by_strength_training(client):
+    payload = {
+        "workouts": [
+            {"day": seed_day(), "title": "Strength A (heavy)", "workout_type": "cross",
+             "target_duration_s": 2700, "plan_name": "strength-test"},
+            {"day": seed_day(), "title": "CT: hot bath 20-40 min", "workout_type": "cross",
+             "target_duration_s": 2400, "plan_name": "strength-test"},
+        ],
+    }
+    client.post("/api/plan", json=payload)
+
+    def by_title():
+        return {w["title"]: w for w in
+                client.get(f"/api/plan?start={seed_day()}&end={seed_day()}").json()}
+
+    # A morning bike commute must not tick the gym session; it goes to the other
+    # cross card instead.
+    with session_scope() as session:
+        session.add(Activity(id=3, name="Bike commute", sport="road_biking",
+                             start_time_utc=datetime.combine(SEED_DAY, time(6, 0)),
+                             start_time_local=datetime.combine(SEED_DAY, time(8, 0)),
+                             elapsed_s=2700, moving_s=2700, distance_m=18000))
+    assert by_title()["Strength A (heavy)"]["completed_activity_id"] is None
+    assert by_title()["CT: hot bath 20-40 min"]["completed_activity_id"] == 3
+
+    # The gym session claims the strength card, and never the other cross card.
+    with session_scope() as session:
+        session.add(Activity(id=2, name="Gym", sport="strength_training",
+                             start_time_utc=datetime.combine(SEED_DAY, time(16, 0)),
+                             start_time_local=datetime.combine(SEED_DAY, time(18, 0)),
+                             elapsed_s=2700, moving_s=2700, distance_m=0))
+    assert by_title()["Strength A (heavy)"]["completed_activity_id"] == 2
+    assert by_title()["CT: hot bath 20-40 min"]["completed_activity_id"] == 3
+
+    with session_scope() as session:
+        session.delete(session.get(Activity, 2))
+        session.delete(session.get(Activity, 3))
+    client.delete("/api/plan?plan_name=strength-test")
+
+
 def test_plan_update_workout(client):
     payload = {
         "workouts": [
