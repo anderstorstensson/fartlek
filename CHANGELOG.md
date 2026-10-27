@@ -22,6 +22,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   diagnostic by design, and `onset_activity_id` is deliberately not a foreign key so
   history survives a Garmin re-import.
 
+### Fixed
+- A strength workout on the calendar is no longer ticked by a bike ride or any other
+  non-running activity. Cross cards titled "Strength …" are completed only by a
+  `strength_training` activity, which was common on run-commute days with a bike leg.
+
 ## [0.2.0] — 2026-07-23
 
 ### Added

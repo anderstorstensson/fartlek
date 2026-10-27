@@ -795,7 +795,10 @@ Rules:
   day are fully supported. List doubles in execution order (AM run first): completion
   matching is type-aware and order-aware — runs mark run sessions in start-time
   order, non-running activities mark `cross` sessions, so a run never falsely ✓s
-  the gym session.
+  the gym session. Within `cross`, a card titled "Strength …" is marked only by a
+  `strength_training` activity, so a bike commute never ✓s it. **Title every gym
+  card "Strength …"**, or this check can't see it. Other cross cards (heat rides,
+  baths, bike commutes) take the remaining non-running sports.
 - Always show the plan to the user and get their approval BEFORE publishing.
 - To revise later: regenerate the full plan and re-POST with `replace_plan: true`;
   to remove: `DELETE /api/plan?plan_name=<name>`. Existing plans: `GET /api/plan/plans`.

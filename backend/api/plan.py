@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/plan", tags=["plan"])
 
 
 def _activity_map(session: Session, start: date, end: date) -> dict[date, dict[str, list[int]]]:
-    """Activity ids per local date in [start, end], split into runs and other sports.
+    """Activity ids per local date in [start, end], split into runs, strength and other sports.
 
     Walking is excluded — it is never a prescribed session and would falsely
     complete cross-training workouts.
@@ -32,10 +32,24 @@ def _activity_map(session: Session, start: date, end: date) -> dict[date, dict[s
     ).all()
     days: dict[date, dict[str, list[int]]] = {}
     for activity in activities:
-        day = days.setdefault(activity.start_time_local.date(), {"runs": [], "other": []})
-        kind = "runs" if "running" in (activity.sport or "") else "other"
-        day[kind].append(activity.id)
+        day = days.setdefault(
+            activity.start_time_local.date(), {"runs": [], "strength": [], "other": []}
+        )
+        day[_activity_kind(activity.sport or "")].append(activity.id)
     return days
+
+
+def _activity_kind(sport: str) -> str:
+    if "running" in sport:
+        return "runs"
+    return "strength" if sport == "strength_training" else "other"
+
+
+def _workout_kind(workout: PlannedWorkout) -> str:
+    """Strength cards only accept a gym session; a bike commute must not tick them."""
+    if workout.workout_type != "cross":
+        return "runs"
+    return "strength" if "strength" in workout.title.lower() else "other"
 
 
 def _assign_completions(
@@ -44,8 +58,9 @@ def _assign_completions(
     """Pair each planned workout with an activity of the matching kind, in order.
 
     Run-type workouts consume that day's runs in start-time order (so doubles pair
-    AM/PM correctly), `cross` workouts consume non-running activities, `rest` never
-    completes.
+    AM/PM correctly), `cross` workouts titled "Strength …" consume strength_training
+    activities, other `cross` workouts consume the remaining non-running sports, and
+    `rest` never completes.
     """
     consumed: dict[tuple[date, str], int] = {}
     completions: dict[int, int | None] = {}
@@ -53,7 +68,7 @@ def _assign_completions(
         if workout.workout_type == "rest":
             completions[workout.id] = None
             continue
-        kind = "other" if workout.workout_type == "cross" else "runs"
+        kind = _workout_kind(workout)
         ids = days.get(workout.day, {}).get(kind, [])
         index = consumed.get((workout.day, kind), 0)
         completions[workout.id] = ids[index] if index < len(ids) else None
